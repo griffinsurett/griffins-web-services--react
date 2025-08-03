@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0000; /* black */
+  --color-accent: #14b8a6; /* teal-500 */
+  --color-accent2: #319795; /* teal-600 */
+}
+
+@layer base {
+  body {
+    @apply bg-black overflow-x-hidden;
+  }
+}
+
+@utility rounded-border {
+  @apply inline-block border border-teal-500 text-teal-500 rounded-full font-medium;
+}
+
+@utility paragraph-spacing {
+  @apply max-w-3xl mx-auto;
+}
+
+@utility main-duration {
+  @apply duration-450;
+}
+
+@utility button-style {
+  @apply px-8 py-4 rounded-full cursor-pointer;
+}
+
+@layer components {
+  .hero-gradient-bg {
+    @apply bg-cover bg-center;
+    background-image: linear-gradient(
+    323.34deg,
+      var(--color-accent) -85.13%,   /* teal-500 */
+      var(--color-bg) 40.1%      /* black */
+  );
+  }
+
+  /* section styles */
+  .section-padding {
+    @apply py-24 px-5;
+  }
+
+  .inner-section {
+    @apply max-w-6xl mx-auto;
+  }
+
+  .section-color-border {
+    @apply absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500 to-transparent;
+  }
+
+  .text-section {
+    @apply text-center mb-16;
+  }
+
+  /* ----------------------------------------
+     GENERIC CARD CONTAINER & OVERLAY
+  -----------------------------------------*/
+  /* Outer Card */
+  .outer-card-transition {
+    @apply transition-all hover:transform hover:-translate-y-3 main-duration;
+  }
+
+  .outer-card-color {
+    @apply bg-white/5 border border-teal-500/20 hover:border-teal-500 hover:shadow-teal-500/20;
+  }
+
+  .outer-card-style {
+    @apply relative overflow-hidden hover:shadow-2xl rounded-3xl p-9;
+  }
+
+  /* Inner Card */
+  .inner-card-transition {
+    @apply opacity-0 group-hover:opacity-100 transition-opacity main-duration;
+  }
+
+  .inner-card-style {
+    @apply absolute;
+  }
+
+  .inner-card-color {
+    @apply inset-0 bg-gradient-to-br from-teal-500/10 to-transparent;
+  }
+
+  /* other card components */
+  .card-icon-color {
+    @apply bg-gradient-to-br from-teal-500 to-teal-600 text-black;
+  }
+
+  /* ----------------------------------------
+     HOVER MODES
+  -----------------------------------------*/
+  .card-hover-large {
+    @apply hover:-translate-y-3 hover:shadow-2xl hover:border-teal-500;
+  }
+  .card-hover-small {
+    @apply hover:-translate-y-2 hover:shadow-xl hover:border-teal-500;
+  }
+
+  /* ----------------------------------------
+     ICON SIZING
+  -----------------------------------------*/
+  .icon-large {
+    @apply w-15 h-15 text-2xl flex items-center justify-center mx-auto rounded-full relative;
+  }
+
+  .icon-medium {
+    @apply w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold;
+  }
+
+  .icon-small {
+    @apply relative rounded-full w-10 h-10 flex items-center justify-center text-xl;
+  }
+
+  .icon-xsmall {
+    @apply w-8 h-8 rounded-full flex items-center justify-center;
+  }
+
+  /* border styles */
+  .border-title {
+    @apply border-2 px-5 py-2 text-sm uppercase tracking-wider mb-6 rounded-border;
+  }
+
+  .tag-title {
+    @apply px-3 py-1 text-xs uppercase tracking-wider rounded-border;
+  }
+
+  .footer-nav {
+    @apply text-2xl font-bold;
+  }
+
+  .h1 {
+    @apply text-5xl md:text-7xl font-extrabold leading-tight;
+  }
+  .h2 {
+    @apply text-4xl md:text-5xl font-bold;
+  }
+  .h3 {
+    @apply text-2xl font-semibold;
+  }
+  .h4 {
+    @apply font-semibold text-lg;
+  }
+
+  .hero-text {
+    @apply text-xl md:text-2xl leading-relaxed;
+  }
+
+  .large-text {
+    @apply text-xl leading-relaxed paragraph-spacing;
+  }
+
+  .button-transition {
+    @apply transition-all duration-450 hover:transform hover:-translate-y-1 hover:shadow-2xl;
+  }
+
+  /* card styles */
+}
