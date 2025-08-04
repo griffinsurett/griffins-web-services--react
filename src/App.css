@@ -2,8 +2,8 @@
 
 @theme {
   --color-bg: #0000; /* black */
-  --color-accent: #14b8a6; /* teal-500 */
-  --color-accent2: #319795; /* teal-600 */
+  --color-accent: #5e76f6; /* accent  will be #5e76f6 or  tho */
+  --color-accent2: color-mix(in srgb, var(--color-accent) 85%, black);
 }
 
 @layer base {
@@ -13,7 +13,7 @@
 }
 
 @utility rounded-border {
-  @apply inline-block border border-teal-500 text-teal-500 rounded-full font-medium;
+  @apply inline-block border border-accent text-accent rounded-full font-medium;
 }
 
 @utility paragraph-spacing {
@@ -28,27 +28,39 @@
   @apply px-8 py-4 rounded-full cursor-pointer;
 }
 
+@utility section-border-styles {
+  @apply absolute top-0 left-0 right-0 h-px;
+}
+
 @layer components {
   .hero-gradient-bg {
     @apply bg-cover bg-center;
     background-image: linear-gradient(
-    323.34deg,
-      var(--color-accent) -85.13%,   /* teal-500 */
-      var(--color-bg) 40.1%      /* black */
-  );
+      323.34deg,
+      var(--color-accent) -85.13%,
+      /* accent */ var(--color-bg) 40.1% /* black */
+    );
+  }
+
+  .text-border {
+    -webkit-text-stroke: 2px var(--color-accent);
   }
 
   /* section styles */
-  .section-padding {
-    @apply py-24 px-5;
+  .outer-section {
+    @apply relative py-24 px-5;
   }
 
   .inner-section {
     @apply max-w-6xl mx-auto;
   }
 
+  .section-dim-border {
+    @apply section-border-styles bg-gradient-to-r from-transparent via-white/20 to-transparent;
+  }
+
   .section-color-border {
-    @apply absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500 to-transparent;
+    @apply section-border-styles bg-gradient-to-r from-transparent via-accent to-transparent;
   }
 
   .text-section {
@@ -64,7 +76,7 @@
   }
 
   .outer-card-color {
-    @apply bg-white/5 border border-teal-500/20 hover:border-teal-500 hover:shadow-teal-500/20;
+    @apply bg-white/5 border border-accent/20 hover:border-accent hover:shadow-accent/20;
   }
 
   .outer-card-style {
@@ -81,22 +93,22 @@
   }
 
   .inner-card-color {
-    @apply inset-0 bg-gradient-to-br from-teal-500/10 to-transparent;
+    @apply inset-0 bg-gradient-to-br from-accent/10 to-transparent;
   }
 
   /* other card components */
   .card-icon-color {
-    @apply bg-gradient-to-br from-teal-500 to-teal-600 text-black;
+    @apply bg-gradient-to-br from-accent to-accent2 text-black;
   }
 
   /* ----------------------------------------
      HOVER MODES
   -----------------------------------------*/
   .card-hover-large {
-    @apply hover:-translate-y-3 hover:shadow-2xl hover:border-teal-500;
+    @apply hover:-translate-y-3 hover:shadow-2xl hover:border-accent;
   }
   .card-hover-small {
-    @apply hover:-translate-y-2 hover:shadow-xl hover:border-teal-500;
+    @apply hover:-translate-y-2 hover:shadow-xl hover:border-accent;
   }
 
   /* ----------------------------------------
