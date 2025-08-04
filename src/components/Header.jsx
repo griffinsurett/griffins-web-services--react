@@ -8,8 +8,8 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 bg-transparent z-[99999]">
-        <div className="px-12 flex items-center justify-between py-5">
+      <header className="fixed inset-x-0 top-0 bg-transparent z-[99999] w-19/20 lg:9/10 mx-auto">
+        <div className="flex items-center justify-between py-5">
           <a href="#" className="text-2xl font-bold text-white">
             Griffin's <span className="text-accent">Web</span>
           </a>
