@@ -3,7 +3,7 @@ import React from "react";
 import ContactItem from "../components/LoopComponents/ContactItem";
 import SocialLink from "../components/LoopComponents/SocialLink";
 import UnderlineLink from "../components/LoopComponents/UnderlineLink";
-import { Phone, Mail, MapPin } from "lucide-react";
+// import { Phone, Mail, MapPin } from "lucide-react";
 import { siteData, contactItems, socialMediaLinks } from "../siteData";
 
 // const contactItems = [
