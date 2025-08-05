@@ -350,8 +350,8 @@ const GriffinsLanding = () => {
             </p>
           </div>
 
-          <div className="group outer-card-color outer-card-style outer-card-transition">
-            <div className="inner-card-style inner-card-color inner-card-transition"></div>
+          <div className="group card-bg outer-card-style">
+            <div className=""></div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-8 relative z-10">
               <Input

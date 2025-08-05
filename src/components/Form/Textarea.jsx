@@ -1,3 +1,4 @@
+// src/components/Form/Textarea.jsx
 const Textarea = ({
   name,
   value,
@@ -7,6 +8,7 @@ const Textarea = ({
   required = false,
   className = "",
   colSpan = "",
+  error = false,
   ...props
 }) => {
   return (
@@ -19,10 +21,8 @@ const Textarea = ({
         placeholder={placeholder}
         required={required}
         className={`
-          w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 
-          text-white placeholder-gray-400 
-          focus:outline-none focus:border-accent focus:bg-black/70 
-          main-duration transition-all resize-none
+          form-field resize-none
+          ${error ? 'form-field-error' : ''}
           ${className}
         `}
         {...props}

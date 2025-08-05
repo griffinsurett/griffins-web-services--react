@@ -29,11 +29,36 @@
 }
 
 @utility button-style {
-  @apply px-8 py-4 rounded-full cursor-pointer;
+  @apply px-8 py-4 rounded-full cursor-pointer w-full lg:w-auto;
 }
 
 @utility section-border-styles {
   @apply absolute top-0 left-0 right-0 h-px;
+}
+
+/* The main form field styling - this complex combination is used repeatedly */
+@utility form-field {
+  @apply w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 text-gray-300 placeholder-gray-400 focus:outline-none focus:border-accent focus:bg-black/70 main-duration transition-all;
+  
+  /* Fix for select dropdown arrow spacing */
+  &[type="select"], 
+  select& {
+    @apply pr-6; /* Add more right padding for the arrow */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e76f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+    appearance: none; /* Remove default arrow */
+  }
+}
+
+@utility card-bg {
+  @apply bg-white/5 border border-accent/20;
+}
+
+/* Optional validation states if you plan to use them across multiple forms */
+@utility form-field-error {
+  @apply border-red-500 focus:border-red-500;
 }
 
 @layer components {
@@ -71,6 +96,10 @@
     @apply text-center mb-8;
   }
 
+  .form-option {
+    @apply bg-black text-white;
+  }
+
   /* ----------------------------------------
      GENERIC CARD CONTAINER & OVERLAY
   -----------------------------------------*/
@@ -80,7 +109,7 @@
   }
 
   .outer-card-color {
-    @apply bg-white/5 border border-accent/20 hover:border-accent hover:shadow-accent/20;
+    @apply card-bg hover:border-accent hover:shadow-accent/20;
   }
 
   .outer-card-style {

@@ -7,6 +7,7 @@ const Input = ({
   placeholder,
   required = false,
   className = "",
+  error = false,
   ...props
 }) => {
   return (
@@ -19,10 +20,8 @@ const Input = ({
         placeholder={placeholder}
         required={required}
         className={`
-          w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 
-          text-white placeholder-gray-400 
-          focus:outline-none focus:border-accent focus:bg-black/70 
-          main-duration transition-all
+          form-field
+          ${error ? 'form-field-error' : ''}
           ${className}
         `}
         {...props}

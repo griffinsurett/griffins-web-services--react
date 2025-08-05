@@ -8,6 +8,7 @@ const Select = ({
   required = false,
   className = "",
   colSpan = "",
+  error = false,
   ...props
 }) => {
   return (
@@ -18,22 +19,20 @@ const Select = ({
         onChange={onChange}
         required={required}
         className={`
-          w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 
-          text-white 
-          focus:outline-none focus:border-accent focus:bg-black/70 
-          main-duration transition-all
+          form-field
+          ${error ? 'form-field-error' : ''}
           ${className}
         `}
         {...props}
       >
-        <option value="" className="bg-black text-white">
+        <option value="" className="form-option">
           {placeholder}
         </option>
         {options.map((option) => (
           <option 
             key={option.value} 
             value={option.value} 
-            className="bg-black text-white"
+            className="form-option"
           >
             {option.label}
           </option>
