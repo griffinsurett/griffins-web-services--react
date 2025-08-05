@@ -26,14 +26,14 @@ const Button = ({
     return (
       <a href={href} className={allClasses} {...props}>
         {icon}
-        <span>{children}</span>
+       {children}
       </a>
     );
   }
   return (
     <button className={allClasses} {...props}>
       {icon}
-      <span>{children}</span>
+       {children}
     </button>
   );
 };

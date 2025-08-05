@@ -1,5 +1,5 @@
 export default function SocialLink({ data }) {
-  const { href, label, icon } = data;
+const { href, label, icon: Icon } = data;
   return (
     <a
       href={href}
@@ -13,7 +13,7 @@ export default function SocialLink({ data }) {
         hover:-translate-y-1
       "
     >
-      {icon}
+      <Icon />
     </a>
   );
 }

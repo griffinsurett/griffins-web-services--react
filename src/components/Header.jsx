@@ -11,9 +11,7 @@ export default function Header() {
     <>
       <header className="fixed inset-x-0 top-0 bg-transparent z-[99999] w-19/20 lg:9/10 mx-auto">
         <div className="flex items-center justify-between py-2">
-          <a href="/" className="text-2xl font-bold primary-text">
             <Logo loading="eager" />
-          </a>
 
           {/* Hidden checkbox for state */}
           <input id={checkboxId} type="checkbox" className="hidden" />

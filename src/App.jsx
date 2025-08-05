@@ -10,6 +10,7 @@ import TestimonialCard from "./components/LoopComponents/TestimonialCard";
 import Input from "./components/Form/Input"; // Importing Input component
 import Textarea from "./components/Form/Textarea"; // Importing Textarea component
 import Select from "./components/Form/Select"; // Importing Select component
+import { siteData } from "./siteData";
 
 const GriffinsLanding = () => {
   const [formData, setFormData] = useState({
@@ -190,12 +191,11 @@ const GriffinsLanding = () => {
         <div className="inner-section relative z-10">
           <h1 className="h1 mb-2">
             Build Your{" "}
-            <span className="heading-accent-text">Digital Empire</span> with
-            Griffin's Web Services
+            <span className="text-accent-heading">Digital Empire</span> with
+            {siteData.title}
           </h1>
           <p className="hero-text secondary-text mb-10 max-w-4xl mx-auto">
-            Fast Professional websites that convert visitors into customers.
-            Fast, modern, and built to grow your business online.
+            {siteData.description}
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
             <Button variant="primary">Get Started Today ✨</Button>
@@ -205,15 +205,15 @@ const GriffinsLanding = () => {
       </section>
 
       {/* About Section */}
-      <section className="outer-section secondary-bg relative">
+      <section className="outer-section bg-secondary relative">
         <div className="section-dim-border"></div>
         <div className="inner-section">
           <div className="text-section">
             <h2 className="h2 mb-6">
-              Who We <span className="heading-accent-text">Are</span>
+              Who We <span className="text-accent-heading">Are</span>
             </h2>
             <p className="large-text">
-              Griffin's Web Services is your trusted partner in digital
+              {siteData.title} is your trusted partner in digital
               transformation. We combine creative design, cutting-edge
               development, and ongoing support to help businesses thrive online.
             </p>
@@ -228,12 +228,12 @@ const GriffinsLanding = () => {
       </section>
 
       {/* Website Types Section */}
-      <section className="outer-section secondary-bg relative">
+      <section className="outer-section bg-secondary relative">
         <div className="inner-section">
           <div className="text-section">
             <div className="border-title">Website Types</div>
             <h2 className="h2 mb-6">
-              Websites We <span className="heading-accent-text">Build</span>
+              Websites We <span className="text-accent-heading">Build</span>
             </h2>
             <p className="large-text">
               From simple landing pages to complex web applications - we create
@@ -260,7 +260,7 @@ const GriffinsLanding = () => {
             <div className="border-title">Benefits</div>
             <h2 className="h2 mb-6">
               Why Choose{" "}
-              <span className="heading-accent-text">Griffin's Web?</span>
+              <span className="text-accent-heading">Griffin's Web?</span>
             </h2>
             <p className="large-text">
               We don't just build websites - we craft digital experiences that
@@ -292,13 +292,13 @@ const GriffinsLanding = () => {
       </div>
 
       {/* Testimonials Section */}
-      <section className="outer-section secondary-bg relative">
+      <section className="outer-section bg-secondary relative">
         <div className="section-color-border"></div>
         <div className="inner-section">
           <div className="text-section">
             <div className="border-title">Testimonials</div>
             <h2 className="h2 mb-6">
-              What Our <span className="heading-accent-text">Clients Say</span>
+              What Our <span className="text-accent-heading">Clients Say</span>
             </h2>
             <p className="large-text">
               Don't just take our word for it - hear from businesses who've
@@ -335,13 +335,13 @@ const GriffinsLanding = () => {
       </section>
 
       {/* Quote Form Section */}
-      <section className="outer-section secondary-bg relative">
+      <section className="outer-section bg-secondary relative">
         <div className="section-color-border"></div>
         <div className="inner-section">
           <div className="text-section">
             <div className="border-title">Get A Quote</div>
             <h2 className="h2 mb-6">
-              Ready to Get <span className="heading-accent-text">Started?</span>
+              Ready to Get <span className="text-accent-heading">Started?</span>
             </h2>
             <p className="large-text secondary-text">
               Tell us about your project and we'll provide you with a detailed
@@ -459,7 +459,6 @@ const GriffinsLanding = () => {
       {/* Footer */}
       <div className="footer-container">
         <Footer />
-        
       </div>
     </div>
   );
