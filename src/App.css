@@ -22,7 +22,7 @@
   --color-bg: var(--color-primary-dark);
   --color-secondary-bg: var(--color-secondary-dark);
   --color-tertiary-bg: var(--color-tertiary-dark);
-  --color-bg-card: rgba(255, 255, 255, 0.02); /* white 2% for a darker feel */
+  --color-bg-card: rgba(255, 255, 255, 0.05);
 
   --color-primary-text: var(--color-primary-light);
   --color-secondary-text: var(--color-secondary-light);

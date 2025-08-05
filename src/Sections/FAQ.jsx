@@ -1,7 +1,7 @@
 // src/components/FAQ.jsx
 import React from "react";
-import Button from "./Button";
-import AccordionItem from "./LoopComponents/AccordionItem";
+import Button from "../components/Button";
+import AccordionItem from "../components/LoopComponents/AccordionItem";
 
 const FAQ = () => {
   const faqs = [

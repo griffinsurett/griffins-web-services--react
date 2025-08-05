@@ -1,8 +1,8 @@
 // src/components/Footer.jsx
 import React from "react";
-import ContactItem from "./LoopComponents/ContactItem";
-import SocialLink from "./LoopComponents/SocialLink";
-import UnderlineLink from "./LoopComponents/UnderlineLink";
+import ContactItem from "../components/LoopComponents/ContactItem";
+import SocialLink from "../components/LoopComponents/SocialLink";
+import UnderlineLink from "../components/LoopComponents/UnderlineLink";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { siteData, contactItems, socialMediaLinks } from "../siteData";
 
@@ -62,20 +62,22 @@ export default function Footer() {
   return (
     <footer className="bg-bg primary-text py-4 w-9/10 mx-auto lg:w-auto">
       <div className="inner-section text-center">
-        <h4 className="text-primary text-xl lg:text-2xl xl:text-3xl font-semibold mb-4">Connect:</h4>
-        
+        <h4 className="text-primary text-xl lg:text-2xl xl:text-3xl font-semibold mb-4">
+          Connect:
+        </h4>
+
         <div className="space-y-3">
           <div className="mb-6 flex justify-center items-center gap-2 md:gap-3 lg:gap-9 xl:gap-15 flex-wrap">
-          {contactItems.map((item) => (
-            <ContactItem key={item.href} data={item} />
-          ))}
-        </div>
+            {contactItems.map((item) => (
+              <ContactItem key={item.href} data={item} />
+            ))}
+          </div>
           <div className="flex justify-center gap-5">
             {socialMediaLinks.map((item) => (
               <SocialLink key={item.name} data={item} />
             ))}
           </div>
-             <div className="flex flex-wrap justify-center gap-2 md:gap-3 lg:gap-6">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 lg:gap-6">
             {footerNav.map((item) => (
               <UnderlineLink key={item.label} href={item.href}>
                 {item.label}
@@ -83,7 +85,8 @@ export default function Footer() {
             ))}
           </div>
           <div className="muted-text text-lg">
-            © {new Date().getFullYear()} {siteData.legalName}. All rights reserved.
+            © {new Date().getFullYear()} {siteData.legalName}. All rights
+            reserved.
           </div>
         </div>
       </div>
