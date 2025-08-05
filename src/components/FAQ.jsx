@@ -1,7 +1,10 @@
+
+// src/components/FAQ.jsx
 import React from "react";
 import Button from "./Button";
+import AccordionItem from "./LoopComponents/AccordionItem";
 
-const FAQSection = () => {
+const FAQ = () => {
   const faqs = [
     {
       question: "How long does it take to build a website?",
@@ -16,18 +19,17 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="outer-section bg-zinc-950 relative">
+    <section className="outer-section bg-secondary relative">
       <div className="section-color-border" />
       <div className="inner-section">
         {/* Header */}
         <div className="text-section">
-          <div className="inline-block px-5 py-2 border border-accent text-accent rounded-full text-sm font-medium uppercase tracking-wider mb-6">
-            FAQ
-          </div>
-          <h2 className="h2 mb-6 text-white">
-            Frequently Asked <span className="text-accent">Questions</span>
+          <div className="border-title mb-6">FAQ</div>
+          <h2 className="h2 mb-6">
+            Frequently Asked{" "}
+            <span className="text-heading-accent">Questions</span>
           </h2>
-          <p className="large-text text-gray-300">
+          <p className="large-text">
             Got questions? We've got answers. Here are the most common questions
             we receive about our web services.
           </p>
@@ -42,7 +44,7 @@ const FAQSection = () => {
 
         {/* Footer CTA */}
         <div className="text-center mt-12">
-          <p className="text-gray-400 mb-6">
+          <p className="text-secondary mb-6">
             Still have questions? We're here to help!
           </p>
           <Button variant="primary" href="/#contact" className="text-center">
@@ -54,59 +56,4 @@ const FAQSection = () => {
   );
 };
 
-export default FAQSection;
-
-/**
- * Single accordion entry (only `data` prop!)
- */
-function AccordionItem({ data }) {
-  const { question, answer } = data;
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  return (
-    <div
-      className={`bg-white/5 rounded-2xl transition-all main-duration overflow-hidden ${
-        isOpen
-          ? "border border-accent shadow-xl shadow-accent/10"
-          : "border border-accent/20"
-      }`}
-    >
-      <button
-        onClick={() => setIsOpen((o) => !o)}
-        className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-white/5 transition-colors main-duration focus:outline-none"
-      >
-        <h3 className="h3 text-white pr-4">{question}</h3>
-        <div
-          className={`flex-shrink-0 icon-xsmall transition-all main-duration ${
-            isOpen ? "card-icon-color rotate-45" : "bg-accent/20 rotate-0"
-          }`}
-        >
-          <svg
-            className={`w-4 h-4 ${isOpen ? "" : "text-accent"}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-        </div>
-      </button>
-
-      <div
-        className={`overflow-hidden transition-all main-duration ease-in-out ${
-          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="px-6 pb-5">
-          <div className="w-full h-px bg-accent/20 mb-4" />
-          <p className="text-gray-300 leading-relaxed">{answer}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+export default FAQ;

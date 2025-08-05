@@ -48,8 +48,8 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
       isOpen={isOpen}
       onClose={handleClose}
       closeButton={false}
-      overlayClass="bg-black/80"
-      className="w-full h-full bg-black flex items-center justify-center"
+      overlayClass="bg-primary/80"
+      className="w-full h-full bg-primary flex items-center justify-center"
       allowScroll={false}
     >
       <div className="relative w-full h-full flex flex-col">
@@ -71,7 +71,7 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
         </nav>
 
         {/* Optional footer content in modal */}
-        <div className="text-center pb-8 text-gray-400">
+        <div className="text-center pb-8 text-muted">
           <p className="text-sm">
             Ready to transform your online presence?
           </p>

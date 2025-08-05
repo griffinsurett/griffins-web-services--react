@@ -1,19 +1,86 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0000; /* black */
-  --color-accent: #5e76f6; /* accent  will be #5e76f6 or  tho */
+  /* Base Colors - Raw color definitions */
+  --color-primary-dark: #09090b; /* Very dark background */
+  --color-primary-light: #fafafa; /* Off-white */
+  --color-secondary-dark: #0f0f0f; /* Darker black */
+  --color-secondary-light: #e5e5e5; /* Light off-white */
+  --color-tertiary-dark: #171717; /* Medium dark black */
+  --color-tertiary-light: #d4d4d4; /* Muted off-white */
+
+  /* Accent Colors - Keep exactly the same */
+  --color-accent: #5e76f6;
   --color-accent-secondary: color-mix(in srgb, var(--color-accent) 85%, black);
+
+  /* Semantic Color Assignments - What the colors are used for */
+  --color-bg: var(--color-primary-dark);
+  --color-bg-secondary: var(--color-secondary-dark);
+  --color-bg-tertiary: var(--color-tertiary-dark);
+  --color-bg-card: rgba(255, 255, 255, 0.05);
+
+  --color-text-primary: var(--color-primary-light);
+  --color-text-secondary: var(--color-secondary-light);
+  --color-text-muted: var(--color-tertiary-light);
+
+  --color-heading-primary: var(--color-primary-light);
+  --color-heading-accent: var(--color-accent);
+
+  /* Additional utility colors */
+  --color-border-dim: rgba(255, 255, 255, 0.2);
 }
 
 @layer base {
   body {
-    @apply bg-black overflow-x-hidden;
+    @apply bg-bg overflow-x-hidden;
   }
-    ::selection {
+  ::selection {
     color: var(--color-accent);
     transition: all 0.3s ease-in-out;
   }
+}
+
+/* Background utilities */
+@utility bg-primary {
+  background-color: var(--color-bg);
+}
+
+@utility bg-secondary {
+  background-color: var(--color-bg-secondary);
+}
+
+@utility bg-tertiary {
+  background-color: var(--color-bg-tertiary);
+}
+
+@utility bg-card {
+  background-color: var(--color-bg-card);
+}
+
+/* Text color utilities */
+@utility text-primary {
+  color: var(--color-text-primary);
+}
+
+@utility text-secondary {
+  color: var(--color-text-secondary);
+}
+
+@utility text-muted {
+  color: var(--color-text-muted);
+}
+
+/* Heading color utilities */
+@utility text-heading {
+  color: var(--color-heading-primary);
+}
+
+@utility text-heading-accent {
+  color: var(--color-heading-accent);
+}
+
+@utility bg-bg2 {
+  @apply bg-zinc-950;
 }
 
 @utility rounded-border {
@@ -36,27 +103,32 @@
   @apply absolute top-0 left-0 right-0 h-px;
 }
 
-/* The main form field styling - this complex combination is used repeatedly */
+/* The main form field styling - updated with color variables */
 @utility form-field {
-  @apply w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 text-gray-300 placeholder-gray-400 focus:outline-none focus:border-accent focus:bg-black/70 main-duration transition-all;
-  
+  @apply w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 focus:outline-none focus:border-accent focus:bg-bg/70 main-duration transition-all;
+  color: var(--color-text-muted);
+
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+
   /* Fix for select dropdown arrow spacing */
-  &[type="select"], 
+  &[type="select"],
   select& {
-    @apply pr-6; /* Add more right padding for the arrow */
+    @apply pr-6;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235e76f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 1rem;
-    appearance: none; /* Remove default arrow */
+    appearance: none;
   }
 }
 
-@utility card-bg {
-  @apply bg-white/5 border border-accent/20;
+@utility inner-card-bg {
+  background-color: var(--color-bg-card);
+  @apply border border-accent/20;
 }
 
-/* Optional validation states if you plan to use them across multiple forms */
 @utility form-field-error {
   @apply border-red-500 focus:border-red-500;
 }
@@ -67,7 +139,7 @@
     background-image: linear-gradient(
       323.34deg,
       var(--color-accent) -85.13%,
-      /* accent */ var(--color-bg) 40.1% /* black */
+      var(--color-bg) 40.1%
     );
   }
 
@@ -85,7 +157,13 @@
   }
 
   .section-dim-border {
-    @apply section-border-styles bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    @apply section-border-styles bg-gradient-to-r from-transparent to-transparent;
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      var(--color-border-dim),
+      transparent
+    );
   }
 
   .section-color-border {
@@ -96,27 +174,27 @@
     @apply text-center mb-8;
   }
 
-  .form-option {
-    @apply bg-black text-white;
+  .emphasized-text {
+    @apply font-bold text-heading-accent;
   }
 
-  /* ----------------------------------------
-     GENERIC CARD CONTAINER & OVERLAY
-  -----------------------------------------*/
-  /* Outer Card */
+  .form-option {
+    @apply bg-bg text-primary;
+  }
+
+  /* Card components */
   .outer-card-transition {
     @apply transition-all hover:transform hover:-translate-y-3 main-duration;
   }
 
   .outer-card-color {
-    @apply card-bg hover:border-accent hover:shadow-accent/20;
+    @apply inner-card-bg hover:border-accent hover:shadow-accent/20;
   }
 
   .outer-card-style {
     @apply relative overflow-hidden hover:shadow-2xl rounded-3xl p-9;
   }
 
-  /* Inner Card */
   .inner-card-transition {
     @apply opacity-0 group-hover:opacity-100 transition-opacity main-duration;
   }
@@ -129,14 +207,11 @@
     @apply inset-0 bg-gradient-to-br from-accent/10 to-transparent;
   }
 
-  /* other card components */
   .card-icon-color {
     @apply bg-gradient-to-br from-accent to-accent-secondary text-black;
   }
 
-  /* ----------------------------------------
-     HOVER MODES
-  -----------------------------------------*/
+  /* Hover modes */
   .card-hover-large {
     @apply hover:-translate-y-3 hover:shadow-2xl hover:border-accent;
   }
@@ -144,9 +219,7 @@
     @apply hover:-translate-y-2 hover:shadow-xl hover:border-accent;
   }
 
-  /* ----------------------------------------
-     ICON SIZING
-  -----------------------------------------*/
+  /* Icon sizing */
   .icon-large {
     @apply w-15 h-15 text-2xl flex items-center justify-center mx-auto rounded-full relative;
   }
@@ -163,7 +236,7 @@
     @apply w-8 h-8 rounded-full flex items-center justify-center;
   }
 
-  /* border styles */
+  /* Border styles */
   .border-title {
     @apply border-2 px-5 py-2 text-sm uppercase tracking-wider mb-6 rounded-border;
   }
@@ -176,26 +249,27 @@
     @apply text-2xl font-bold;
   }
 
+  /* Typography - updated with color variables */
   .h1 {
-    @apply text-5xl md:text-7xl font-extrabold leading-tight;
+    @apply text-5xl md:text-7xl font-extrabold leading-tight text-heading-primary;
   }
   .h2 {
-    @apply text-4xl md:text-5xl font-bold;
+    @apply text-4xl md:text-5xl font-bold text-heading-primary;
   }
   .h3 {
-    @apply text-2xl font-semibold;
+    @apply text-2xl font-semibold text-heading-primary;
   }
   .h4 {
-    @apply font-semibold text-lg;
+    @apply font-semibold text-lg text-heading-primary;
+  }
+
+  p {
+    @apply text-secondary;
   }
 
   .hero-text {
     @apply text-xl md:text-2xl leading-relaxed;
   }
-
-  /* .xsmall-text {
-    @apply text-xs lg:text-sm leading-relaxed;
-  } */
 
   .small-text {
     @apply text-sm lg:text-base leading-relaxed;
@@ -208,6 +282,4 @@
   .button-transition {
     @apply transition-all duration-450 hover:transform hover:-translate-y-1 hover:shadow-2xl;
   }
-
-  /* card styles */
 }

@@ -1,7 +1,8 @@
+// src/components/Footer.jsx
 import React from "react";
 import ContactItem from "./LoopComponents/ContactItem";
 import SocialLink from "./LoopComponents/SocialLink";
-import UnderlineLink from "./LoopComponents/UnderlineLink"; // or NavItem, if you prefer
+import UnderlineLink from "./LoopComponents/UnderlineLink";
 
 const contactItems = [
   { href: "mailto:hello@griffinsweb.com", label: "hello@griffinsweb.com" },
@@ -56,7 +57,7 @@ const footerNav = [
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white py-4">
+    <footer className="bg-primary text-primary py-4">
       <div className="inner-section text-center">
         <h4 className="text-accent text-lg font-semibold mb-4">Connect</h4>
         <div className="space-y-2 mb-6">
@@ -77,8 +78,8 @@ export default function Footer() {
             <SocialLink key={item.name} data={item} />
           ))}
         </div>
-          <div className="text-gray-400 text-lg">
-            © 2025 Griffin’s Web Services. All rights reserved.
+          <div className="text-muted text-lg">
+            © 2025 Griffin's Web Services. All rights reserved.
           </div>
          </div>
         </div>

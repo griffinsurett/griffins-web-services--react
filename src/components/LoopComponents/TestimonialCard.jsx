@@ -1,7 +1,7 @@
+// src/components/LoopComponents/TestimonialCard.jsx
 export default function TestimonialCard({ data }) {
   const { tag, quote, author, role, avatar, rating } = data;
   
-  // Fixed: Define the RatingStar component
   const RatingStar = ({ i }) => (
     <svg
       key={i}
@@ -16,7 +16,7 @@ export default function TestimonialCard({ data }) {
     <div className="group text-left outer-card-color outer-card-style outer-card-transition">
       <div className="inner-card-color absolute inner-card-transition"></div>
       <div className="card-icon-color icon-medium mb-5 z-10">❝</div>
-      <p className="text-gray-300 text-lg leading-relaxed mb-8 italic relative z-10">
+      <p className="text-secondary text-lg leading-relaxed mb-8 italic relative z-10">
         "{quote}"
       </p>
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 relative z-10">
@@ -24,7 +24,7 @@ export default function TestimonialCard({ data }) {
           <div className="icon-small card-icon-color">{avatar}</div>
           <div>
             <h4 className="h4">{author}</h4>
-            <p className="text-gray-300 text-sm">{role}</p>
+            <p className="text-secondary text-sm">{role}</p>
           </div>
         </div>
         <div className="flex gap-1 text-center justify-center items-center">
