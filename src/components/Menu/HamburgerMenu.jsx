@@ -23,11 +23,11 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
       setIsOpen(checkbox.checked);
     };
 
-    checkbox.addEventListener('change', handleChange);
+    checkbox.addEventListener("change", handleChange);
     // Initialize
     handleChange();
 
-    return () => checkbox.removeEventListener('change', handleChange);
+    return () => checkbox.removeEventListener("change", handleChange);
   }, [checkboxId]);
 
   const handleClose = () => {
@@ -71,10 +71,8 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
         </nav>
 
         {/* Optional footer content in modal */}
-        <div className="text-center pb-8 text-muted">
-          <p className="text-sm">
-            Ready to transform your online presence?
-          </p>
+        <div className="text-center pb-8 muted-text">
+          <p className="text-sm">Ready to transform your online presence?</p>
         </div>
       </div>
     </Modal>

@@ -9,7 +9,7 @@ const UnderlineLink = ({ href, children, className = "", ...props }) => (
     className={`
       relative inline-flex items-center group
       bg-transparent hover:bg-transparent
-      text-primary hover:text-accent
+      primary-text hover:text-accent
       !shadow-none     !hover:shadow-none
       !transform-none  !hover:transform-none   
       px-0 py-0

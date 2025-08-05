@@ -1,4 +1,3 @@
-
 // src/components/FAQ.jsx
 import React from "react";
 import Button from "./Button";
@@ -19,7 +18,7 @@ const FAQ = () => {
   ];
 
   return (
-    <section className="outer-section bg-secondary relative">
+    <section className="outer-section secondary-bg relative">
       <div className="section-color-border" />
       <div className="inner-section">
         {/* Header */}
@@ -27,7 +26,7 @@ const FAQ = () => {
           <div className="border-title mb-6">FAQ</div>
           <h2 className="h2 mb-6">
             Frequently Asked{" "}
-            <span className="text-heading-accent">Questions</span>
+            <span className="heading-accent-text">Questions</span>
           </h2>
           <p className="large-text">
             Got questions? We've got answers. Here are the most common questions
@@ -44,7 +43,7 @@ const FAQ = () => {
 
         {/* Footer CTA */}
         <div className="text-center mt-12">
-          <p className="text-secondary mb-6">
+          <p className="secondary-text mb-6">
             Still have questions? We're here to help!
           </p>
           <Button variant="primary" href="/#contact" className="text-center">

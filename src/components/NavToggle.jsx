@@ -26,7 +26,7 @@ export default function NavToggle({
         htmlFor={id}
         className={`
           block md:hidden p-3 cursor-pointer
-          text-accent hover:text-accent-secondary
+          text-accent hover:text-primary-secondary
           ${labelClassName}
         `}
         aria-label={ariaLabel}

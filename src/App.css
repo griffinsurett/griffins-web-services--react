@@ -2,29 +2,34 @@
 
 @theme {
   /* Base Colors - Raw color definitions */
-  --color-primary-dark: #09090b; /* Very dark background */
-  --color-primary-light: #fafafa; /* Off-white */
-  --color-secondary-dark: #0f0f0f; /* Darker black */
-  --color-secondary-light: #e5e5e5; /* Light off-white */
-  --color-tertiary-dark: #171717; /* Medium dark black */
-  --color-tertiary-light: #d4d4d4; /* Muted off-white */
+  --color-primary-dark: var(--color-black); /* ~1% brightness */
+  --color-secondary-dark: var(--color-zinc-950); /* ~3.5% brightness */
+  --color-tertiary-dark: var(--color-zinc-900); /* ~4.3% brightness */
+  --color-primary-light: var(--color-zinc-50); /* Off-white */
+  --color-secondary-light: var(--color-zinc-100); /* Light off-white */
+  --color-tertiary-light: var(--color-zinc-200); /* Muted off-white */
 
   /* Accent Colors - Keep exactly the same */
   --color-accent: #5e76f6;
-  --color-accent-secondary: color-mix(in srgb, var(--color-accent) 85%, black);
 
-  /* Semantic Color Assignments - What the colors are used for */
+  --color-primary: var(--color-accent);
+  --color-primary-secondary: color-mix(
+    in srgb,
+    var(--color-primary) 85%,
+    black
+  );
+
   --color-bg: var(--color-primary-dark);
-  --color-bg-secondary: var(--color-secondary-dark);
-  --color-bg-tertiary: var(--color-tertiary-dark);
-  --color-bg-card: rgba(255, 255, 255, 0.05);
+  --color-secondary-bg: var(--color-secondary-dark);
+  --color-tertiary-bg: var(--color-tertiary-dark);
+  --color-bg-card: rgba(255, 255, 255, 0.02); /* white 2% for a darker feel */
 
-  --color-text-primary: var(--color-primary-light);
-  --color-text-secondary: var(--color-secondary-light);
-  --color-text-muted: var(--color-tertiary-light);
+  --color-primary-text: var(--color-primary-light);
+  --color-secondary-text: var(--color-secondary-light);
+  --color-muted-text: var(--color-tertiary-light);
 
-  --color-heading-primary: var(--color-primary-light);
-  --color-heading-accent: var(--color-accent);
+  --color-primary-heading: var(--color-primary-light);
+  --color-accent-heading: var(--color-primary);
 
   /* Additional utility colors */
   --color-border-dim: rgba(255, 255, 255, 0.2);
@@ -41,16 +46,16 @@
 }
 
 /* Background utilities */
-@utility bg-primary {
+@utility primary-bg {
   background-color: var(--color-bg);
 }
 
-@utility bg-secondary {
-  background-color: var(--color-bg-secondary);
+@utility secondary-bg {
+  background-color: var(--color-secondary-bg);
 }
 
-@utility bg-tertiary {
-  background-color: var(--color-bg-tertiary);
+@utility tertiary-bg {
+  background-color: var(--color-tertiary-bg);
 }
 
 @utility bg-card {
@@ -58,25 +63,25 @@
 }
 
 /* Text color utilities */
-@utility text-primary {
-  color: var(--color-text-primary);
+@utility primary-text {
+  color: var(--color-primary-text);
 }
 
-@utility text-secondary {
-  color: var(--color-text-secondary);
+@utility secondary-text {
+  color: var(--color-secondary-text);
 }
 
-@utility text-muted {
-  color: var(--color-text-muted);
+@utility muted-text {
+  color: var(--color-muted-text);
 }
 
 /* Heading color utilities */
-@utility text-heading {
-  color: var(--color-heading-primary);
+@utility heading-text {
+  color: var(--color-primary-heading);
 }
 
-@utility text-heading-accent {
-  color: var(--color-heading-accent);
+@utility heading-accent-text {
+  color: var(--color-accent-heading);
 }
 
 @utility bg-bg2 {
@@ -84,7 +89,7 @@
 }
 
 @utility rounded-border {
-  @apply inline-block border border-accent text-accent rounded-full font-medium;
+  @apply inline-block border border-primary text-primary rounded-full font-medium;
 }
 
 @utility paragraph-spacing {
@@ -106,10 +111,10 @@
 /* The main form field styling - updated with color variables */
 @utility form-field {
   @apply w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 focus:outline-none focus:border-accent focus:bg-bg/70 main-duration transition-all;
-  color: var(--color-text-muted);
+  color: var(--color-muted-text);
 
   &::placeholder {
-    color: var(--color-text-muted);
+    color: var(--color-muted-text);
   }
 
   /* Fix for select dropdown arrow spacing */
@@ -144,7 +149,7 @@
   }
 
   .text-border {
-    -webkit-text-stroke: 2px var(--color-accent);
+    -webkit-text-stroke: 2px var(--color-primary);
   }
 
   /* section styles */
@@ -167,7 +172,7 @@
   }
 
   .section-color-border {
-    @apply section-border-styles bg-gradient-to-r from-transparent via-accent to-transparent;
+    @apply section-border-styles bg-gradient-to-r from-transparent via-primary to-transparent;
   }
 
   .text-section {
@@ -175,11 +180,11 @@
   }
 
   .emphasized-text {
-    @apply font-bold text-heading-accent;
+    @apply font-bold heading-accent-text;
   }
 
   .form-option {
-    @apply bg-bg text-primary;
+    @apply bg-bg primary-text;
   }
 
   /* Card components */
@@ -188,7 +193,7 @@
   }
 
   .outer-card-color {
-    @apply inner-card-bg hover:border-accent hover:shadow-accent/20;
+    @apply inner-card-bg hover:border-primary hover:shadow-primary/20;
   }
 
   .outer-card-style {
@@ -204,11 +209,11 @@
   }
 
   .inner-card-color {
-    @apply inset-0 bg-gradient-to-br from-accent/10 to-transparent;
+    @apply inset-0 bg-gradient-to-br from-primary/10 to-transparent;
   }
 
   .card-icon-color {
-    @apply bg-gradient-to-br from-accent to-accent-secondary text-black;
+    @apply bg-gradient-to-br from-primary to-primary-secondary text-black;
   }
 
   /* Hover modes */
@@ -251,20 +256,20 @@
 
   /* Typography - updated with color variables */
   .h1 {
-    @apply text-5xl md:text-7xl font-extrabold leading-tight text-heading-primary;
+    @apply text-5xl md:text-7xl font-extrabold leading-tight text-primary-heading;
   }
   .h2 {
-    @apply text-4xl md:text-5xl font-bold text-heading-primary;
+    @apply text-4xl md:text-5xl font-bold text-primary-heading;
   }
   .h3 {
-    @apply text-2xl font-semibold text-heading-primary;
+    @apply text-2xl font-semibold text-primary-heading;
   }
   .h4 {
-    @apply font-semibold text-lg text-heading-primary;
+    @apply font-semibold text-lg text-primary-heading;
   }
 
   p {
-    @apply text-secondary;
+    @apply secondary-text;
   }
 
   .hero-text {

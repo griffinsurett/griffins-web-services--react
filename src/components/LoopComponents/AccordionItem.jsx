@@ -10,7 +10,7 @@ function AccordionItem({ data }) {
 
   return (
     <div
-      className={`card-bg rounded-2xl transition-all main-duration overflow-hidden ${
+      className={`card-bg cursor-pointer rounded-2xl transition-all main-duration overflow-hidden ${
         isOpen
           ? "border border-accent shadow-xl shadow-accent/10"
           : "border border-accent/20"
@@ -49,7 +49,7 @@ function AccordionItem({ data }) {
       >
         <div className="px-6 pb-5">
           <div className="w-full h-px bg-accent/20 mb-4" />
-          <p className="text-secondary leading-relaxed">{answer}</p>
+          <p className="secondary-text leading-relaxed">{answer}</p>
         </div>
       </div>
     </div>

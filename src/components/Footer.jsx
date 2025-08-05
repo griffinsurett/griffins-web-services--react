@@ -57,32 +57,33 @@ const footerNav = [
 
 export default function Footer() {
   return (
-    <footer className="bg-primary text-primary py-4">
+    <footer className="bg-bg primary-text py-4">
       <div className="inner-section text-center">
-        <h4 className="text-accent text-lg font-semibold mb-4">Connect</h4>
+        <h4 className="text-primary text-lg font-semibold mb-4">Connect</h4>
         <div className="space-y-2 mb-6">
           {contactItems.map((item) => (
             <ContactItem key={item.href} data={item} />
           ))}
         </div>
-         <div className="space-y-3">
-            <div className="flex flex-wrap justify-center gap-6">
+        <div className="space-y-3">
+          <div className="flex flex-wrap justify-center gap-6">
             {footerNav.map((item) => (
               <UnderlineLink key={item.label} href={item.href}>
                 {item.label}
               </UnderlineLink>
             ))}
           </div>
-            <div className="flex justify-center gap-5">
-          {socialMedia.map((item) => (
-            <SocialLink key={item.name} data={item} />
-          ))}
-        </div>
-          <div className="text-muted text-lg">
+          <div className="flex justify-center gap-5">
+            {socialMedia.map((item) => (
+              <SocialLink key={item.name} data={item} />
+            ))}
+          </div>
+          <div className="muted-text text-lg">
             © 2025 Griffin's Web Services. All rights reserved.
           </div>
-         </div>
         </div>
+      </div>
+      <div className="section-color-border"></div>
     </footer>
   );
 }

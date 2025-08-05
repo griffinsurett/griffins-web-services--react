@@ -12,7 +12,6 @@ import Textarea from "./components/Form/Textarea"; // Importing Textarea compone
 import Select from "./components/Form/Select"; // Importing Select component
 
 const GriffinsLanding = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -180,21 +179,21 @@ const GriffinsLanding = () => {
   ];
 
   return (
-    <div className="bg-primary text-primary min-h-screen">
+    <div className="primary-bg primary-text min-h-screen">
       {/* Navigation */}
       <Header />
 
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center text-center px-5 pt-32 pb-20 bg-primary relative">
+      <section className="min-h-screen flex items-center justify-center text-center px-5 pt-32 pb-20 primary-bg relative">
         {/* Dark gradient background */}
         <div className="absolute inset-0 hero-gradient-bg"></div>
         <div className="inner-section relative z-10">
           <h1 className="h1 mb-2">
             Build Your{" "}
-            <span className="text-heading-accent">Digital Empire</span> with
+            <span className="heading-accent-text">Digital Empire</span> with
             Griffin's Web Services
           </h1>
-          <p className="hero-text text-secondary mb-10 max-w-4xl mx-auto">
+          <p className="hero-text secondary-text mb-10 max-w-4xl mx-auto">
             Fast Professional websites that convert visitors into customers.
             Fast, modern, and built to grow your business online.
           </p>
@@ -206,12 +205,12 @@ const GriffinsLanding = () => {
       </section>
 
       {/* About Section */}
-      <section className="outer-section bg-secondary relative">
+      <section className="outer-section secondary-bg relative">
         <div className="section-dim-border"></div>
         <div className="inner-section">
           <div className="text-section">
             <h2 className="h2 mb-6">
-              Who We <span className="text-heading-accent">Are</span>
+              Who We <span className="heading-accent-text">Are</span>
             </h2>
             <p className="large-text">
               Griffin's Web Services is your trusted partner in digital
@@ -229,12 +228,12 @@ const GriffinsLanding = () => {
       </section>
 
       {/* Website Types Section */}
-      <section className="outer-section bg-secondary relative">
+      <section className="outer-section secondary-bg relative">
         <div className="inner-section">
           <div className="text-section">
             <div className="border-title">Website Types</div>
             <h2 className="h2 mb-6">
-              Websites We <span className="text-heading-accent">Build</span>
+              Websites We <span className="heading-accent-text">Build</span>
             </h2>
             <p className="large-text">
               From simple landing pages to complex web applications - we create
@@ -254,14 +253,14 @@ const GriffinsLanding = () => {
       <FAQSection />
 
       {/* Benefits Section */}
-      <section className="outer-section bg-primary">
+      <section className="outer-section primary-bg">
         <div className="section-color-border"></div>
         <div className="inner-section">
           <div className="text-section">
             <div className="border-title">Benefits</div>
             <h2 className="h2 mb-6">
               Why Choose{" "}
-              <span className="text-heading-accent">Griffin's Web?</span>
+              <span className="heading-accent-text">Griffin's Web?</span>
             </h2>
             <p className="large-text">
               We don't just build websites - we craft digital experiences that
@@ -278,7 +277,7 @@ const GriffinsLanding = () => {
       </section>
 
       {/* Stats Section */}
-      <div className="py-20 px-5 relative bg-primary">
+      <div className="py-20 px-5 relative primary-bg">
         <div className="absolute top-0 left-0 right-0 h-px"></div>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
@@ -293,13 +292,13 @@ const GriffinsLanding = () => {
       </div>
 
       {/* Testimonials Section */}
-      <section className="outer-section bg-secondary relative">
+      <section className="outer-section secondary-bg relative">
         <div className="section-color-border"></div>
         <div className="inner-section">
           <div className="text-section">
             <div className="border-title">Testimonials</div>
             <h2 className="h2 mb-6">
-              What Our <span className="text-heading-accent">Clients Say</span>
+              What Our <span className="heading-accent-text">Clients Say</span>
             </h2>
             <p className="large-text">
               Don't just take our word for it - hear from businesses who've
@@ -316,7 +315,7 @@ const GriffinsLanding = () => {
       </section>
 
       {/* CTA */}
-      <section className="outer-section bg-primary text-center relative">
+      <section className="outer-section primary-bg text-center relative">
         <div className="section-color-border"></div>
         <div className="inner-section">
           <div className="mb-12">
@@ -324,7 +323,7 @@ const GriffinsLanding = () => {
             <h2 className="h2 mb-6">
               Ready to Transform Your Online Presence?
             </h2>
-            <p className="large-text text-secondary">
+            <p className="large-text secondary-text">
               Join hundreds of successful businesses who trust Griffin's Web
               Services for their digital growth.
             </p>
@@ -336,15 +335,15 @@ const GriffinsLanding = () => {
       </section>
 
       {/* Quote Form Section */}
-      <section className="outer-section bg-primary relative">
+      <section className="outer-section secondary-bg relative">
         <div className="section-color-border"></div>
         <div className="inner-section">
           <div className="text-section">
             <div className="border-title">Get A Quote</div>
             <h2 className="h2 mb-6">
-              Ready to Get <span className="text-heading-accent">Started?</span>
+              Ready to Get <span className="heading-accent-text">Started?</span>
             </h2>
-            <p className="large-text text-secondary">
+            <p className="large-text secondary-text">
               Tell us about your project and we'll provide you with a detailed
               quote within 24 hours.
             </p>
@@ -460,6 +459,7 @@ const GriffinsLanding = () => {
       {/* Footer */}
       <div className="footer-container">
         <Footer />
+        
       </div>
     </div>
   );

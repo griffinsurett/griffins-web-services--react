@@ -11,21 +11,17 @@ export default function Header() {
     <>
       <header className="fixed inset-x-0 top-0 bg-transparent z-[99999] w-19/20 lg:9/10 mx-auto">
         <div className="flex items-center justify-between py-2">
-          <a href="/" className="text-2xl font-bold text-primary">
-           <Logo loading="eager"/>
+          <a href="/" className="text-2xl font-bold primary-text">
+            <Logo loading="eager" />
           </a>
-          
+
           {/* Hidden checkbox for state */}
-          <input
-            id={checkboxId}
-            type="checkbox"
-            className="hidden"
-          />
-          
+          <input id={checkboxId} type="checkbox" className="hidden" />
+
           {/* Hamburger/X Button */}
           <HamburgerIcon
             checkboxId={checkboxId}
-            className="text-primary transition-colors duration-300"
+            className="primary-text transition-colors duration-300"
           />
         </div>
       </header>

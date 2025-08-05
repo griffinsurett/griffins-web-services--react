@@ -5,7 +5,7 @@ export default function ContactItem({ data }) {
     <a
       href={href}
       className="
-        block text-secondary
+        block secondary-text
         hover:text-accent
         transition-colors duration-450
       "
