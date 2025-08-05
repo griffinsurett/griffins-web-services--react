@@ -1,5 +1,5 @@
 // src/siteData.js
-import { Mail, Phone, MapPin, Linkedin, Twitter, Github, Instagram } from 'lucide-react';
+import { Mail, Phone, Linkedin, Twitter, Github, Instagram } from 'lucide-react';
 
 /**
  * Centralized site data for titles and branding.
