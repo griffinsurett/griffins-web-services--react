@@ -10,7 +10,7 @@
   --color-tertiary-light: var(--color-zinc-200); /* Muted off-white */
 
   /* Accent Colors - Keep exactly the same */
-  --color-accent: #5e76f6;
+  --color-accent: #5e76f6; /* #5e76f6 */
 
   --color-primary: var(--color-accent);
   --color-primary-secondary: color-mix(
@@ -129,7 +129,7 @@
   }
 }
 
-@utility inner-card-bg {
+@utility card-bg {
   background-color: var(--color-bg-card);
   @apply border border-accent/20;
 }
@@ -193,7 +193,7 @@
   }
 
   .outer-card-color {
-    @apply inner-card-bg hover:border-primary hover:shadow-primary/20;
+    @apply card-bg hover:border-primary hover:shadow-primary/20;
   }
 
   .outer-card-style {

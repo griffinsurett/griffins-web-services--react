@@ -10,7 +10,7 @@ function AccordionItem({ data }) {
 
   return (
     <div
-      className={`card-bg cursor-pointer rounded-2xl transition-all main-duration overflow-hidden ${
+      className={`outer-card-color cursor-pointer rounded-2xl transition-all main-duration overflow-hidden ${
         isOpen
           ? "border border-accent shadow-xl shadow-accent/10"
           : "border border-accent/20"
