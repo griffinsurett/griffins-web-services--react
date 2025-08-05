@@ -3,12 +3,16 @@
 @theme {
   --color-bg: #0000; /* black */
   --color-accent: #5e76f6; /* accent  will be #5e76f6 or  tho */
-  --color-accent2: color-mix(in srgb, var(--color-accent) 85%, black);
+  --color-accent-secondary: color-mix(in srgb, var(--color-accent) 85%, black);
 }
 
 @layer base {
   body {
     @apply bg-black overflow-x-hidden;
+  }
+    ::selection {
+    color: var(--color-accent);
+    transition: all 0.3s ease-in-out;
   }
 }
 
@@ -52,7 +56,7 @@
   }
 
   .inner-section {
-    @apply max-w-6xl mx-auto;
+    @apply w-9/10 lg:max-w-6xl mx-auto;
   }
 
   .section-dim-border {
@@ -98,7 +102,7 @@
 
   /* other card components */
   .card-icon-color {
-    @apply bg-gradient-to-br from-accent to-accent2 text-black;
+    @apply bg-gradient-to-br from-accent to-accent-secondary text-black;
   }
 
   /* ----------------------------------------
@@ -158,6 +162,14 @@
 
   .hero-text {
     @apply text-xl md:text-2xl leading-relaxed;
+  }
+
+  /* .xsmall-text {
+    @apply text-xs lg:text-sm leading-relaxed;
+  } */
+
+  .small-text {
+    @apply text-sm lg:text-base leading-relaxed;
   }
 
   .large-text {

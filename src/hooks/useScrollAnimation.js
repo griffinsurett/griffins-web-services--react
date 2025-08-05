@@ -15,7 +15,7 @@ export function useScrollAnimation(
     // px from top to still count as “at top”
     restoreAtTopOffset  = 100,
     // OPTIONAL: the id of your menu’s <input type="checkbox" />
-    menuCheckboxId      = "headerMenu-toggle",
+    menuCheckboxId      = "nav-toggle",
   } = {}
 ) {
   const [inView, setInView] = useState(false);

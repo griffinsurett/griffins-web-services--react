@@ -20,7 +20,7 @@ const FAQSection = () => {
       <div className="section-color-border" />
       <div className="inner-section">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-section">
           <div className="inline-block px-5 py-2 border border-accent text-accent rounded-full text-sm font-medium uppercase tracking-wider mb-6">
             FAQ
           </div>

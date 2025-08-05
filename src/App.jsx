@@ -471,10 +471,11 @@ const GriffinsLanding = () => {
             </div>
           </div>
         </div>
+        
       </section>
 
       {/* Footer */}
-      <div className="footer-container border-t border-accent/20 ">
+      <div className="footer-container">
         <Footer />
         </div>
       </div>

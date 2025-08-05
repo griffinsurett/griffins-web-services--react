@@ -19,7 +19,7 @@ export default function TestimonialCard({ data }) {
       <p className="text-gray-300 text-lg leading-relaxed mb-8 italic relative z-10">
         "{quote}"
       </p>
-      <div className="flex items-center justify-between relative z-10">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 relative z-10">
         <div className="flex items-center gap-4">
           <div className="icon-small card-icon-color">{avatar}</div>
           <div>
@@ -27,7 +27,7 @@ export default function TestimonialCard({ data }) {
             <p className="text-gray-300 text-sm">{role}</p>
           </div>
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 text-center justify-center items-center">
           {[...Array(rating)].map((_, i) => (
             <RatingStar key={i} i={i} />
           ))}

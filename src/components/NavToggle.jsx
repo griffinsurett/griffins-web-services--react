@@ -1,16 +1,16 @@
 // src/components/NavToggle.jsx
-import React from 'react';
+import React from "react";
 
 export default function NavToggle({
-  /** 
+  /**
    * the `id` shared between the <input> and <label>;
-   * defaults to "nav-toggle" 
+   * defaults to "nav-toggle"
    */
-  id = 'nav-toggle',
+  id = "nav-toggle",
   /** any extra classes for the label */
-  labelClassName = '',
+  labelClassName = "",
   /** a11y label for your button */
-  ariaLabel = 'Open navigation menu',
+  ariaLabel = "Open navigation menu",
 }) {
   return (
     <>
@@ -26,7 +26,7 @@ export default function NavToggle({
         htmlFor={id}
         className={`
           block md:hidden p-3 cursor-pointer
-          text-accent hover:text-accent2
+          text-accent hover:text-accent-secondary
           ${labelClassName}
         `}
         aria-label={ariaLabel}
