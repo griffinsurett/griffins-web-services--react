@@ -7,6 +7,9 @@ import Footer from "./components/Footer";
 import StatisticListing from "./components/LoopComponents/StatisticListing";
 import FeatureCard from "./components/LoopComponents/FeatureCard";
 import TestimonialCard from "./components/LoopComponents/TestimonialCard";
+import Input from "./components/Form/Input"; // Importing Input component
+import Textarea from "./components/Form/Textarea"; // Importing Textarea component
+import Select from "./components/Form/Select"; // Importing Select component
 
 const GriffinsLanding = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -347,121 +350,102 @@ const GriffinsLanding = () => {
             </p>
           </div>
 
-          <div className="bg-white/5 border border-accent/20 rounded-3xl p-12">
-            <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent"></div>
+          <div className="group outer-card-color outer-card-style outer-card-transition">
+            <div className="inner-card-style inner-card-color inner-card-transition"></div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-8 relative z-10">
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Full Name *"
-                  className="w-full bg-white/10 border border-accent/30 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:bg-white/20 transition-all duration-450"
-                  required
-                />
-              </div>
+              <Input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Full Name *"
+                required
+              />
 
-              <div className="space-y-2">
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="Email Address *"
-                  className="w-full bg-white/10 border border-accent/30 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:bg-white/20 transition-all duration-450"
-                  required
-                />
-              </div>
+              <Input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Email Address *"
+                required
+              />
 
-              <div className="space-y-2">
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="Phone Number"
-                  className="w-full bg-white/10 border border-accent/30 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:bg-white/20 transition-all duration-450"
-                />
-              </div>
+              <Input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                placeholder="Phone Number"
+              />
 
-              <div className="space-y-2">
-                <input
-                  type="text"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleInputChange}
-                  placeholder="Company Name"
-                  className="w-full bg-white/10 border border-accent/30 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:bg-white/20 transition-all duration-450"
-                />
-              </div>
+              <Input
+                type="text"
+                name="company"
+                value={formData.company}
+                onChange={handleInputChange}
+                placeholder="Company Name"
+              />
 
-              <div className="space-y-2 md:col-span-2">
-                <select
-                  name="websiteType"
-                  value={formData.websiteType}
-                  onChange={handleInputChange}
-                  className="w-full bg-white/10 border border-accent/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent focus:bg-white/20 transition-all duration-450"
-                  required
-                >
-                  <option value="">Type of Website *</option>
-                  <option value="landing-page">Landing Page</option>
-                  <option value="small-business">Small Business Website</option>
-                  <option value="portfolio">Personal Portfolio Website</option>
-                  <option value="blog">Blog</option>
-                  <option value="ecommerce">E-Commerce Website</option>
-                  <option value="nonprofit">Non-Profit Website</option>
-                  <option value="corporate">Large Corporate Website</option>
-                  <option value="custom-app">
-                    Custom Full-Stack Application
-                  </option>
-                </select>
-              </div>
+              <Select
+                name="websiteType"
+                value={formData.websiteType}
+                onChange={handleInputChange}
+                placeholder="Type of Website *"
+                colSpan="md:col-span-2"
+                required
+                options={[
+                  { value: "landing-page", label: "Landing Page" },
+                  { value: "small-business", label: "Small Business Website" },
+                  { value: "portfolio", label: "Personal Portfolio Website" },
+                  { value: "blog", label: "Blog" },
+                  { value: "ecommerce", label: "E-Commerce Website" },
+                  { value: "nonprofit", label: "Non-Profit Website" },
+                  { value: "corporate", label: "Large Corporate Website" },
+                  {
+                    value: "custom-app",
+                    label: "Custom Full-Stack Application",
+                  },
+                ]}
+              />
 
-              <div className="space-y-2">
-                <select
-                  name="budget"
-                  value={formData.budget}
-                  onChange={handleInputChange}
-                  className="w-full bg-white/10 border border-accent/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent focus:bg-white/20 transition-all duration-450"
-                >
-                  <option value="">Project Budget</option>
-                  <option value="under-5k">Under $5,000</option>
-                  <option value="5k-10k">$5,000 - $10,000</option>
-                  <option value="10k-25k">$10,000 - $25,000</option>
-                  <option value="25k-50k">$25,000 - $50,000</option>
-                  <option value="over-50k">$50,000+</option>
-                </select>
-              </div>
+              <Select
+                name="budget"
+                value={formData.budget}
+                onChange={handleInputChange}
+                placeholder="Project Budget"
+                options={[
+                  { value: "under-5k", label: "Under $5,000" },
+                  { value: "5k-10k", label: "$5,000 - $10,000" },
+                  { value: "10k-25k", label: "$10,000 - $25,000" },
+                  { value: "25k-50k", label: "$25,000 - $50,000" },
+                  { value: "over-50k", label: "$50,000+" },
+                ]}
+              />
 
-              <div className="space-y-2">
-                <select
-                  name="timeline"
-                  value={formData.timeline}
-                  onChange={handleInputChange}
-                  className="w-full bg-white/10 border border-accent/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent focus:bg-white/20 transition-all duration-450"
-                >
-                  <option value="">Project Timeline</option>
-                  <option value="asap">ASAP</option>
-                  <option value="1-month">Within 1 month</option>
-                  <option value="2-3-months">2-3 months</option>
-                  <option value="3-6-months">3-6 months</option>
-                  <option value="flexible">I'm flexible</option>
-                </select>
-              </div>
+              <Select
+                name="timeline"
+                value={formData.timeline}
+                onChange={handleInputChange}
+                placeholder="Project Timeline"
+                options={[
+                  { value: "asap", label: "ASAP" },
+                  { value: "1-month", label: "Within 1 month" },
+                  { value: "2-3-months", label: "2-3 months" },
+                  { value: "3-6-months", label: "3-6 months" },
+                  { value: "flexible", label: "I'm flexible" },
+                ]}
+              />
 
-              <div className="space-y-2 md:col-span-2">
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  rows="5"
-                  placeholder="Project Details * - Tell us about your project, goals, and any specific requirements..."
-                  className="w-full bg-white/10 border border-accent/30 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:bg-white/20 transition-all duration-450 resize-none"
-                  required
-                ></textarea>
-              </div>
+              <Textarea
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
+                placeholder="Project Details * - Tell us about your project, goals, and any specific requirements..."
+                colSpan="md:col-span-2"
+                required
+              />
             </div>
 
             <div className="text-center relative z-10">
@@ -471,14 +455,13 @@ const GriffinsLanding = () => {
             </div>
           </div>
         </div>
-        
       </section>
 
       {/* Footer */}
       <div className="footer-container">
         <Footer />
-        </div>
       </div>
+    </div>
   );
 };
 
