@@ -329,24 +329,6 @@ const WebsiteTypes = () => {
             </div>
           </div>
         </div>
-
-        {/* Progress indicator for desktop */}
-        <div className="hidden lg:flex justify-center mt-8 gap-2">
-          {websiteTypes.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => handleDirectClick(i)}
-              className={`
-                w-3 h-3 rounded-full transition-all duration-300
-                ${activeIndex === i 
-                  ? "bg-accent scale-125" 
-                  : "bg-accent/30 hover:bg-accent/50"
-                }
-              `}
-              aria-label={`View ${websiteTypes[i].title}`}
-            />
-          ))}
-        </div>
       </div>
     </section>
   );
