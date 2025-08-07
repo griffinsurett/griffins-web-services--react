@@ -1,101 +1,137 @@
 // src/hooks/useAccordionAutoplay.js
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
+import { 
+  useScrollInteraction, 
+  useClickInteraction, 
+  useHoverInteraction, 
+  usePauseableState, 
+  useAutoAdvance 
+} from './useUserInteractions';
 
 const useAccordionAutoplay = (totalItems, initialIndex = 0, autoAdvanceDelay = 3000) => {
-  const [activeIndex, setActiveIndex] = useState(initialIndex);
-  const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
-  
-  const autoplayTimeoutRef = useRef(null);
-  const scrollTimeoutRef = useRef(null);
-  const lastScrollY = useRef(window.scrollY);
+  // Use the generic pauseable state hook
+  const { 
+    isPaused: isAutoplayPaused, 
+    userEngaged,
+    shouldPauseAfterVideo,
+    pause, 
+    resume, 
+    engageUser,
+    disengageUser,
+    pauseAfterVideoIfEngaged,
+    handleResumeActivity 
+  } = usePauseableState({
+    initialPausedState: false,
+    resumeTriggers: ['scroll', 'click-outside', 'hover-away']
+  });
 
-  // Clear all timeouts on unmount
-  useEffect(() => {
-    return () => {
-      if (autoplayTimeoutRef.current) clearTimeout(autoplayTimeoutRef.current);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    };
-  }, []);
+  // Use the generic auto-advance hook
+  const {
+    activeIndex,
+    setActiveIndex,
+    goToIndex,
+    scheduleAutoAdvance,
+    clearAutoAdvanceTimeout
+  } = useAutoAdvance({
+    totalItems,
+    initialIndex,
+    autoAdvanceDelay,
+    loop: true
+  });
 
-  // Handle scroll detection for resuming autoplay
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollDelta = Math.abs(currentScrollY - lastScrollY.current);
-      
-      // If user scrolls significantly, resume autoplay
-      if (scrollDelta > 150 && isAutoplayPaused) {
-        setIsAutoplayPaused(false);
-      }
-      
-      lastScrollY.current = currentScrollY;
-      
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = setTimeout(() => {
-        lastScrollY.current = window.scrollY;
-      }, 150);
-    };
+  // Use the generic scroll interaction hook
+  useScrollInteraction({
+    scrollThreshold: 150,
+    debounceDelay: 150,
+    onScrollActivity: () => {
+      handleResumeActivity('scroll');
+    }
+  });
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    };
-  }, [isAutoplayPaused]);
+  // Use the generic click interaction hook
+  useClickInteraction({
+    containerSelector: '[data-accordion-container], [data-video-container]',
+    itemSelector: '[data-accordion-item], [data-video-container]',
+    onOutsideClick: () => {
+      handleResumeActivity('click-outside');
+    },
+    onInsideClick: (event, containerElement) => {
+      // When clicking inside an accordion item or video container, engage the user
+      engageUser();
+    },
+    onItemClick: (event, itemElement, containerElement) => {
+      // When clicking on specific item or video container, engage the user
+      engageUser();
+    }
+  });
 
-  // Handle global clicks to resume autoplay
-  useEffect(() => {
-    const handleGlobalClick = (event) => {
-      const accordionContainer = event.target.closest('[data-accordion-container]');
-      const clickedAccordion = event.target.closest('[data-accordion-item]');
-      
-      if (!accordionContainer || !clickedAccordion) {
-        // Clicked outside accordion area, resume autoplay
-        setIsAutoplayPaused(false);
-      }
-    };
+  // Use the generic hover interaction hook
+  const { handleMouseEnter, handleMouseLeave } = useHoverInteraction({
+    onHoverStart: (element, index) => {
+      // When hovering over an accordion item, engage the user
+      engageUser();
+    },
+    onHoverEnd: (element, index) => {
+      // When hovering away from an accordion item, disengage and potentially resume
+      handleResumeActivity('hover-away');
+    },
+    hoverDelay: 0
+  });
 
-    document.addEventListener('click', handleGlobalClick);
-    return () => document.removeEventListener('click', handleGlobalClick);
-  }, []);
-
-  // Auto-advance logic
+  // Auto-advance logic - only used when video ends, not on a timer
   const advanceToNext = useCallback(() => {
     if (!isAutoplayPaused) {
-      autoplayTimeoutRef.current = setTimeout(() => {
-        if (!isAutoplayPaused) {
-          setActiveIndex(prevIndex => (prevIndex + 1) % totalItems);
-        }
-      }, autoAdvanceDelay);
+      // Use goToNext instead of scheduleAutoAdvance to advance immediately
+      const nextIndex = (activeIndex + 1) % totalItems;
+      goToIndex(nextIndex);
     }
-  }, [isAutoplayPaused, totalItems, autoAdvanceDelay]);
+  }, [isAutoplayPaused, activeIndex, totalItems, goToIndex]);
+
+  // Enhanced video ended handler - pause if user is engaged
+  const handleVideoEnded = useCallback(() => {
+    const didPause = pauseAfterVideoIfEngaged();
+    
+    // Only advance if we didn't pause due to engagement
+    if (!didPause) {
+      // Add a small delay before advancing to next item
+      setTimeout(() => {
+        advanceToNext();
+      }, 1000);
+    }
+  }, [pauseAfterVideoIfEngaged, advanceToNext]);
 
   // Manual selection handler
   const handleManualSelection = useCallback((index) => {
-    setActiveIndex(index);
-    setIsAutoplayPaused(false); // Continue autoplay from this point
-    
-    if (autoplayTimeoutRef.current) {
-      clearTimeout(autoplayTimeoutRef.current);
-    }
-  }, []);
+    goToIndex(index);
+    engageUser(); // User manually selected, so they're engaged
+  }, [goToIndex, engageUser]);
 
-  // Simple hover handlers (just for visual feedback, no autoplay interference)
+  // Accordion-specific hover handlers (delegated to the generic hover hook)
   const handleAccordionHover = useCallback((index, isHovering) => {
-    // Could be used for visual hover effects in the future, but doesn't affect autoplay
-  }, []);
+    if (isHovering) {
+      handleMouseEnter(null, index);
+    } else {
+      handleMouseLeave(null, index);
+    }
+  }, [handleMouseEnter, handleMouseLeave]);
 
   // No special border logic - border always follows video progress
   const shouldShowFullBorder = useCallback(() => {
     return false; // Always show progress border, never full border
   }, []);
 
+  // Remove the automatic scheduling effect - let videos drive the timing
+  // The advancement should only happen when videos actually end
+
   return {
     activeIndex,
     isAutoplayPaused,
+    userEngaged,
+    shouldPauseAfterVideo,
     shouldShowFullBorder,
     handleManualSelection,
     handleAccordionHover,
+    handleVideoEnded, // New: specific handler for video ended
     advanceToNext,
     setActiveIndex
   };

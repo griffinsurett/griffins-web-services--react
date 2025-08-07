@@ -71,9 +71,12 @@ const WebsiteTypes = () => {
   const {
     activeIndex,
     isAutoplayPaused,
+    userEngaged,
+    shouldPauseAfterVideo,
     shouldShowFullBorder,
     handleManualSelection,
     handleAccordionHover,
+    handleVideoEnded, // New handler from the hook
     advanceToNext
   } = useAccordionAutoplay(websiteTypes.length, 0);
 
@@ -155,7 +158,7 @@ const WebsiteTypes = () => {
     setProgress(newProgress);
   };
 
-  // ENHANCED: Handle video ended with simple autoplay logic
+  // ENHANCED: Handle video ended with user engagement logic
   const handleEnded = () => {
     setProgress(100);
     
@@ -164,12 +167,10 @@ const WebsiteTypes = () => {
       clearTimeout(advanceTimeoutRef.current);
     }
     
-    // Simple: advance to next after delay if autoplay isn't paused
-    if (!isAutoplayPaused) {
-      advanceTimeoutRef.current = setTimeout(() => {
-        advanceToNext();
-      }, 1000);
-    }
+    // Use the new handleVideoEnded from the hook which handles engagement logic
+    handleVideoEnded();
+    
+    // REMOVED: Don't do additional advancement here - let handleVideoEnded handle it
   };
 
   const handleVideoLoad = () => {
@@ -182,37 +183,6 @@ const WebsiteTypes = () => {
     const selectedIndex = parseInt(event.target.value, 10);
     setIsTransitioning(true);
     handleManualSelection(selectedIndex);
-    setProgress(0);
-    
-    // Clear any pending advance
-    if (advanceTimeoutRef.current) {
-      clearTimeout(advanceTimeoutRef.current);
-      advanceTimeoutRef.current = null;
-    }
-    
-    // Brief delay to allow UI to update
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 150);
-  };
-
-  // Handle direct accordion clicks (for progress indicators)
-  const handleDirectClick = (index) => {
-    if (index === activeIndex) {
-      // If clicking the same item, restart the video
-      const currentVideo = getCurrentVideoRef();
-      if (currentVideo) {
-        currentVideo.currentTime = 0;
-        setProgress(0);
-        currentVideo.play().catch(() => {
-          console.log("Autoplay prevented");
-        });
-      }
-      return;
-    }
-    
-    setIsTransitioning(true);
-    handleManualSelection(index);
     setProgress(0);
     
     // Clear any pending advance
@@ -289,7 +259,12 @@ const WebsiteTypes = () => {
           <div className="hidden lg:block">
             <div className="sticky top-8">
               {activeIndex >= 0 && activeIndex < websiteTypes.length ? (
-                <div className="transition-all duration-500 ease-in-out">
+                <div 
+                  className="transition-all duration-500 ease-in-out"
+                  data-video-container
+                  onMouseEnter={() => handleAccordionHover(activeIndex, true)}
+                  onMouseLeave={() => handleAccordionHover(activeIndex, false)}
+                >
                   <VideoPlayer
                     key={`desktop-${activeIndex}`}
                     ref={desktopVideoRef}
@@ -314,16 +289,21 @@ const WebsiteTypes = () => {
                       {websiteTypes[activeIndex].description}
                     </p>
                     
-                    {/* Simple debug info */}
+                    {/* Enhanced debug info */}
                     <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
                       <div>⏸️ Autoplay Paused: {isAutoplayPaused ? '✅' : '❌'}</div>
+                      <div>👤 User Engaged: {userEngaged ? '✅' : '❌'}</div>
+                      <div>⏳ Pause After Video: {shouldPauseAfterVideo ? '✅' : '❌'}</div>
                       <div>🎪 Active Index: {activeIndex}</div>
                       <div>📊 Progress: {Math.round(progress)}%</div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="relative rounded-xl overflow-hidden bg-tertiary-bg h-96 flex items-center justify-center">
+                <div 
+                  className="relative rounded-xl overflow-hidden bg-tertiary-bg h-96 flex items-center justify-center"
+                  data-video-container
+                >
                   <div className="text-center">
                     <div className="icon-large bg-accent/20 text-accent mx-auto mb-4">
                       🎬
