@@ -1,5 +1,6 @@
 // src/components/LoopComponents/EnhancedAccordionItem.jsx
 import React from "react";
+import AnimatedBorderCard from "../AnimatedBorderCard";
 
 const EnhancedAccordionItem = ({
   data,
@@ -42,32 +43,13 @@ const EnhancedAccordionItem = ({
         className="sr-only" // Screen reader only - visually hidden but accessible
       />
 
-      {/* Outer container that creates the border effect */}
-      {/* Animated progress border overlay or full border */}
-      {isActive && (
-        <div 
-          className="absolute inset-0 rounded-3xl pointer-events-none"
-          style={{
-            background: shouldShowFullBorder 
-              ? 'var(--color-accent)' // Full border for manual selection
-              : `conic-gradient(
-                  from 0deg,
-                  var(--color-accent) 0deg,
-                  var(--color-accent) ${progress * 3.6}deg,
-                  transparent ${progress * 3.6}deg,
-                  transparent 360deg
-                )`, // Progress border for autoplay
-            mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-            maskComposite: 'exclude',
-            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-            WebkitMaskComposite: 'xor',
-            padding: '1px'
-          }}
-        />
-      )}
-
-      {/* Inner card with background that creates the border illusion */}
-      <div className="card-bg rounded-3xl overflow-hidden transition-all duration-100 relative z-10">
+      {/* Using the new AnimatedBorderCard component */}
+      <AnimatedBorderCard
+        isActive={isActive}
+        progress={progress}
+        showFullBorder={shouldShowFullBorder}
+        className="transition-all duration-100"
+      >
         {/* Header - Now a label for the radio input */}
         <label
           htmlFor={`accordion-${value}`}
@@ -123,7 +105,7 @@ const EnhancedAccordionItem = ({
             )}
           </div>
         </div>
-      </div>
+      </AnimatedBorderCard>
     </div>
   );
 };

@@ -155,6 +155,7 @@ const WebsiteTypes = () => {
     setProgress(newProgress);
   };
 
+  // ENHANCED: Handle video ended with simple autoplay logic
   const handleEnded = () => {
     setProgress(100);
     
@@ -163,11 +164,11 @@ const WebsiteTypes = () => {
       clearTimeout(advanceTimeoutRef.current);
     }
     
-    // Auto-advance to next item after a delay, but only if autoplay isn't paused
+    // Simple: advance to next after delay if autoplay isn't paused
     if (!isAutoplayPaused) {
       advanceTimeoutRef.current = setTimeout(() => {
         advanceToNext();
-      }, 1000); // 1 second pause at the end before advancing
+      }, 1000);
     }
   };
 
@@ -301,7 +302,7 @@ const WebsiteTypes = () => {
                     className="shadow-2xl shadow-accent/20"
                   />
                   
-                  {/* Video Info */}
+                  {/* Video Info Card with Enhanced Border Animation */}
                   <div className="mt-6 p-6 card-bg rounded-xl">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="icon-small card-icon-color">
@@ -312,6 +313,13 @@ const WebsiteTypes = () => {
                     <p className="secondary-text leading-relaxed">
                       {websiteTypes[activeIndex].description}
                     </p>
+                    
+                    {/* Simple debug info */}
+                    <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
+                      <div>⏸️ Autoplay Paused: {isAutoplayPaused ? '✅' : '❌'}</div>
+                      <div>🎪 Active Index: {activeIndex}</div>
+                      <div>📊 Progress: {Math.round(progress)}%</div>
+                    </div>
                   </div>
                 </div>
               ) : (
