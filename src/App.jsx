@@ -29,13 +29,14 @@ const GriffinsLanding = () => {
       {/* Hero Section */}
       <Hero />
 
-      <PortfolioSection />
-
       {/* About Section */}
       <About />
 
       {/* Website Types Section */}
       <WebsiteTypes />
+
+      {/* Portfolio Section */}
+      <PortfolioSection />
 
       {/* FAQ Section */}
       <FAQSection />
