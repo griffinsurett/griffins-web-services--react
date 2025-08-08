@@ -192,7 +192,7 @@ export default function PortfolioCarousel({
               key={i}
               onClick={() => onChange(i)}
               className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                i === currentIndex ? "bg-blue-500 scale-125" : "bg-white/30 hover:bg-white/50"
+                i === currentIndex ? "bg-primary scale-125" : "bg-white/30 hover:bg-white/50"
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />

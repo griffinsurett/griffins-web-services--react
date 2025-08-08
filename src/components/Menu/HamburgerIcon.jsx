@@ -24,7 +24,7 @@ export default function HamburgerIcon({ checkboxId, className = "" }) {
       htmlFor={checkboxId}
       className={`
         group                       /* enable group-hover */
-        relative w-6 h-5 cursor-pointer
+        relative h-4.5 lg:h-5 w-6  cursor-pointer
         flex flex-col justify-between items-start
         z-50
         ${className}
@@ -46,7 +46,7 @@ export default function HamburgerIcon({ checkboxId, className = "" }) {
           block h-px bg-current transition-all duration-300
           ${isOpen
             ? "opacity-0 w-full"                      /* hidden when open */
-            : "opacity-100 w-4 group-hover:w-full"}  /* expand on hover */
+            : "opacity-100 w-4 group-hover:w-full"} 
         `}
       />
 
