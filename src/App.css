@@ -262,7 +262,7 @@
     @apply text-4xl md:text-5xl font-bold text-primary-heading;
   }
   .h3 {
-    @apply text-2xl font-semibold text-primary-heading;
+    @apply text-xl font-semibold text-primary-heading;
   }
   .h4 {
     @apply font-semibold text-lg text-primary-heading;

@@ -53,9 +53,9 @@ const EnhancedAccordionItem = ({
         {/* Header - Now a label for the radio input */}
         <label
           htmlFor={`accordion-${value}`}
-          className="w-full text-left flex items-center justify-between p-6 hover:bg-card/50 transition-colors duration-300 cursor-pointer relative z-20"
+          className="w-full text-left flex items-center justify-between p-5 hover:bg-card/50 transition-colors duration-300 cursor-pointer relative z-20"
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <div className="icon-medium card-icon-color">
               {icon}
             </div>

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import EnhancedAccordionItem from "../components/LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "../components/VideoPlayer";
 import useAccordionAutoplay from "../hooks/useAccordionAutoplay";
-import EarRape from "../assets/Black-Microwave-Earrape.mp4"
+import EarRape from "../assets/Black-Microwave-Earrape.mp4";
 
 const demoVideo = EarRape; // Replace with your video paths
 
@@ -73,11 +73,12 @@ const WebsiteTypes = () => {
     isAutoplayPaused,
     userEngaged,
     shouldPauseAfterVideo,
+    isResumeScheduled, // ADD THIS LINE
     shouldShowFullBorder,
     handleManualSelection,
     handleAccordionHover,
-    handleVideoEnded, // New handler from the hook
-    advanceToNext
+    handleVideoEnded,
+    advanceToNext,
   } = useAccordionAutoplay(websiteTypes.length, 0);
 
   const [progress, setProgress] = useState(0);
@@ -137,7 +138,7 @@ const WebsiteTypes = () => {
       const mobileVideo = mobileVideoRef.current;
 
       // Reset and start both videos (only the visible one will actually play)
-      [desktopVideo, mobileVideo].forEach(video => {
+      [desktopVideo, mobileVideo].forEach((video) => {
         if (video) {
           video.currentTime = 0;
           setProgress(0);
@@ -154,22 +155,23 @@ const WebsiteTypes = () => {
   const handleTimeUpdate = () => {
     const currentVideo = getCurrentVideoRef();
     if (!currentVideo?.duration) return;
-    const newProgress = (currentVideo.currentTime / currentVideo.duration) * 100;
+    const newProgress =
+      (currentVideo.currentTime / currentVideo.duration) * 100;
     setProgress(newProgress);
   };
 
   // ENHANCED: Handle video ended with user engagement logic
   const handleEnded = () => {
     setProgress(100);
-    
+
     // Clear any existing timeout
     if (advanceTimeoutRef.current) {
       clearTimeout(advanceTimeoutRef.current);
     }
-    
+
     // Use the new handleVideoEnded from the hook which handles engagement logic
     handleVideoEnded();
-    
+
     // REMOVED: Don't do additional advancement here - let handleVideoEnded handle it
   };
 
@@ -184,13 +186,13 @@ const WebsiteTypes = () => {
     setIsTransitioning(true);
     handleManualSelection(selectedIndex);
     setProgress(0);
-    
+
     // Clear any pending advance
     if (advanceTimeoutRef.current) {
       clearTimeout(advanceTimeoutRef.current);
       advanceTimeoutRef.current = null;
     }
-    
+
     // Brief delay to allow UI to update
     setTimeout(() => {
       setIsTransitioning(false);
@@ -221,7 +223,10 @@ const WebsiteTypes = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-12" data-accordion-container>
+        <div
+          className="grid lg:grid-cols-2 gap-6 lg:gap-12"
+          data-accordion-container
+        >
           {/* Left: Accordion list */}
           <div className="flex flex-col space-y-4">
             {websiteTypes.map((websiteType, i) => (
@@ -259,7 +264,7 @@ const WebsiteTypes = () => {
           <div className="hidden lg:block">
             <div className="sticky top-8">
               {activeIndex >= 0 && activeIndex < websiteTypes.length ? (
-                <div 
+                <div
                   className="transition-all duration-500 ease-in-out"
                   data-video-container
                   onMouseEnter={() => handleAccordionHover(activeIndex, true)}
@@ -276,7 +281,7 @@ const WebsiteTypes = () => {
                     desktop={true}
                     className="shadow-2xl shadow-accent/20"
                   />
-                  
+
                   {/* Video Info Card with Enhanced Border Animation */}
                   <div className="mt-6 p-6 card-bg rounded-xl">
                     <div className="flex items-center gap-3 mb-3">
@@ -288,19 +293,28 @@ const WebsiteTypes = () => {
                     <p className="secondary-text leading-relaxed">
                       {websiteTypes[activeIndex].description}
                     </p>
-                    
+
                     {/* Enhanced debug info */}
                     <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
-                      <div>⏸️ Autoplay Paused: {isAutoplayPaused ? '✅' : '❌'}</div>
-                      <div>👤 User Engaged: {userEngaged ? '✅' : '❌'}</div>
-                      <div>⏳ Pause After Video: {shouldPauseAfterVideo ? '✅' : '❌'}</div>
+                      <div>
+                        ⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}
+                      </div>
+                      <div>👤 User Engaged: {userEngaged ? "✅" : "❌"}</div>
+                      <div>
+                        ⏳ Pause After Video:{" "}
+                        {shouldPauseAfterVideo ? "✅" : "❌"}
+                      </div>
+                      <div>
+                        ⏲️ Resume Scheduled:{" "}
+                        {isResumeScheduled ? "✅ (5s delay)" : "❌"}
+                      </div>
                       <div>🎪 Active Index: {activeIndex}</div>
                       <div>📊 Progress: {Math.round(progress)}%</div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div 
+                <div
                   className="relative rounded-xl overflow-hidden bg-tertiary-bg h-96 flex items-center justify-center"
                   data-video-container
                 >

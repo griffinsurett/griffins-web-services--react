@@ -1,139 +1,112 @@
 // src/hooks/useAccordionAutoplay.js
-import { useCallback, useEffect } from 'react';
-import { 
-  useScrollInteraction, 
-  useClickInteraction, 
-  useHoverInteraction, 
-  usePauseableState, 
-  useAutoAdvance 
-} from './useUserInteractions';
+import { useCallback, useEffect, useRef } from "react";
+import { usePauseableState, useAutoAdvance } from "./usePauseableState";
+import {
+  useScrollInteraction,
+  useClickInteraction,
+  useHoverInteraction,
+} from "./useInteractions";
 
 const useAccordionAutoplay = (totalItems, initialIndex = 0, autoAdvanceDelay = 3000) => {
-  // Use the generic pauseable state hook
-  const { 
-    isPaused: isAutoplayPaused, 
+  // Pause/engagement + centralized resume scheduler
+  const {
+    isPaused: isAutoplayPaused,
     userEngaged,
     shouldPauseAfterVideo,
-    pause, 
-    resume, 
+    isResumeScheduled,
     engageUser,
-    disengageUser,
     pauseAfterVideoIfEngaged,
-    handleResumeActivity 
+    handleResumeActivity,
   } = usePauseableState({
     initialPausedState: false,
-    resumeTriggers: ['scroll', 'click-outside', 'hover-away']
+    resumeTriggers: ["scroll", "click-outside", "hover-away"],
+    resumeDelay: 5000,
   });
 
-  // Use the generic auto-advance hook
-  const {
-    activeIndex,
-    setActiveIndex,
-    goToIndex,
-    scheduleAutoAdvance,
-    clearAutoAdvanceTimeout
-  } = useAutoAdvance({
+  // Indexing
+  const { activeIndex, setActiveIndex, goToIndex } = useAutoAdvance({
     totalItems,
     initialIndex,
     autoAdvanceDelay,
-    loop: true
+    loop: true,
   });
 
-  // Use the generic scroll interaction hook
+  // Interactions → schedule resume via centralized logic
   useScrollInteraction({
     scrollThreshold: 150,
     debounceDelay: 150,
-    onScrollActivity: () => {
-      handleResumeActivity('scroll');
-    }
+    onScrollActivity: () => handleResumeActivity("scroll"),
   });
 
-  // Use the generic click interaction hook
   useClickInteraction({
-    containerSelector: '[data-accordion-container], [data-video-container]',
-    itemSelector: '[data-accordion-item], [data-video-container]',
-    onOutsideClick: () => {
-      handleResumeActivity('click-outside');
-    },
-    onInsideClick: (event, containerElement) => {
-      // When clicking inside an accordion item or video container, engage the user
-      engageUser();
-    },
-    onItemClick: (event, itemElement, containerElement) => {
-      // When clicking on specific item or video container, engage the user
-      engageUser();
-    }
+    containerSelector: "[data-accordion-container], [data-video-container]",
+    itemSelector: "[data-accordion-item], [data-video-container]",
+    onOutsideClick: () => handleResumeActivity("click-outside"),
+    onInsideClick: () => engageUser(),
+    onItemClick: () => engageUser(),
   });
 
-  // Use the generic hover interaction hook
   const { handleMouseEnter, handleMouseLeave } = useHoverInteraction({
-    onHoverStart: (element, index) => {
-      // When hovering over an accordion item, engage the user
-      engageUser();
-    },
-    onHoverEnd: (element, index) => {
-      // When hovering away from an accordion item, disengage and potentially resume
-      handleResumeActivity('hover-away');
-    },
-    hoverDelay: 0
+    onHoverStart: () => engageUser(),
+    onHoverEnd: () => handleResumeActivity("hover-away"),
+    hoverDelay: 0,
   });
 
-  // Auto-advance logic - only used when video ends, not on a timer
+  // Advance helpers
   const advanceToNext = useCallback(() => {
     if (!isAutoplayPaused) {
-      // Use goToNext instead of scheduleAutoAdvance to advance immediately
       const nextIndex = (activeIndex + 1) % totalItems;
       goToIndex(nextIndex);
     }
   }, [isAutoplayPaused, activeIndex, totalItems, goToIndex]);
 
-  // Enhanced video ended handler - pause if user is engaged
+  // On video end:
+  // - pause if engaged
+  // - else advance after 1s
   const handleVideoEnded = useCallback(() => {
     const didPause = pauseAfterVideoIfEngaged();
-    
-    // Only advance if we didn't pause due to engagement
-    if (!didPause) {
-      // Add a small delay before advancing to next item
-      setTimeout(() => {
-        advanceToNext();
-      }, 1000);
-    }
+    if (!didPause) setTimeout(advanceToNext, 1000);
   }, [pauseAfterVideoIfEngaged, advanceToNext]);
 
-  // Manual selection handler
-  const handleManualSelection = useCallback((index) => {
-    goToIndex(index);
-    engageUser(); // User manually selected, so they're engaged
-  }, [goToIndex, engageUser]);
-
-  // Accordion-specific hover handlers (delegated to the generic hover hook)
-  const handleAccordionHover = useCallback((index, isHovering) => {
-    if (isHovering) {
-      handleMouseEnter(null, index);
-    } else {
-      handleMouseLeave(null, index);
+  // When the centralized scheduler resumes autoplay, nudge to next item
+  const prevPausedRef = useRef(isAutoplayPaused);
+  useEffect(() => {
+    if (prevPausedRef.current && !isAutoplayPaused) {
+      advanceToNext();
     }
-  }, [handleMouseEnter, handleMouseLeave]);
+    prevPausedRef.current = isAutoplayPaused;
+  }, [isAutoplayPaused, advanceToNext]);
 
-  // No special border logic - border always follows video progress
-  const shouldShowFullBorder = useCallback(() => {
-    return false; // Always show progress border, never full border
-  }, []);
+  // Manual selection
+  const handleManualSelection = useCallback(
+    (index) => {
+      goToIndex(index);
+      engageUser();
+    },
+    [goToIndex, engageUser]
+  );
 
-  // Remove the automatic scheduling effect - let videos drive the timing
-  // The advancement should only happen when videos actually end
+  // Presentational extras
+  const handleAccordionHover = useCallback(
+    (index, isHovering) =>
+      isHovering ? handleMouseEnter(null, index) : handleMouseLeave(null, index),
+    [handleMouseEnter, handleMouseLeave]
+  );
+
+  const shouldShowFullBorder = () => false;
 
   return {
     activeIndex,
     isAutoplayPaused,
+    isResumeScheduled,
     userEngaged,
     shouldPauseAfterVideo,
     shouldShowFullBorder,
     handleManualSelection,
     handleAccordionHover,
-    handleVideoEnded, // New: specific handler for video ended
+    handleVideoEnded,
     advanceToNext,
-    setActiveIndex
+    setActiveIndex,
   };
 };
 
