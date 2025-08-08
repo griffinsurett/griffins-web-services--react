@@ -26,7 +26,7 @@ const EnhancedAccordionItem = ({
   };
 
   return (
-    <div 
+    <div
       className={`group relative ${className}`}
       data-accordion-item
       onMouseEnter={handleMouseEnter}
@@ -56,25 +56,23 @@ const EnhancedAccordionItem = ({
           className="w-full text-left flex items-center justify-between p-5 hover:bg-card/50 transition-colors duration-300 cursor-pointer relative z-20"
         >
           <div className="flex items-center gap-2">
-            <div className="icon-medium card-icon-color">
-              {icon}
-            </div>
+            <div className="icon-medium card-icon-color">{icon}</div>
             <div>
               <h3 className="h3">{title}</h3>
             </div>
           </div>
-          
+
           {/* Expand/Collapse Icon */}
           <div
             className={`
-              w-8 h-8 rounded-full flex items-center justify-center
-              transition-all duration-300 text-xl font-normal leading-none
-              ${isActive 
-                ? "bg-accent text-black" 
-                : "bg-accent/20 text-accent"
-              }
-            `}
-          >
+            w-8 h-8 rounded-full flex items-center justify-center
+            transition-all duration-600 text-xl font-normal leading-none
+            ${
+              isActive
+                ? "bg-accent text-black"
+                : "bg-accent/20 group-hover:bg-accent/30 text-accent"
+            }
+          `}>
             <span className="block transform translate-y-[-1px]">
               {isActive ? "−" : "+"}
             </span>
@@ -91,18 +89,12 @@ const EnhancedAccordionItem = ({
           <div className="px-6 pb-6">
             {/* Divider */}
             <div className="w-full h-px bg-accent/20 mb-4" />
-            
+
             {/* Description */}
-            <p className="secondary-text leading-relaxed mb-6">
-              {description}
-            </p>
-            
+            <p className="secondary-text leading-relaxed mb-6">{description}</p>
+
             {/* Children (Video player on mobile) */}
-            {children && (
-              <div className="lg:hidden">
-                {children}
-              </div>
-            )}
+            {children && <div className="lg:hidden">{children}</div>}
           </div>
         </div>
       </AnimatedBorderCard>

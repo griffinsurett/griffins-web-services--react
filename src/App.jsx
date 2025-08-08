@@ -11,6 +11,7 @@ import Stats from "./Sections/Stats";
 import Testimonials from "./Sections/Testimonials";
 import CTASection from "./Sections/CTASection";
 import QuoteForm from "./Sections/QuoteForm";
+import PortfolioSection from "./Sections/PortfolioSection";
 
 const GriffinsLanding = () => {
   useEffect(() => {
@@ -25,9 +26,10 @@ const GriffinsLanding = () => {
     <div className="primary-bg primary-text min-h-screen">
       {/* Navigation */}
       <Header />
-
       {/* Hero Section */}
       <Hero />
+
+      <PortfolioSection />
 
       {/* About Section */}
       <About />

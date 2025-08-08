@@ -284,7 +284,7 @@ const WebsiteTypes = () => {
 
                   {/* Video Info Card with Enhanced Border Animation */}
                   <div className="mt-6 p-6 card-bg rounded-xl">
-                    <div className="flex items-center gap-3 mb-3">
+                    <div className="flex items-center gap-4 mb-3">
                       <div className="icon-small card-icon-color">
                         {websiteTypes[activeIndex].icon}
                       </div>
