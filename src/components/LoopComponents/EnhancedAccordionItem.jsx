@@ -40,7 +40,10 @@ const EnhancedAccordionItem = ({
         value={value}
         checked={isActive}
         onChange={onToggle}
-        className="sr-only" // Screen reader only - visually hidden but accessible
+        className="absolute -left-[9999px]" // keep it out of flow so no scroll-on-focus
+        tabIndex={-1} // don't take focus
+        aria-hidden="true" // label still toggles it
+        data-accordion-radio
       />
 
       {/* Using the new AnimatedBorderCard component */}
@@ -54,6 +57,7 @@ const EnhancedAccordionItem = ({
         <label
           htmlFor={`accordion-${value}`}
           className="w-full text-left flex items-center justify-between p-5 hover:bg-card/50 transition-colors duration-300 cursor-pointer relative z-20"
+          onMouseDown={(e) => e.preventDefault()} // prevent focus jump
         >
           <div className="flex items-center gap-2">
             <div className="icon-medium card-icon-color">{icon}</div>
@@ -72,7 +76,8 @@ const EnhancedAccordionItem = ({
                 ? "bg-accent text-black"
                 : "bg-accent/20 group-hover:bg-accent/30 text-accent"
             }
-          `}>
+          `}
+          >
             <span className="block transform translate-y-[-1px]">
               {isActive ? "−" : "+"}
             </span>
