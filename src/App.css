@@ -254,6 +254,10 @@
     @apply text-2xl font-bold;
   }
 
+  button {
+    @apply cursor-pointer;
+  }
+
   /* Typography - updated with color variables */
   .h1 {
     @apply text-5xl md:text-7xl font-extrabold leading-tight text-primary-heading;

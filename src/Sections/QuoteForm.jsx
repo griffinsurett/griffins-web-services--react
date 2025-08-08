@@ -81,7 +81,7 @@ const QuoteForm = () => {
         >
           <div className="inner-card-style"></div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-8 relative z-10">
+          <div className="grid md:grid-cols-2 gap-4 mb-5 relative z-10">
             <Input
               type="text"
               name="name"

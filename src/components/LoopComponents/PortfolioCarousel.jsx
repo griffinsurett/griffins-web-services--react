@@ -169,14 +169,14 @@ export default function PortfolioCarousel({
             <button
               onClick={goToPrevious}
               aria-label="Previous"
-              className="absolute left-3 top-3 lg:left-8 lg:top-1/2 lg:-translate-y-1/2 z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 text-white backdrop-blur-sm hover:bg-white/20 transition"
+              className="absolute left-3 top-3 lg:left-8 lg:top-1/2 lg:-translate-y-1/2 z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 secondary-text backdrop-blur-sm hover:bg-white/20 transition"
             >
               <ChevronLeft className="mx-auto my-auto w-5 h-5 md:w-6 md:h-6" />
             </button>
             <button
               onClick={goToNext}
               aria-label="Next"
-              className="absolute right-3 top-3 lg:right-8 lg:top-1/2 lg:-translate-y-1/2 z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 text-white backdrop-blur-sm hover:bg-white/20 transition"
+              className="absolute right-3 top-3 lg:right-8 lg:top-1/2 lg:-translate-y-1/2 z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 secondary-text backdrop-blur-sm hover:bg-white/20 transition"
             >
               <ChevronRight className="mx-auto my-auto w-5 h-5 md:w-6 md:h-6" />
             </button>
@@ -192,7 +192,7 @@ export default function PortfolioCarousel({
               key={i}
               onClick={() => onChange(i)}
               className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                i === currentIndex ? "bg-primary scale-125" : "bg-white/30 hover:bg-white/50"
+                i === currentIndex ? "bg-primary scale-130" : "bg-white/20 hover:bg-white/50"
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />
