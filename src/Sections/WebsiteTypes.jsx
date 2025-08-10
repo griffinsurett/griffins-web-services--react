@@ -208,16 +208,6 @@ const WebsiteTypes = () => {
 
   return (
     <>
-      <style jsx>{`
-        @media (max-width: 1024px) {
-          [data-accordion-container] {
-            scroll-behavior: smooth;
-          }
-          [data-accordion-item] {
-            transition: all 0.1s ease !important; 
-          }
-        }  
-   `}</style>
       <section className="outer-section bg-secondary relative">
         <div className="section-dim-border"></div>
         <div className="inner-section">
