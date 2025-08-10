@@ -15,7 +15,7 @@ const Button = ({
 
   // Define each variant’s full set of classes
   const variantClasses = {
-    primary: `${baseClasses} border border-accent bg-accent hover:bg-primary-secondary text-black hover:text-white hover:bg-transparent`,
+    primary: `${baseClasses} border-2 border-accent bg-accent hover:bg-primary-secondary text-black hover:text-white hover:bg-transparent`,
     secondary: `${baseClasses} border-2 border-accent hover:bg-accent hover:text-black text-white`,
   };
 
