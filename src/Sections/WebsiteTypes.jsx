@@ -1,15 +1,15 @@
-// Simple solution - just modify WebsiteTypes.jsx
+// Updated WebsiteTypes.jsx - Use existing useScrollAnimation hook
 import React, { useState, useEffect, useRef } from "react";
 import EnhancedAccordionItem from "../components/LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "../components/VideoPlayer";
 import useAccordionAutoplay from "../hooks/useAccordionAutoplay";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
 
 const demoVideo = EarRape;
 
 const WebsiteTypes = () => {
   const sectionRef = useRef(null);
-  const [isInView, setIsInView] = useState(false);
 
   const websiteTypes = [
     {
@@ -70,28 +70,12 @@ const WebsiteTypes = () => {
     },
   ];
 
-  // Intersection Observer to detect when section is visible
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsInView(entry.isIntersecting);
-      },
-      {
-        threshold: 0.3, // Trigger when 30% of section is visible
-        rootMargin: "0px",
-      }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
+  // Use your existing useScrollAnimation hook just for the IntersectionObserver
+  const isInView = useScrollAnimation(sectionRef, {
+    threshold: 0.3, // 30% of section visible
+    onForward: () => {}, // We don't need the scroll direction logic
+    onBackward: () => {}, // Just the intersection detection
+  });
 
   // Use existing hooks unchanged
   const {
