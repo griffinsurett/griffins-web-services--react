@@ -45,6 +45,25 @@
   }
 }
 
+@media (max-width: 1024px) {
+  /* Disable autoplay on mobile entirely */
+  [data-accordion-container] {
+    /* Pause all animations during scroll */
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent rapid height changes */
+  [data-accordion-item] {
+    transition: all 0.1s ease !important; /* Faster transitions */
+  }
+  
+  /* Prevent iOS bounce */
+  body {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Background utilities */
 @utility primary-bg {
   background-color: var(--color-bg);
