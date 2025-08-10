@@ -213,7 +213,6 @@ const WebsiteTypes = () => {
           [data-accordion-container] {
             scroll-behavior: smooth;
           }
-
           [data-accordion-item] {
             transition: all 0.1s ease !important; 
           }
