@@ -1,14 +1,16 @@
-// src/Sections/WebsiteTypes.jsx
+// Simple solution - just modify WebsiteTypes.jsx
 import React, { useState, useEffect, useRef } from "react";
 import EnhancedAccordionItem from "../components/LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "../components/VideoPlayer";
 import useAccordionAutoplay from "../hooks/useAccordionAutoplay";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
 
-const demoVideo = EarRape; // Replace with your video paths
+const demoVideo = EarRape;
 
 const WebsiteTypes = () => {
-  // Add video sources to your existing data
+  const sectionRef = useRef(null);
+  const [isInView, setIsInView] = useState(false);
+
   const websiteTypes = [
     {
       icon: "🚀",
@@ -68,12 +70,36 @@ const WebsiteTypes = () => {
     },
   ];
 
+  // Intersection Observer to detect when section is visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      {
+        threshold: 0.3, // Trigger when 30% of section is visible
+        rootMargin: "0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, []);
+
+  // Use existing hooks unchanged
   const {
     activeIndex,
     isAutoplayPaused,
     userEngaged,
     shouldPauseAfterVideo,
-    isResumeScheduled, // ADD THIS LINE
+    isResumeScheduled,
     shouldShowFullBorder,
     handleManualSelection,
     handleAccordionHover,
@@ -88,9 +114,15 @@ const WebsiteTypes = () => {
   const [wasVideoPaused, setWasVideoPaused] = useState(false);
   const advanceTimeoutRef = useRef(null);
 
-  // Get the current active video ref
+  // Clear autoplay timeouts when section is not in view
+  useEffect(() => {
+    if (!isInView && advanceTimeoutRef.current) {
+      clearTimeout(advanceTimeoutRef.current);
+      advanceTimeoutRef.current = null;
+    }
+  }, [isInView]);
+
   const getCurrentVideoRef = () => {
-    // Check if desktop video is visible (window width >= 1024px)
     if (window.innerWidth >= 1024) {
       return desktopVideoRef.current;
     }
@@ -98,23 +130,19 @@ const WebsiteTypes = () => {
   };
 
   const handleVideoClick = () => {
-    // When user clicks on video, pause autoplay to respect their control
     handleManualSelection(activeIndex);
   };
 
-  // Watch for autoplay resume to continue video playback
   useEffect(() => {
     const currentVideo = getCurrentVideoRef();
     if (!currentVideo) return;
 
     if (!isAutoplayPaused && wasVideoPaused) {
-      // Resume video playback when autoplay resumes
       currentVideo.play().catch(() => {
         console.log("Resume play prevented");
       });
       setWasVideoPaused(false);
     } else if (isAutoplayPaused && !currentVideo.paused) {
-      // Only pause video if it was paused by autoplay, not by user click
       if (!currentVideo.dataset.userPaused) {
         currentVideo.pause();
         setWasVideoPaused(true);
@@ -122,22 +150,19 @@ const WebsiteTypes = () => {
     }
   }, [isAutoplayPaused, wasVideoPaused]);
 
-  // Reset & autoplay whenever the active panel changes
+  // Reset & autoplay whenever the active panel changes (only if in view)
   useEffect(() => {
-    if (isTransitioning) return;
+    if (isTransitioning || !isInView) return;
 
-    // Clear any pending advance timeout
     if (advanceTimeoutRef.current) {
       clearTimeout(advanceTimeoutRef.current);
       advanceTimeoutRef.current = null;
     }
 
-    // Small delay to ensure video element is ready
     const timer = setTimeout(() => {
       const desktopVideo = desktopVideoRef.current;
       const mobileVideo = mobileVideoRef.current;
 
-      // Reset and start both videos (only the visible one will actually play)
       [desktopVideo, mobileVideo].forEach((video) => {
         if (video) {
           video.currentTime = 0;
@@ -150,31 +175,30 @@ const WebsiteTypes = () => {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [activeIndex, isTransitioning]);
+  }, [activeIndex, isTransitioning, isInView]);
 
   const handleTimeUpdate = () => {
     const currentVideo = getCurrentVideoRef();
     if (!currentVideo?.duration) return;
-    const newProgress =
-      (currentVideo.currentTime / currentVideo.duration) * 100;
+    const newProgress = (currentVideo.currentTime / currentVideo.duration) * 100;
     setProgress(newProgress);
   };
 
-  // ENHANCED: Handle video ended with user engagement logic
+  // Wrap handleVideoEnded to only work when section is visible
   const handleEnded = () => {
     setProgress(100);
 
-    // Clear any existing timeout
     if (advanceTimeoutRef.current) {
       clearTimeout(advanceTimeoutRef.current);
     }
 
-    // Use the new handleVideoEnded from the hook which handles engagement logic
-    handleVideoEnded();
+    // Only handle video ended if section is in view
+    if (isInView) {
+      handleVideoEnded();
+    }
   };
 
   const handleVideoLoad = () => {
-    // When video loads, just ensure progress is reset
     setProgress(0);
   };
 
@@ -185,19 +209,16 @@ const WebsiteTypes = () => {
     handleManualSelection(selectedIndex);
     setProgress(0);
 
-    // Clear any pending advance
     if (advanceTimeoutRef.current) {
       clearTimeout(advanceTimeoutRef.current);
       advanceTimeoutRef.current = null;
     }
 
-    // Brief delay to allow UI to update
     setTimeout(() => {
       setIsTransitioning(false);
     }, 150);
   };
 
-  // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (advanceTimeoutRef.current) {
@@ -207,12 +228,14 @@ const WebsiteTypes = () => {
   }, []);
 
   return (
-    <>
-      <section className="outer-section bg-secondary relative">
-        <div className="section-dim-border"></div>
-        <div className="inner-section">
-          <div className="text-section">
-            <div className="border-title">Website Types</div>
+    <section 
+      ref={sectionRef}
+      className="outer-section bg-secondary relative"
+    >
+      <div className="section-dim-border"></div>
+      <div className="inner-section">
+        <div className="text-section">
+          <div className="border-title">Website Types</div>
           <h2 className="h2 mb-6">
             Websites We <span className="text-accent-heading">Build</span>
           </h2>
@@ -281,7 +304,6 @@ const WebsiteTypes = () => {
                     className="shadow-2xl shadow-accent/20"
                   />
 
-                  {/* Video Info Card with Enhanced Border Animation */}
                   <div className="mt-6 p-6 card-bg rounded-xl">
                     <div className="flex items-center gap-4 mb-3">
                       <div className="icon-small card-icon-color">
@@ -293,20 +315,13 @@ const WebsiteTypes = () => {
                       {websiteTypes[activeIndex].description}
                     </p>
 
-                    {/* Enhanced debug info */}
+                    {/* Debug info */}
                     <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
-                      <div>
-                        ⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}
-                      </div>
+                      <div>👁️ Section In View: {isInView ? "✅" : "❌"}</div>
+                      <div>⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
                       <div>👤 User Engaged: {userEngaged ? "✅" : "❌"}</div>
-                      <div>
-                        ⏳ Pause After Video:{" "}
-                        {shouldPauseAfterVideo ? "✅" : "❌"}
-                      </div>
-                      <div>
-                        ⏲️ Resume Scheduled:{" "}
-                        {isResumeScheduled ? "✅ (5s delay)" : "❌"}
-                      </div>
+                      <div>⏳ Pause After Video: {shouldPauseAfterVideo ? "✅" : "❌"}</div>
+                      <div>⏲️ Resume Scheduled: {isResumeScheduled ? "✅ (5s delay)" : "❌"}</div>
                       <div>🎪 Active Index: {activeIndex}</div>
                       <div>📊 Progress: {Math.round(progress)}%</div>
                     </div>
@@ -332,7 +347,6 @@ const WebsiteTypes = () => {
         </div>
       </div>
     </section>
-    </>
   );
 };
 
