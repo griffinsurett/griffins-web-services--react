@@ -171,8 +171,6 @@ const WebsiteTypes = () => {
 
     // Use the new handleVideoEnded from the hook which handles engagement logic
     handleVideoEnded();
-
-    // REMOVED: Don't do additional advancement here - let handleVideoEnded handle it
   };
 
   const handleVideoLoad = () => {
