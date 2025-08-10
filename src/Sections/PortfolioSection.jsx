@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+// Updated PortfolioSection.jsx - Add section visibility detection
+import React, { useState, useRef } from "react";
 import PortfolioCarousel from "../components/LoopComponents/PortfolioCarousel";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import Placeholder from "../assets/placeholder.jpg"
 
 export default function PortfolioSection() {
+  const sectionRef = useRef(null);
+
   const items = [
     { id: 1, title: "E-commerce", image: Placeholder },
     { id: 2, title: "Restaurant", image: Placeholder },
@@ -15,8 +19,18 @@ export default function PortfolioSection() {
 
   const [index, setIndex] = useState(0);
 
+  // Use existing useScrollAnimation hook for section visibility
+  const isInView = useScrollAnimation(sectionRef, {
+    threshold: 0.3, // 30% of section visible
+    onForward: () => {},
+    onBackward: () => {},
+  });
+
   return (
-    <section className="w-screen overflow-x-hidden outer-section bg-secondary relative">
+    <section 
+      ref={sectionRef}
+      className="w-screen overflow-x-hidden outer-section bg-secondary relative"
+    >
       <div className="inner-section">
         <header className="text-section">
           <div className="border-title">Our Projects</div>
@@ -34,7 +48,7 @@ export default function PortfolioSection() {
           onChange={setIndex}
           showArrows={false}
           showDots={true}
-          autoPlay={true}
+          autoPlay={isInView} // Only autoplay when section is in view
           autoPlayInterval={4000}
           pauseOnHover={true}
         />
