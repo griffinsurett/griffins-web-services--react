@@ -65,16 +65,21 @@ export const usePauseableState = ({
     return false;
   }, [shouldPauseAfterVideo, userEngaged]);
 
-  const handleResumeActivity = useCallback(
-    (triggerType) => {
-      if (!resumeTriggers.includes(triggerType)) return;
-      // If paused (at end) or still in "engaged" state: schedule resume
-      if (isPaused || userEngaged) {
-        scheduleResume();
-      }
-    },
-    [resumeTriggers, isPaused, userEngaged, scheduleResume]
-  );
+const handleResumeActivity = useCallback(
+  (triggerType) => {
+    if (!resumeTriggers.includes(triggerType)) return;
+
+    // Disengage immediately for all resume triggers
+    setUserEngaged(false);
+    setShouldPauseAfterVideo(false);
+
+    // Schedule resume only if actually paused
+    if (isPaused) {
+      scheduleResume();
+    }
+  },
+  [resumeTriggers, isPaused, scheduleResume]
+);
 
   useEffect(() => () => cancelScheduledResume(), [cancelScheduledResume]);
 

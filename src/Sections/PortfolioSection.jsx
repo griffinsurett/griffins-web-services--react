@@ -1,8 +1,8 @@
-// Updated PortfolioSection.jsx - Add section visibility detection
-import React, { useState, useRef } from "react";
-import PortfolioCarousel from "../components/LoopComponents/PortfolioCarousel";
+// src/Sections/PortfolioSection.jsx
+import React, { useRef } from "react";
+import PortfolioCarousel from "../components/PortfolioCarousel";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
-import Placeholder from "../assets/placeholder.jpg"
+import Placeholder from "../assets/placeholder.jpg";
 
 export default function PortfolioSection() {
   const sectionRef = useRef(null);
@@ -17,19 +17,18 @@ export default function PortfolioSection() {
     { id: 7, title: "SaaS",       image: Placeholder },
   ];
 
-  const [index, setIndex] = useState(0);
-
-  // Use existing useScrollAnimation hook for section visibility
-  const isInView = useScrollAnimation(sectionRef, {
-    threshold: 0.3, // 30% of section visible
+  // Keep section-specific concerns here (e.g., header animations)
+  useScrollAnimation(sectionRef, {
+    threshold: 0.3,
     onForward: () => {},
     onBackward: () => {},
   });
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="w-screen overflow-x-hidden outer-section bg-secondary relative"
+      data-portfolio-section
     >
       <div className="inner-section">
         <header className="text-section">
@@ -42,16 +41,8 @@ export default function PortfolioSection() {
           </p>
         </header>
 
-        <PortfolioCarousel
-          items={items}
-          currentIndex={index}
-          onChange={setIndex}
-          showArrows={false}
-          showDots={true}
-          autoPlay={isInView} // Only autoplay when section is in view
-          autoPlayInterval={4000}
-          pauseOnHover={true}
-        />
+        {/* Carousel owns its autoplay/engagement */}
+        <PortfolioCarousel items={items} autoAdvanceDelay={4000} autoplay />
       </div>
     </section>
   );

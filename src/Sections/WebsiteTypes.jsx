@@ -164,7 +164,8 @@ const WebsiteTypes = () => {
   const handleTimeUpdate = () => {
     const currentVideo = getCurrentVideoRef();
     if (!currentVideo?.duration) return;
-    const newProgress = (currentVideo.currentTime / currentVideo.duration) * 100;
+    const newProgress =
+      (currentVideo.currentTime / currentVideo.duration) * 100;
     setProgress(newProgress);
   };
 
@@ -212,10 +213,7 @@ const WebsiteTypes = () => {
   }, []);
 
   return (
-    <section 
-      ref={sectionRef}
-      className="outer-section bg-secondary relative"
-    >
+    <section ref={sectionRef} className="outer-section bg-secondary relative">
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">
@@ -302,10 +300,18 @@ const WebsiteTypes = () => {
                     {/* Debug info */}
                     <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
                       <div>👁️ Section In View: {isInView ? "✅" : "❌"}</div>
-                      <div>⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
+                      <div>
+                        ⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}
+                      </div>
                       <div>👤 User Engaged: {userEngaged ? "✅" : "❌"}</div>
-                      <div>⏳ Pause After Video: {shouldPauseAfterVideo ? "✅" : "❌"}</div>
-                      <div>⏲️ Resume Scheduled: {isResumeScheduled ? "✅ (5s delay)" : "❌"}</div>
+                      <div>
+                        ⏳ Pause After Video:{" "}
+                        {shouldPauseAfterVideo ? "✅" : "❌"}
+                      </div>
+                      <div>
+                        ⏲️ Resume Scheduled:{" "}
+                        {isResumeScheduled ? "✅ (5s delay)" : "❌"}
+                      </div>
                       <div>🎪 Active Index: {activeIndex}</div>
                       <div>📊 Progress: {Math.round(progress)}%</div>
                     </div>
