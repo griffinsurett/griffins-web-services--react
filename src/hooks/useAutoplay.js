@@ -2,14 +2,15 @@
 import { useEffect, useRef, useCallback } from "react";
 
 /**
- * Very small hook: advances an index on an interval.
- * No pause, no resume, no engagement awareness.
+ * Advances an index on a timer.
+ * - autoplayTime: number | () => number (ms)
+ * - schedule(): recompute delay and (re)start the timer
  */
 export default function useAutoplay({
   totalItems,
   currentIndex,
   setIndex,
-  interval = 4000,
+  autoplayTime = 3000,   // number | () => number
   loop = true,
   enabled = true,
 }) {
@@ -24,20 +25,24 @@ export default function useAutoplay({
 
   const advance = useCallback(() => {
     if (totalItems <= 1) return;
-    const nextIndex = currentIndex + 1;
-    if (nextIndex >= totalItems) {
-      setIndex(loop ? 0 : totalItems - 1);
-    } else {
-      setIndex(nextIndex);
-    }
+    const next = currentIndex + 1;
+    setIndex(next >= totalItems ? (loop ? 0 : totalItems - 1) : next);
   }, [currentIndex, setIndex, totalItems, loop]);
+
+  const resolveDelay = useCallback(() => {
+    try {
+      return typeof autoplayTime === "function" ? autoplayTime() : autoplayTime;
+    } catch {
+      return 3000;
+    }
+  }, [autoplayTime]);
 
   const schedule = useCallback(() => {
     clearTimer();
-    if (enabled && totalItems > 1) {
-      timerRef.current = setTimeout(advance, interval);
-    }
-  }, [enabled, totalItems, interval, advance, clearTimer]);
+    if (!enabled || totalItems <= 1) return;
+    const delay = Math.max(0, Number(resolveDelay()) || 0);
+    timerRef.current = setTimeout(advance, delay);
+  }, [enabled, totalItems, advance, resolveDelay, clearTimer]);
 
   useEffect(() => {
     schedule();

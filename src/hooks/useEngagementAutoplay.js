@@ -8,14 +8,14 @@ export default function useEngagementAutoplay({
   totalItems,
   currentIndex,
   setIndex,
-  interval = 4000,
+  autoplayTime = 3000,        // number | () => number
   resumeDelay = 5000,
   resumeTriggers = ["scroll", "click-outside", "hover-away"],
   containerSelector = "[data-autoplay-container]",
   itemSelector = "[data-autoplay-item]",
   inView = true,
-  nudgeOnResume = true,
-  pauseOnEngage = false,
+  nudgeOnResume = false,
+  pauseOnEngage = false,       // 🚫 do not pause immediately on engage
   engageOnlyOnActiveItem = false,
   activeItemAttr = "data-active",
 }) {
@@ -33,15 +33,15 @@ export default function useEngagementAutoplay({
     resumeDelay,
   });
 
-  const { advance } = useAutoplay({
+  const { advance, schedule } = useAutoplay({
     totalItems,
     currentIndex,
     setIndex,
-    interval,
+    autoplayTime,              // 🔁 remaining video + delay
     enabled: !isPaused && inView,
   });
 
-  // Nudge forward after resuming from paused/hidden state
+  // Nudge forward after resuming
   const prevPaused = useRef(isPaused || !inView);
   useEffect(() => {
     const was = prevPaused.current;
@@ -57,25 +57,26 @@ export default function useEngagementAutoplay({
     onScrollActivity: () => handleResumeActivity("scroll"),
   });
 
-  // Clicks:
-  // - outside → schedule resume
-  // - item click → engage only if active (when requested)
+  // Click interactions
   useClickInteraction({
     containerSelector,
     itemSelector,
     onOutsideClick: () => handleResumeActivity("click-outside"),
-    onInsideClick: () => {}, // don't blanket-engage on container clicks
+    onInsideClick: () => {},
     onItemClick: (e, item) => {
       if (engageOnlyOnActiveItem) {
         const isActive = item?.getAttribute?.(activeItemAttr) === "true";
         if (!isActive) return;
       }
       engageUser();
-      if (pauseOnEngage) pause();
+      // 🚫 do NOT pause video/autoplay here; only mark engagement
+      if (pauseOnEngage) {
+        // kept for API parity; default is false
+      }
     },
   });
 
-  // Hover on items only → engage if (active); leave → schedule resume
+  // Hover engagement on active items only
   useEffect(() => {
     const items = Array.from(document.querySelectorAll(itemSelector));
     if (!items.length) return;
@@ -87,7 +88,9 @@ export default function useEngagementAutoplay({
         if (!isActive) return;
       }
       engageUser();
-      if (pauseOnEngage) pause();
+      if (pauseOnEngage) {
+        // intentionally noop by default
+      }
     };
     const onLeave = () => handleResumeActivity("hover-away");
 
@@ -102,7 +105,6 @@ export default function useEngagementAutoplay({
         el.removeEventListener("mouseleave", onLeave);
       });
     };
-    // Rebind when active slide changes or DOM could have updated
   }, [
     itemSelector,
     activeItemAttr,
@@ -110,8 +112,7 @@ export default function useEngagementAutoplay({
     pauseOnEngage,
     engageUser,
     handleResumeActivity,
-    pause,
-    currentIndex, // 👈 ensures we re-read active flags per render
+    currentIndex,
   ]);
 
   return {
@@ -122,5 +123,6 @@ export default function useEngagementAutoplay({
     resume,
     engageUser,
     advance,
+    schedule,                  // 👈 allow rescheduling when video progress changes
   };
 }
