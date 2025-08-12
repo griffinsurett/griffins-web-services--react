@@ -219,7 +219,7 @@ const WebsiteTypes = () => {
         <div className="text-section">
           <div className="border-title">Website Types</div>
           <h2 className="h2 mb-6">
-            Websites We <span className="text-accent-heading">Build</span>
+            Websites We <span className="emphasized-text">Build</span>
           </h2>
           <p className="large-text">
             From simple landing pages to complex web applications - we create
