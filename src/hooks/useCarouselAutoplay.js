@@ -19,15 +19,14 @@ export default function useCarouselAutoplay({
     totalItems,
     currentIndex,
     setIndex,
-    interval: autoAdvanceDelay,
+    autoplayTime: autoAdvanceDelay, // aligned to the new API (number | fn)
     resumeDelay: 5000,
     resumeTriggers: ["scroll", "click-outside", "hover-away"],
     containerSelector,
     itemSelector,
     inView,
-    nudgeOnResume: true,
     pauseOnEngage: true,
-    engageOnlyOnActiveItem: true,     // 👈 key behavior
-    activeItemAttr: "data-active",    // 👈 reads the attribute we added
+    engageOnlyOnActiveItem: true,
+    activeItemAttr: "data-active",
   });
 }

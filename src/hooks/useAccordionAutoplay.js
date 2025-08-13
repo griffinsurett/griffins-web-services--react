@@ -4,14 +4,14 @@ import useEngagementAutoplay from "./useEngagementAutoplay";
 
 /**
  * Native-radio–driven accordion autoplay.
- * - We derive active from radios; autoplay advances by clicking the next radio.
- * - Engagement never pauses video; it only causes us to pause AUTOPLAY once the video ends.
- * - Accepts `autoplayTime`: number | () => number (ms), typically (remaining video + delay).
+ * - Active panel is derived from radios; autoplay advances by clicking the next radio.
+ * - Engagement never pauses the video; it only causes us to pause AUTOPLAY once the video ends.
+ * - `autoplayTime`: number | () => number (ms), typically (remaining video + delay).
  */
 export default function useAccordionAutoplay({
   totalItems,
   initialIndex = 0,
-  autoplayTime = 3000,       // number | () => number
+  autoplayTime = 3000, // number | () => number
   inView = true,
   radioName = "website-types",
 }) {
@@ -27,7 +27,7 @@ export default function useAccordionAutoplay({
       );
       if (input) {
         suppressEngageRef.current = true;
-        input.click(); // semantic + fires change
+        input.click(); // semantic + fires 'change'
       }
     },
     [radioName]
@@ -37,14 +37,13 @@ export default function useAccordionAutoplay({
     totalItems,
     currentIndex: activeIndex,
     setIndex: selectIndex,
-    autoplayTime,                 // 🔁 remaining time + delay (or static)
+    autoplayTime,
     resumeDelay: 5000,
     resumeTriggers: ["scroll", "click-outside", "hover-away"],
     containerSelector: "[data-accordion-container], [data-video-container]",
     itemSelector: "[data-accordion-item], [data-video-container]",
     inView,
-    nudgeOnResume: false,
-    pauseOnEngage: false,         // 🚫 don’t pause on engage
+    pauseOnEngage: false,
     engageOnlyOnActiveItem: true,
     activeItemAttr: "data-active",
   });
@@ -91,13 +90,8 @@ export default function useAccordionAutoplay({
   };
 
   const handleVideoEnded = useCallback(() => {
-    // If engaged, pause AUTOPLAY now; otherwise advance after 1s
-    if (core.userEngaged) {
-      core.pause();
-    } else {
-      setTimeout(core.advance, 1000);
-    }
-  }, [core]);
+   core.beginGraceWindow(); // tell the engine we’re in the delay/grace window
+ }, [core.beginGraceWindow]);
 
   return {
     activeIndex,
@@ -107,7 +101,7 @@ export default function useAccordionAutoplay({
     handleManualSelection,
     handleVideoEnded,
     advanceToNext: core.advance,
-    reschedule: core.schedule, // 👈 call when video time changes
+    reschedule: core.schedule, // call when video timing changes
     shouldShowFullBorder: () => false,
   };
 }

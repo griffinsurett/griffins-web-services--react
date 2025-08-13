@@ -1,9 +1,17 @@
 // src/hooks/useEngagementAutoplay.js
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import useAutoplay from "./useAutoplay";
 import { usePauseableState } from "./usePauseableState";
 import { useScrollInteraction, useClickInteraction } from "./useInteractions";
 
+/**
+ * Engagement-aware autoplay controller.
+ *
+ * - `autoplayTime`: number | () => number (ms). If a function, it’s called each (re)schedule.
+ *   Great for “video remaining + delay” logic.
+ * - Engagement marks user as “engaged”; you decide whether to pause immediately via `pauseOnEngage`.
+ * - Resume after inactivity is handled by `usePauseableState` with `resumeDelay` and triggers.
+ */
 export default function useEngagementAutoplay({
   totalItems,
   currentIndex,
@@ -14,11 +22,11 @@ export default function useEngagementAutoplay({
   containerSelector = "[data-autoplay-container]",
   itemSelector = "[data-autoplay-item]",
   inView = true,
-  nudgeOnResume = false,
-  pauseOnEngage = false,       // 🚫 do not pause immediately on engage
+  pauseOnEngage = false,       // do not pause immediately by default
   engageOnlyOnActiveItem = false,
   activeItemAttr = "data-active",
 }) {
+    const graceRef = useRef(false);
   const {
     isPaused,
     userEngaged,
@@ -33,22 +41,31 @@ export default function useEngagementAutoplay({
     resumeDelay,
   });
 
+  // Core timer: schedule/advance only when not paused and in view
   const { advance, schedule } = useAutoplay({
     totalItems,
     currentIndex,
     setIndex,
-    autoplayTime,              // 🔁 remaining video + delay
+    autoplayTime,
     enabled: !isPaused && inView,
   });
 
-  // Nudge forward after resuming
-  const prevPaused = useRef(isPaused || !inView);
+    // ✅ Public hook method: enter “grace window” (e.g., right at video `ended`)
+  const beginGraceWindow = useCallback(() => {
+    graceRef.current = true;
+    // If the user is already engaged, pause now (cancels the scheduled advance).
+    if (userEngaged && !isPaused) pause();
+  }, [userEngaged, isPaused, pause]);
+
+  // Leave grace on index change (advance or manual selection)
   useEffect(() => {
-    const was = prevPaused.current;
-    const now = isPaused || !inView;
-    if (was && !now && nudgeOnResume) advance();
-    prevPaused.current = now;
-  }, [isPaused, inView, nudgeOnResume, advance]);
+    graceRef.current = false;
+  }, [currentIndex]);
+
+  // If the user engages while in grace, pause immediately.
+  useEffect(() => {
+    if (graceRef.current && userEngaged && !isPaused) pause();
+  }, [userEngaged, isPaused, pause]);
 
   // Scroll → schedule resume
   useScrollInteraction({
@@ -69,41 +86,51 @@ export default function useEngagementAutoplay({
         if (!isActive) return;
       }
       engageUser();
-      // 🚫 do NOT pause video/autoplay here; only mark engagement
-      if (pauseOnEngage) {
-        // kept for API parity; default is false
-      }
+      if (pauseOnEngage) pause();
     },
   });
 
-  // Hover engagement on active items only
+  // Hover: engage on eligible enter; treat leaving all eligible hosts as hover-away
   useEffect(() => {
     const items = Array.from(document.querySelectorAll(itemSelector));
     if (!items.length) return;
 
+    const isEligible = (el) =>
+      !!el && (!engageOnlyOnActiveItem || el.getAttribute?.(activeItemAttr) === "true");
+
     const onEnter = (ev) => {
-      if (engageOnlyOnActiveItem) {
-        const el = ev.currentTarget;
-        const isActive = el?.getAttribute?.(activeItemAttr) === "true";
-        if (!isActive) return;
-      }
+      const host = ev.currentTarget;
+      if (!isEligible(host)) return;
       engageUser();
-      if (pauseOnEngage) {
-        // intentionally noop by default
-      }
+      if (pauseOnEngage) pause();
     };
-    const onLeave = () => handleResumeActivity("hover-away");
+
+    const onLeave = (ev) => {
+      const nextHost = ev.relatedTarget?.closest?.(itemSelector);
+      if (isEligible(nextHost)) return;
+      handleResumeActivity("hover-away");
+    };
 
     items.forEach((el) => {
       el.addEventListener("mouseenter", onEnter);
       el.addEventListener("mouseleave", onLeave);
     });
 
+    // Fallback: if engaged but pointer isn’t over any eligible host, treat as hover-away
+    const onPointerMove = (e) => {
+      if (!userEngaged) return;
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const host = under?.closest?.(itemSelector);
+      if (!isEligible(host)) handleResumeActivity("hover-away");
+    };
+    document.addEventListener("pointermove", onPointerMove, { passive: true });
+
     return () => {
       items.forEach((el) => {
         el.removeEventListener("mouseenter", onEnter);
         el.removeEventListener("mouseleave", onLeave);
       });
+      document.removeEventListener("pointermove", onPointerMove);
     };
   }, [
     itemSelector,
@@ -112,7 +139,9 @@ export default function useEngagementAutoplay({
     pauseOnEngage,
     engageUser,
     handleResumeActivity,
-    currentIndex,
+    pause,
+    currentIndex,   // rebind when active item changes
+    userEngaged,    // keep fallback accurate
   ]);
 
   return {
@@ -123,6 +152,7 @@ export default function useEngagementAutoplay({
     resume,
     engageUser,
     advance,
-    schedule,                  // 👈 allow rescheduling when video progress changes
+    schedule,
+    beginGraceWindow,
   };
 }

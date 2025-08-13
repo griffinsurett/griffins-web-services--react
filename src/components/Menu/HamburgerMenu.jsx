@@ -34,6 +34,7 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
     const checkbox = document.getElementById(checkboxId);
     if (checkbox) {
       checkbox.checked = false;
+      checkbox.dispatchEvent(new Event("change", { bubbles: true }));
     }
     setIsOpen(false);
   };

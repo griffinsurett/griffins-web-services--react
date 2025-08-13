@@ -59,6 +59,9 @@ export const useClickInteraction = ({
 } = {}) => {
   useEffect(() => {
     const handleGlobalClick = (event) => {
+      // ✅ Ignore programmatic clicks (e.g., our autoplay radio .click())
+      if (!event.isTrusted) return;
+
       const container = event.target.closest(containerSelector);
       const item = event.target.closest(itemSelector);
 
@@ -75,12 +78,13 @@ export const useClickInteraction = ({
   }, [containerSelector, itemSelector, onOutsideClick, onInsideClick, onItemClick]);
 
   return {
-    triggerClick: useCallback((selector) => {
+    triggerClick: (selector) => {
       const el = document.querySelector(selector);
       if (el) el.click();
-    }, []),
+    },
   };
 };
+
 
 /** Hover */
 export const useHoverInteraction = ({
