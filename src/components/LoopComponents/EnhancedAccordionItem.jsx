@@ -11,7 +11,6 @@ const EnhancedAccordionItem = ({
   name,              // Radio group name
   value,             // string index value
   index,             // numeric index
-  shouldShowFullBorder = false,
 }) => {
   const { icon, title, description } = data;
 
@@ -39,7 +38,6 @@ const EnhancedAccordionItem = ({
       <AnimatedBorderCard
         isActive={isActive}
         progress={progress}
-        showFullBorder={shouldShowFullBorder}
         className="transition-all duration-100"
       >
         {/* Label toggles the radio */}

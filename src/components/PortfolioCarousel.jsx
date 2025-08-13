@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useCarouselAutoplay from "../hooks/useCarouselAutoplay";
 import { useVisibility } from "../hooks/useVisibility";
+import PortfolioItemComponent from "./LoopComponents/PortfolioItemComponent";
 
 /**
  * Self-contained 3D carousel with engagement-aware autoplay.
@@ -115,73 +116,21 @@ export default function PortfolioCarousel({
         className={`${stageBase} ${className}`}
         style={{ height: `${centerH}px` }}
       >
-        {items.map((item, i) => {
-          const pos = getPosition(i);
-          const isActive = pos === "center";
-
-          let style;
-          let topClass = isActive ? "top-0" : "top-1/2";
-          let baseTranslate =
-            isActive ? "translate(-50%, 0)" : "translate(-50%, -50%)";
-
-          if (isActive) {
-            style = {
-              width: `${centerW}px`,
-              height: `${centerH}px`,
-              transform: `${baseTranslate} scale(1) rotateY(0deg)`,
-              zIndex: 30,
-              opacity: 1,
-            };
-          } else if (pos === "left") {
-            style = {
-              width: `${sideW}px`,
-              height: `${sideH}px`,
-              transform: `${baseTranslate} translateX(-${tx}px) scale(0.9) rotateY(22deg)`,
-              zIndex: 20,
-              opacity: 0.5,
-              filter: "brightness(0.75)",
-            };
-          } else if (pos === "right") {
-            style = {
-              width: `${sideW}px`,
-              height: `${sideH}px`,
-              transform: `${baseTranslate} translateX(${tx}px) scale(0.9) rotateY(-22deg)`,
-              zIndex: 20,
-              opacity: 0.5,
-              filter: "brightness(0.75)",
-            };
-          } else {
-            style = {
-              width: `${sideW}px`,
-              height: `${sideH}px`,
-              transform: `${baseTranslate} scale(0)`,
-              zIndex: 10,
-              opacity: 0,
-              pointerEvents: "none",
-            };
-          }
-
-          return (
-            <div
-              key={item.id}
-              className={`${slideBase} ${topClass}`}
-              style={style}
-              data-carousel-item
-              data-index={i}
-              data-active={isActive ? "true" : "false"} // used by the hook for slide-scoped engagement
-              onClick={() => i !== index && setIndex(i)}
-            >
-              <figure className="w-full h-full bg-white">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                />
-              </figure>
-            </div>
-          );
-        })}
+        {items.map((item, i) => (
+          <PortfolioItemComponent
+            key={item.id ?? i}
+            item={item}
+            i={i}
+            activeIndex={index}
+            itemsLength={items.length}
+            centerW={centerW}
+            centerH={centerH}
+            sideW={sideW}
+            sideH={sideH}
+            tx={tx}
+            onSelect={setIndex}
+          />
+        ))}
 
         {/* Arrows */}
         {showArrows && items.length > 1 && (

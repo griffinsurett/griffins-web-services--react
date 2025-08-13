@@ -3,18 +3,18 @@ import React, { useRef } from "react";
 import PortfolioCarousel from "../components/PortfolioCarousel";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import Placeholder from "../assets/placeholder.jpg";
+import ProntoDesktop from "../assets/ProntoJunkRemoval/pronto-desktop.jpg"
+import FariasDesktop from "../assets/FariasDemolition/Farias-Desktop.jpg"
+import JSVDesktop from "../assets/JSV-Quick-Solar/jsv-Desktop.jpg"
 
 export default function PortfolioSection() {
   const sectionRef = useRef(null);
 
   const items = [
-    { id: 1, title: "E-commerce", image: Placeholder },
-    { id: 2, title: "Restaurant", image: Placeholder },
-    { id: 3, title: "Corporate",  image: Placeholder },
-    { id: 4, title: "Portfolio",  image: Placeholder },
-    { id: 5, title: "Blog",       image: Placeholder },
-    { id: 6, title: "Landing",    image: Placeholder },
-    { id: 7, title: "SaaS",       image: Placeholder },
+    { id: 1, title: "Pronto Junk Removal", image: ProntoDesktop },
+    { id: 2, title: "Faria's Demolition", image: FariasDesktop },
+    { id: 3, title: "JSV Quick Solar",  image: JSVDesktop },
+    { id: 4, title: "Corporate",  image: Placeholder },
   ];
 
   // Keep section-specific concerns here (e.g., header animations)
