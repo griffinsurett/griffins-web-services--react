@@ -14,7 +14,7 @@ export default function PortfolioSection() {
     { id: 1, title: "Pronto Junk Removal", image: ProntoDesktop },
     { id: 2, title: "Faria's Demolition", image: FariasDesktop },
     { id: 3, title: "JSV Quick Solar",  image: JSVDesktop },
-    { id: 4, title: "Corporate",  image: Placeholder },
+    // { id: 4, title: "Corporate",  image: Placeholder },
   ];
 
   // Keep section-specific concerns here (e.g., header animations)

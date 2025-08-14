@@ -1,5 +1,5 @@
 import React from "react";
-import AnimatedBorderCard from "../AnimatedBorderCard";
+import AnimatedBorder from "../AnimatedBorder";
 
 const EnhancedAccordionItem = ({
   data,
@@ -35,14 +35,15 @@ const EnhancedAccordionItem = ({
         data-active={isActive ? "true" : "false"}
       />
 
-      <AnimatedBorderCard
+      <AnimatedBorder
         variant="progress"
-        trigger="controlled"
+        triggers="controlled"
         active={isActive}
-        progress={progress} // 0..100 from your autoplay hook
+        controller={progress}
         borderRadius="rounded-3xl"
         borderWidth={2}
         className="transition-all duration-100"
+        loop={false}
       >
         {/* Label toggles the radio */}
         <label
@@ -86,7 +87,7 @@ const EnhancedAccordionItem = ({
             {children && <div className="lg:hidden">{children}</div>}
           </div>
         </div>
-      </AnimatedBorderCard>
+      </AnimatedBorder>
     </div>
   );
 };
