@@ -5,7 +5,7 @@ import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import Placeholder from "../assets/placeholder.jpg";
 import ProntoDesktop from "../assets/ProntoJunkRemoval/pronto-desktop.jpg"
 import FariasDesktop from "../assets/FariasDemolition/Farias-Desktop.jpg"
-import JSVDesktop from "../assets/JSV-Quick-Solar/jsv-Desktop.jpg"
+import JSVDesktop from "../assets/JSV-Quick-Solar/JSV-Desktop.jpg"
 
 export default function PortfolioSection() {
   const sectionRef = useRef(null);
