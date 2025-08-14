@@ -6,6 +6,12 @@ import { siteData } from "../siteData";
 const About = () => {
   const Services = [
     {
+      icon: "💭",
+      title: "Dream",
+      description:
+        "We turn your ideas into stunning digital experiences. Our team collaborates with you to understand your vision and create a website that reflects your brand and engages your audience.",
+    },
+    {
       icon: "🎨",
       title: "Design",
       description:
@@ -17,12 +23,12 @@ const About = () => {
       description:
         "Fast, secure, and scalable websites built with modern technology. From simple landing pages to complex e-commerce platforms, we bring your vision to life.",
     },
-    {
-      icon: "🛠️",
-      title: "Ongoing Support",
-      description:
-        "24/7 maintenance, updates, and support to keep your website running smoothly. We're your long-term partner in digital growth and success.",
-    },
+    // {
+    //   icon: "🛠️",
+    //   title: "Ongoing Support",
+    //   description:
+    //     "24/7 maintenance, updates, and support to keep your website running smoothly. We're your long-term partner in digital growth and success.",
+    // },
   ];
 
   return (

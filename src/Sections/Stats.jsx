@@ -1,6 +1,7 @@
 // src/components/Stats.jsx
 import React from "react";
 import StatisticListing from "../components/LoopComponents/StatisticListing";
+import BorderTitle from "../components/BorderTitle";
 
 const Stats = () => {
   const Stats = [
@@ -15,7 +16,7 @@ const Stats = () => {
       <div className="absolute top-0 left-0 right-0 h-px"></div>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
-          <div className="border-title">Our Results</div>
+          <BorderTitle>Stats</BorderTitle>
         </div>
         <div className="grid md:grid-cols-4 gap-10 text-center">
           {Stats.map((stat, index) => (

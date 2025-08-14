@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import Input from "../components/Form/Input";
 import Textarea from "../components/Form/Textarea";
 import Select from "../components/Form/Select";
+import BorderTitle from "../components/BorderTitle";
 
 const QuoteForm = () => {
   const [formData, setFormData] = useState({
@@ -65,7 +66,7 @@ const QuoteForm = () => {
       <div className="section-color-border"></div>
       <div className="inner-section">
         <div className="text-section">
-          <div className="border-title">Get A Quote</div>
+          <BorderTitle>Get A Quote</BorderTitle>
           <h2 className="h2 mb-6">
             Ready to Get <span className="text-accent-heading">Started?</span>
           </h2>

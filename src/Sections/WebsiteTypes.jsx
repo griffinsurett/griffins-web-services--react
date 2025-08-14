@@ -5,6 +5,7 @@ import VideoPlayer from "../components/VideoPlayer";
 import useAccordionAutoplay from "../hooks/useAccordionAutoplay";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
+import BorderTitle from "../components/BorderTitle";
 
 const demoVideo = EarRape;
 
@@ -140,7 +141,7 @@ const WebsiteTypes = () => {
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">
-          <div className="border-title">Website Types</div>
+          <BorderTitle>Website Types</BorderTitle>
           <h2 className="h2 mb-6">
             Websites We <span className="emphasized-text">Build</span>
           </h2>

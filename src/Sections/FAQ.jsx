@@ -2,6 +2,7 @@
 import React from "react";
 import Button from "../components/Button";
 import AccordionItem from "../components/LoopComponents/AccordionItem";
+import BorderTitle from "../components/BorderTitle";
 
 const FAQ = () => {
   const faqs = [
@@ -23,7 +24,7 @@ const FAQ = () => {
       <div className="inner-section">
         {/* Header */}
         <div className="text-section">
-          <div className="border-title mb-6">FAQ</div>
+          <BorderTitle>FAQ</BorderTitle>
           <h2 className="h2 mb-6">
             Frequently Asked{" "}
             <span className="heading-accent-text">Questions</span>

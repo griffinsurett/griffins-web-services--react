@@ -1,6 +1,7 @@
 // src/components/Benefits.jsx
 import React from "react";
 import FeatureCard from "../components/LoopComponents/FeatureCard";
+import BorderTitle from "../components/BorderTitle";
 
 const Benefits = () => {
   const benefits = [
@@ -47,7 +48,7 @@ const Benefits = () => {
       <div className="section-color-border"></div>
       <div className="inner-section">
         <div className="text-section">
-          <div className="border-title">Benefits</div>
+          <BorderTitle>Benefits</BorderTitle>
           <h2 className="h2 mb-6">
             Why Choose{" "}
             <span className="text-accent-heading">Griffin's Web?</span>

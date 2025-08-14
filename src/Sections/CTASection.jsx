@@ -1,6 +1,7 @@
 // src/components/CTASection.jsx
 import React from "react";
 import Button from "../components/Button";
+import BorderTitle from "../components/BorderTitle";
 
 const CTASection = () => {
   return (
@@ -8,7 +9,7 @@ const CTASection = () => {
       <div className="section-color-border"></div>
       <div className="inner-section">
         <div className="mb-12">
-          <div className="border-title">Get Started</div>
+          <BorderTitle>Get Started</BorderTitle>
           <h2 className="h2 mb-6">Ready to Transform Your Online Presence?</h2>
           <p className="large-text secondary-text">
             Join hundreds of successful businesses who trust Griffin's Web

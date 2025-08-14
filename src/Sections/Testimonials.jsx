@@ -1,6 +1,7 @@
 // src/components/Testimonials.jsx
 import React from "react";
 import TestimonialCard from "../components/LoopComponents/TestimonialCard";
+import BorderTitle from "../components/BorderTitle";
 
 const Testimonials = () => {
   const testimonials = [
@@ -28,8 +29,8 @@ const Testimonials = () => {
     <section className="outer-section bg-secondary relative">
       <div className="section-color-border"></div>
       <div className="inner-section">
-        <div className="text-section">
-          <div className="border-title">Testimonials</div>
+        <div className="text-section">       
+          <BorderTitle>Testimonials</BorderTitle>
           <h2 className="h2 mb-6">
             What Our <span className="text-accent-heading">Clients Say</span>
           </h2>

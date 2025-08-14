@@ -6,6 +6,7 @@ import Placeholder from "../assets/placeholder.jpg";
 import ProntoDesktop from "../assets/ProntoJunkRemoval/pronto-desktop.jpg"
 import FariasDesktop from "../assets/FariasDemolition/Farias-Desktop.jpg"
 import JSVDesktop from "../assets/JSV-Quick-Solar/JSV-Desktop.jpg"
+import BorderTitle from "../components/BorderTitle";
 
 export default function PortfolioSection() {
   const sectionRef = useRef(null);
@@ -32,7 +33,7 @@ export default function PortfolioSection() {
     >
       <div className="inner-section">
         <header className="text-section">
-          <div className="border-title">Our Projects</div>
+          <BorderTitle>Our Projects</BorderTitle>
           <h2 className="h2 text-white mb-6">
             Our <span className="emphasized-text">Portfolio</span>
           </h2>
