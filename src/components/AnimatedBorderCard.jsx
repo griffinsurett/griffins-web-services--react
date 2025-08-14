@@ -1,23 +1,40 @@
 // src/components/AnimatedBorderCard.jsx
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
+/**
+ * A tiny border engine with two variants and three trigger modes.
+ *
+ * Props:
+ *  - variant:    "none" | "solid" | "progress"
+ *  - trigger:    "hover" | "always" | "controlled"
+ *  - active:     boolean (when trigger="controlled")
+ *  - progress:   number 0..100 (optional; only used for progress+controlled)
+ *  - duration:   ms per sweep when internally animating (default 2000)
+ *  - loop:       whether internal progress loops (default true)
+ *  - color:      CSS color for the ring (default var(--color-accent))
+ *  - borderRadius, borderWidth, className, innerClassName: styling
+ */
 const AnimatedBorderCard = ({
   children,
-  // existing API
-  isActive = false,
-  progress = 0,
-  showFullBorder = false,
+
+  // Behavior
+  variant = "none",            // "none" | "solid" | "progress"
+  trigger = "hover",           // "hover" | "always" | "controlled"
+  active = false,              // used when trigger="controlled"
+
+  // Progress control
+  progress,                    // 0..100 (if controlled progress)
+  duration = 2000,             // ms per sweep when internally animated
+  loop = true,                 // loop internal progress
+
+  // Styling
+  color = "var(--color-accent)",
   borderRadius = "rounded-3xl",
-  borderWidth = "1px",
+  borderWidth = 2,             // px or string
   className = "",
   innerClassName = "",
 
-  // NEW: built-in hover effects
-  hoverProgress = false,           // conic progress ring while hovered
-  hoverFull = false,               // solid ring while hovered
-  hoverRingDuration = 2000,        // ms per full sweep when hoverProgress is true
-
-  // allow callers to still attach handlers
+  // Pass-through events still work
   onMouseEnter,
   onMouseLeave,
   ...rest
@@ -27,27 +44,45 @@ const AnimatedBorderCard = ({
   const rafRef = useRef(null);
   const lastTsRef = useRef(0);
 
-  // drive a looping 0..100 progress while hovered (only if hoverProgress)
+  const bw = typeof borderWidth === "number" ? `${borderWidth}px` : borderWidth;
+
+  // Trigger resolution
+  const triggered =
+    variant !== "none" &&
+    (trigger === "always" ||
+      (trigger === "hover" && hovered) ||
+      (trigger === "controlled" && !!active));
+
+  // Should we animate internally?
+  const needsInternalProgress =
+    triggered && variant === "progress" && (progress == null);
+
+  // Internal RAF loop for progress variant
   const step = useCallback(
     (ts) => {
-      if (!hovered || !hoverProgress) return;
+      if (!needsInternalProgress) return;
       const last = lastTsRef.current || ts;
       const dt = ts - last;
       lastTsRef.current = ts;
 
       setInternalProgress((p) => {
-        const inc = (dt / hoverRingDuration) * 100;
+        const inc = (dt / duration) * 100;
         const next = p + inc;
-        return next >= 100 ? next % 100 : next;
+        if (loop) return next >= 100 ? next % 100 : next;
+        return next >= 100 ? 100 : next;
       });
 
+      if (!loop && internalProgress >= 100) {
+        rafRef.current = null;
+        return;
+      }
       rafRef.current = requestAnimationFrame(step);
     },
-    [hovered, hoverProgress, hoverRingDuration]
+    [needsInternalProgress, duration, loop, internalProgress]
   );
 
   useEffect(() => {
-    if (hovered && hoverProgress) {
+    if (needsInternalProgress) {
       lastTsRef.current = 0;
       rafRef.current = requestAnimationFrame(step);
     } else {
@@ -59,19 +94,42 @@ const AnimatedBorderCard = ({
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [hovered, hoverProgress, step]);
+  }, [needsInternalProgress, step]);
 
-  // decide what to render
-  const hoveredShowsOverlay = (hoverFull || hoverProgress) && hovered;
-  const shouldShowOverlay = isActive || hoveredShowsOverlay;
+  const effectiveProgress =
+    variant === "progress"
+      ? (progress != null ? progress : internalProgress)
+      : 0;
 
-  const useProgress =
-    (isActive && !showFullBorder) || (hoverProgress && hovered);
-
-  const useFull =
-    (isActive && showFullBorder) || (hoverFull && hovered);
-
-  const effectiveProgress = isActive ? progress : internalProgress;
+  // Compose overlay style
+  const overlayStyle =
+    variant === "solid"
+      ? {
+          background: color,
+          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+          WebkitMask:
+            "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+          maskComposite: "exclude",
+          WebkitMaskComposite: "xor",
+          padding: bw,
+        }
+      : variant === "progress"
+      ? {
+          background: `conic-gradient(
+            from 0deg,
+            ${color} 0deg,
+            ${color} ${effectiveProgress * 3.6}deg,
+            transparent ${effectiveProgress * 3.6}deg,
+            transparent 360deg
+          )`,
+          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+          WebkitMask:
+            "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+          maskComposite: "exclude",
+          WebkitMaskComposite: "xor",
+          padding: bw,
+        }
+      : {};
 
   const handleEnter = (e) => {
     setHovered(true);
@@ -89,29 +147,13 @@ const AnimatedBorderCard = ({
       onMouseLeave={handleLeave}
       {...rest}
     >
-      {shouldShowOverlay && (
+      {triggered && variant !== "none" && (
         <div
           className={`absolute inset-0 ${borderRadius} pointer-events-none`}
-          style={{
-            background: useFull
-              ? "var(--color-accent)"
-              : `conic-gradient(
-                  from 0deg,
-                  var(--color-accent) 0deg,
-                  var(--color-accent) ${effectiveProgress * 3.6}deg,
-                  transparent ${effectiveProgress * 3.6}deg,
-                  transparent 360deg
-                )`,
-            mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            maskComposite: "exclude",
-            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-            WebkitMaskComposite: "xor",
-            padding: borderWidth,
-          }}
+          style={overlayStyle}
         />
       )}
 
-      {/* Inner content with background that creates the border illusion */}
       <div className={`card-bg ${borderRadius} overflow-hidden relative z-10 ${innerClassName}`}>
         {children}
       </div>

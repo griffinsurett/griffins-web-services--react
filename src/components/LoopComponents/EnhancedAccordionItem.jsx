@@ -5,12 +5,12 @@ const EnhancedAccordionItem = ({
   data,
   isActive,
   progress = 0,
-  onToggle,          // radio onChange
+  onToggle, // radio onChange
   children,
   className = "",
-  name,              // Radio group name
-  value,             // string index value
-  index,             // numeric index
+  name, // Radio group name
+  value, // string index value
+  index, // numeric index
 }) => {
   const { icon, title, description } = data;
 
@@ -18,7 +18,7 @@ const EnhancedAccordionItem = ({
     <div
       className={`group relative ${className}`}
       data-accordion-item
-      data-active={isActive ? "true" : "false"}   // 👈 gating for hover/engage
+      data-active={isActive ? "true" : "false"} // 👈 gating for hover/engage
     >
       {/* Native, UNCONTROLLED radio (source of truth). */}
       <input
@@ -26,7 +26,7 @@ const EnhancedAccordionItem = ({
         id={`accordion-${value}`}
         name={name}
         value={value}
-        defaultChecked={value === "0"}           // initial selection
+        defaultChecked={value === "0"} // initial selection
         onChange={onToggle}
         className="absolute -left-[9999px]"
         tabIndex={-1}
@@ -36,8 +36,12 @@ const EnhancedAccordionItem = ({
       />
 
       <AnimatedBorderCard
-        isActive={isActive}
-        progress={progress}
+        variant="progress"
+        trigger="controlled"
+        active={isActive}
+        progress={progress} // 0..100 from your autoplay hook
+        borderRadius="rounded-3xl"
+        borderWidth={2}
         className="transition-all duration-100"
       >
         {/* Label toggles the radio */}
@@ -57,7 +61,11 @@ const EnhancedAccordionItem = ({
             className={`
               w-8 h-8 rounded-full flex items-center justify-center
               transition-all duration-[600ms] text-xl font-normal leading-none
-              ${isActive ? "bg-accent text-black" : "bg-accent/20 group-hover:bg-accent/30 text-accent"}
+              ${
+                isActive
+                  ? "bg-accent text-black"
+                  : "bg-accent/20 group-hover:bg-accent/30 text-accent"
+              }
             `}
           >
             <span className="block translate-y-[-1px]">
