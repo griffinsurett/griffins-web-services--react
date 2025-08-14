@@ -36,20 +36,21 @@ export default function PortfolioItemComponent({
   const topClass = isActive ? "top-0" : "top-1/2";
   const baseTranslate = isActive ? "translate(-50%, 0)" : "translate(-50%, -50%)";
 
-  // 🔁 Auto-scroll the inner viewport only when this slide is active.
-  // - Waits `startDelay` before the very first start of each active cycle
-  // - Then scrolls top → bottom slowly (~30s)
-  // - Pauses only on real user input
-  // - Resets to top when inactive or off-screen
+  // 🔁 Auto-scroll ONLY while active & visible.
+  // - Wait startDelay before first start
+  // - Slow, “video-like” scroll (top → bottom in ~30s)
+  // - ⛔ When the user scrolls, pause and DO NOT resume while this item stays active
+  // - 🔄 When it becomes inactive/out-of-view, reset to top for the next cycle
   useAutoScroll({
     ref: viewportRef,
     active: isActive,
-    cycleDuration: 30,     // slow, “video-like” scroll duration (seconds)
-    loop: false,           // stop at bottom while active
-    startDelay: 1500,      // ⬅️ NEW: don't start immediately
-    resumeDelay: 1000,     // resume a moment after user stops interacting
-    threshold: 0.35,       // only run when ~35% visible
-    resetOnInactive: true, // snap back to top when not active/in-view
+    cycleDuration: 30,        // slow scroll (seconds top → bottom)
+    loop: false,              // stop at bottom
+    startDelay: 1500,         // don't start immediately
+    resumeDelay: 0,           // ignored because…
+    resumeOnUserInput: false, // ⬅️ never resume during current active cycle
+    threshold: 0.35,
+    resetOnInactive: true,
   });
 
   let style;
@@ -99,7 +100,7 @@ export default function PortfolioItemComponent({
       data-active={isActive ? "true" : "false"}
       onClick={() => i !== activeIndex && onSelect(i)}
     >
-      {/* Scrollable viewport that starts at the TOP of the image */}
+      {/* Scrollable viewport that starts at the TOP */}
       <figure
         ref={viewportRef}
         className="
@@ -123,4 +124,3 @@ export default function PortfolioItemComponent({
     </div>
   );
 }
-

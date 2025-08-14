@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *  - loop:             when reaching bottom, reset to top and continue (while active)
  *  - startDelay:       ms before FIRST start each time the item becomes active+visible
  *  - resumeDelay:      ms after disengage (wheel/scroll/touch/click) to resume
+ *  - resumeOnUserInput:boolean — if false, do NOT resume after user input (default false)
  *  - threshold:        IntersectionObserver threshold to consider "visible"
  *  - resetOnInactive:  when active=false OR inView=false, snap back to top
  */
@@ -30,6 +31,7 @@ export function useAutoScroll({
   loop = false,
   startDelay = 1500,
   resumeDelay = 1200,
+  resumeOnUserInput = false,   // ⬅️ NEW: default = never resume while active
   threshold = 0.3,
   resetOnInactive = true,
 } = {}) {
@@ -38,8 +40,8 @@ export function useAutoScroll({
   const startTimerRef = useRef(null);
   const resumeTimerRef = useRef(null);
 
-  const internalScrollRef = useRef(false); // marks programmatic scrolls
-  const startedThisCycleRef = useRef(false); // has first start occurred for this active+visible cycle?
+  const internalScrollRef = useRef(false);     // marks programmatic scrolls
+  const startedThisCycleRef = useRef(false);   // has first start occurred for this active+visible cycle?
 
   const [inView, setInView] = useState(false);
   const [paused, setPaused] = useState(false); // pause due to user input
@@ -48,12 +50,10 @@ export function useAutoScroll({
   const resolvePxPerSecond = useCallback(
     (host) => {
       if (!host) return 0;
-      // If cycleDuration provided, compute px/sec from content height
       if (cycleDuration && cycleDuration > 0) {
         const max = Math.max(0, host.scrollHeight - host.clientHeight);
         return max > 0 ? max / cycleDuration : 0;
       }
-      // Otherwise, speed can be number or function(host)
       return typeof speed === "function"
         ? Math.max(1, speed(host))
         : Number(speed) || 0;
@@ -92,22 +92,21 @@ export function useAutoScroll({
   }, []);
 
   const scheduleResume = useCallback(() => {
+    if (!resumeOnUserInput) return; // ⬅️ respect no-resume mode
     clearResume();
     setResumeScheduled(true);
     resumeTimerRef.current = setTimeout(() => {
       setResumeScheduled(false);
       setPaused(false);
-      // After a resume, we start immediately (no extra startDelay),
-      // because the first-delay is only for the initial start of a cycle.
+      // After resume, start immediately (no extra startDelay).
     }, resumeDelay);
-  }, [clearResume, resumeDelay]);
+  }, [resumeDelay, resumeOnUserInput, clearResume]);
 
   const step = useCallback(
     (ts) => {
       const host = ref?.current;
       if (!host) return;
 
-      // time delta
       const last = lastTsRef.current || ts;
       const dt = (ts - last) / 1000; // seconds
       lastTsRef.current = ts;
@@ -123,19 +122,15 @@ export function useAutoScroll({
         if (loop) {
           host.scrollTop = 0;
         } else {
-          host.scrollTop = max; // clamp at bottom
-          requestAnimationFrame(() => {
-            internalScrollRef.current = false;
-          });
+          host.scrollTop = max;
+          requestAnimationFrame(() => (internalScrollRef.current = false));
           clearRAF();
           return;
         }
       } else {
         host.scrollTop = next;
       }
-      requestAnimationFrame(() => {
-        internalScrollRef.current = false;
-      });
+      requestAnimationFrame(() => (internalScrollRef.current = false));
 
       rafRef.current = requestAnimationFrame(step);
     },
@@ -150,21 +145,18 @@ export function useAutoScroll({
     }
   }, [step, ref, clearRAF]);
 
-  // Start/stop loop based on state, with a delayed *first* start per cycle
+  // Start/stop with a delayed *first* start per active+visible cycle
   useEffect(() => {
     clearRAF();
     clearStartTimer();
 
     if (active && inView && !paused) {
       if (!startedThisCycleRef.current) {
-        // first start this active+visible cycle → delay it
         startTimerRef.current = setTimeout(() => {
-          // ensure conditions still true after delay
           if (active && inView && !paused) startNow();
         }, Math.max(0, startDelay));
       } else {
-        // already started once this cycle — start immediately (no extra delay)
-        startNow();
+        startNow(); // already started once this cycle — no extra delay
       }
     }
 
@@ -174,28 +166,25 @@ export function useAutoScroll({
     };
   }, [active, inView, paused, startDelay, startNow, clearRAF, clearStartTimer]);
 
-  // Reset to top when the slide becomes inactive or out of view (end of cycle)
+  // Reset to top when item becomes inactive or out of view
   useEffect(() => {
     if (!resetOnInactive) return;
     const host = ref?.current;
     if (!host) return;
 
     if (!active || !inView) {
-      // end of this active+visible cycle
       startedThisCycleRef.current = false;
       clearRAF();
       clearResume();
       clearStartTimer();
-      internalScrollRef.current = true; // mark reset as internal
+      internalScrollRef.current = true;
       host.scrollTop = 0;
-      requestAnimationFrame(() => {
-        internalScrollRef.current = false;
-      });
+      requestAnimationFrame(() => (internalScrollRef.current = false));
+      setPaused(false); // clear paused for next cycle
     }
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // Engagement handlers:
-  // Pause only on *real* user controls. Ignore programmatic scroll events.
+  // Engagement: pause on real user input; DO NOT resume unless resumeOnUserInput=true
   useEffect(() => {
     const host = ref?.current;
     if (!host) return;
@@ -204,24 +193,23 @@ export function useAutoScroll({
       setPaused(true);
       clearResume();
     };
-
-    const schedule = () => scheduleResume();
+    const maybeScheduleResume = () => scheduleResume();
 
     const onWheel = () => {
       pauseNow();
-      schedule();
+      maybeScheduleResume();
     };
 
     const onScroll = () => {
       if (internalScrollRef.current) return; // ignore our own scrolling
       pauseNow();
-      schedule();
+      maybeScheduleResume();
     };
 
     const onTouchStart = () => pauseNow();
-    const onTouchEnd = () => schedule();
+    const onTouchEnd = () => maybeScheduleResume();
     const onPointerDown = () => pauseNow();
-    const onPointerUp = () => schedule();
+    const onPointerUp = () => maybeScheduleResume();
 
     host.addEventListener("wheel", onWheel, { passive: true });
     host.addEventListener("scroll", onScroll, { passive: true });
@@ -240,7 +228,7 @@ export function useAutoScroll({
     };
   }, [ref, scheduleResume, clearResume]);
 
-  // Cleanup on unmount
+  // Cleanup
   useEffect(
     () => () => {
       clearRAF();
