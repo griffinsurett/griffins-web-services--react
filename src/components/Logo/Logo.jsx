@@ -10,7 +10,7 @@ const LogoLink = ({ loading = "lazy" }) => {
   return (
     <a
       href="/"
-      className="flex justify-center items-center gap-1 lg:gap-2"
+      className="flex justify-center items-center gap-2"
     >
       <VideoLogo alt="Griffin's Web Services Animated Logo" loading={loading} />
       <div>
