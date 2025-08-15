@@ -31,6 +31,8 @@ export default function PortfolioSection() {
       className="w-screen overflow-x-hidden outer-section bg-secondary relative"
       data-portfolio-section
     >
+            <div className="section-color-border"></div>
+
       <div className="inner-section">
         <header className="text-section">
           <BorderTitle>Our Projects</BorderTitle>

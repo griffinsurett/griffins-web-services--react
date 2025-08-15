@@ -35,6 +35,9 @@ const GriffinsLanding = () => {
       {/* Website Types Section */}
       <WebsiteTypes />
 
+      {/* CTA Section */}
+      <CTASection />
+
       {/* Portfolio Section */}
       <PortfolioSection />
 
@@ -49,9 +52,6 @@ const GriffinsLanding = () => {
 
       {/* Testimonials Section */}
       <Testimonials />
-
-      {/* CTA Section */}
-      <CTASection />
 
       {/* Quote Form Section */}
       <QuoteForm />
