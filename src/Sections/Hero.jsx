@@ -7,7 +7,7 @@ const Hero = () => {
   return (
     <section className="min-h-screen flex items-center justify-center text-center px-5 pt-32 pb-20 primary-bg relative">
       {/* Dark gradient background */}
-      <div className="absolute inset-0 hero-gradient-bg"></div>
+      <div className="absolute inset-0 shimmer-gradient"></div>
       <div className="inner-section relative z-10">
         <h1 className="h1 mb-2">
           Build Your <span className="text-accent-heading">Digital Empire</span>{" "}

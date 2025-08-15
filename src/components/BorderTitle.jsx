@@ -47,7 +47,7 @@ export default function BorderTitle({
   const textVisible = animating || hasPlayed;
 
   return (
-    <div ref={hostRef} className="inline-block mb-6">
+    <div ref={hostRef} className="inline-block mb-3">
       <div className="relative inline-block">
         {/* Base: persist solid ring after first play */}
         {hasPlayed && (

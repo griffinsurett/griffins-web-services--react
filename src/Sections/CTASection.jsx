@@ -5,7 +5,7 @@ import BorderTitle from "../components/BorderTitle";
 
 const CTASection = () => {
   return (
-    <section className="outer-section primary-bg text-center relative">
+    <section className="outer-section hero-gradient-bg primary-bg text-center relative">
       <div className="section-color-border"></div>
       <div className="inner-section">
         <div className="mb-12">

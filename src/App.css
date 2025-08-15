@@ -154,7 +154,7 @@
 
   /* section styles */
   .outer-section {
-    @apply relative py-24 px-5;
+    @apply relative py-24 px-2;
   }
 
   .inner-section {
@@ -267,7 +267,7 @@
     @apply text-5xl md:text-7xl font-extrabold leading-tight text-primary-heading;
   }
   .h2 {
-    @apply text-4xl md:text-5xl font-bold text-primary-heading;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold text-primary-heading;
   }
   .h3 {
     @apply text-xl font-semibold text-primary-heading;

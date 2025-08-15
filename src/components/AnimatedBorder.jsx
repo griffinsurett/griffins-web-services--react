@@ -360,16 +360,20 @@ const AnimatedBorder = ({
     <div
       className={`relative ${className}`}
       onMouseEnter={(e) => {
-        setHovered(true);
-        beginActive();
-        onMouseEnter?.(e);
-        handleMouseEnter(e.currentTarget);
+      if (wantsHover) {
+         setHovered(true);
+         beginActive();
+         handleMouseEnter(e.currentTarget);
+       }
+       onMouseEnter?.(e);
       }}
       onMouseLeave={(e) => {
-        setHovered(false);
-        onMouseLeave?.(e);
-        handleLeaveVariant();
-        handleMouseLeave(e.currentTarget);
+      if (wantsHover) {
+         setHovered(false);
+         handleLeaveVariant();
+         handleMouseLeave(e.currentTarget);
+       }
+       onMouseLeave?.(e);
       }}
       {...rest}
     >
