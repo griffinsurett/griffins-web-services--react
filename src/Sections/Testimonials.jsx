@@ -33,6 +33,24 @@ const Testimonials = () => {
       avatar: "E",
       rating: 5,
     },
+    {
+      tag: "Tech Startup",
+      quote:
+        "We needed a sleek, modern site to showcase our app. Griffin's Web delivered exactly what we envisioned. The user experience is top-notch and our users love it!",
+      author: "Michael Lee",
+      role: "CTO, InnovateX",
+      avatar: "M",
+      rating: 5,
+    },
+    {
+      tag: "Consulting",
+      quote:
+        "The new site has significantly improved our client engagement. The design is professional and the content is well-organized. We've received many compliments!",
+      author: "Laura Smith",
+      role: "Senior Consultant, Stratagem",
+      avatar: "L",
+      rating: 5,
+    },
   ];
 
   return (
@@ -59,7 +77,7 @@ const Testimonials = () => {
           autoAdvanceDelay={4500}
           showArrows={false}
           showDots
-          drag
+          drag={false}
         />
       </div>
     </section>

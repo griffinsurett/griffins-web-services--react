@@ -1,6 +1,6 @@
 // src/components/Hero.jsx
 import React from "react";
-import Button from "../components/Button";
+import Button from "../components/Buttons/Button";
 import { siteData } from "../siteData";
 
 const Hero = () => {
@@ -17,7 +17,9 @@ const Hero = () => {
           {siteData.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
-          <Button variant="primary">Get Started Today ✨</Button>
+          <Button variant="primary" link="/">
+            Get Started Today ✨
+          </Button>
           <Button variant="secondary">View Our Work 👀</Button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 // src/components/FAQ.jsx
 import React from "react";
-import Button from "../components/Button";
+import Button from "../components/Buttons/Button";
 import AccordionItem from "../components/LoopComponents/AccordionItem";
 import BorderTitle from "../components/BorderTitle";
 

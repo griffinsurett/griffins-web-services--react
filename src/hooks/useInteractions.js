@@ -217,28 +217,205 @@ export const useHoverInteraction = ({
   onHoverStart = () => {},
   onHoverEnd = () => {},
   hoverDelay = 0,
+
+  // NEW (all optional; disabled by default)
+  unhoverIntent,
 } = {}) => {
   const hoverTimeoutRef = useRef(null);
 
+  // ── Intent state
+  const intentEnabled = !!unhoverIntent?.enabled;
+  const intentTimerRef = useRef(null);
+  const moveCleanupRef = useRef(null);
+  const intentStateRef = useRef({
+    active: false,
+    elem: null,
+    index: null,
+    leftAt: 0,
+    rect: null,
+    minDist: 0,
+    reentryGraceMs: 0,
+    lastPos: { x: NaN, y: NaN },
+    lastDistance: Infinity,
+  });
+
+  const clearHoverTimer = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
+  const stopIntentTracking = () => {
+    if (moveCleanupRef.current) {
+      moveCleanupRef.current();
+      moveCleanupRef.current = null;
+    }
+    if (intentTimerRef.current) {
+      clearTimeout(intentTimerRef.current);
+      intentTimerRef.current = null;
+    }
+  };
+
+  const cancelIntent = (reason = "cancel") => {
+    if (!intentEnabled) return;
+    const s = intentStateRef.current;
+    if (!s.active) return;
+
+    stopIntentTracking();
+    s.active = false;
+
+    // Optional callback
+    unhoverIntent?.onUnhoverCancel?.(s.elem, s.index, { reason });
+  };
+
+  const commitIntent = () => {
+    const s = intentStateRef.current;
+    if (!s.active) return;
+
+    const payload = {
+      timeAway: Date.now() - s.leftAt,
+      distance: s.lastDistance,
+    };
+
+    stopIntentTracking();
+    s.active = false;
+
+    unhoverIntent?.onUnhoverCommit?.(s.elem, s.index, payload);
+  };
+
+  const padRect = (r, pad) => ({
+    left: r.left - pad,
+    top: r.top - pad,
+    right: r.right + pad,
+    bottom: r.bottom + pad,
+  });
+
+  const distanceFromRect = (x, y, r) => {
+    // 0 if inside, else Euclidean distance to nearest edge corner
+    const dx = x < r.left ? r.left - x : x > r.right ? x - r.right : 0;
+    const dy = y < r.top ? r.top - y : y > r.bottom ? y - r.bottom : 0;
+    return Math.hypot(dx, dy);
+  };
+
+  const startIntent = (element, index) => {
+    if (!intentEnabled) return;
+
+    // Reset any existing intent
+    cancelIntent("restart");
+
+    const leaveDelay = Number(unhoverIntent?.leaveDelay ?? 120);
+    const reentryGraceMs = Number(unhoverIntent?.reentryGraceMs ?? 250);
+    const minOutDistance = Number(unhoverIntent?.minOutDistance ?? 8);
+    const boundaryPadding = Number(unhoverIntent?.boundaryPadding ?? 6);
+
+    const rawRect = element?.getBoundingClientRect?.();
+    const rect = rawRect ? padRect(rawRect, boundaryPadding) : null;
+
+    const s = intentStateRef.current;
+    s.active = true;
+    s.elem = element || null;
+    s.index = index ?? null;
+    s.leftAt = Date.now();
+    s.rect = rect;
+    s.minDist = minOutDistance;
+    s.reentryGraceMs = reentryGraceMs;
+    s.lastDistance = Infinity;
+
+    // Track pointer distance relative to padded rect
+    const onMove = (e) => {
+      if (!s.active) return;
+      const x = e.clientX, y = e.clientY;
+      s.lastPos = { x, y };
+
+      if (s.rect) {
+        const dist = distanceFromRect(x, y, s.rect);
+        s.lastDistance = dist;
+
+        // If the pointer comes back inside the padded rect, treat as re-entry
+        if (dist === 0 && Date.now() - s.leftAt <= s.reentryGraceMs) {
+          cancelIntent("reenter-geom");
+        }
+      }
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    moveCleanupRef.current = () => window.removeEventListener("pointermove", onMove);
+
+    // Periodically check for commit condition after initial leaveDelay
+    const check = () => {
+      if (!s.active) return;
+
+      const elapsed = Date.now() - s.leftAt;
+      const dist = s.lastDistance;
+
+      if (elapsed >= leaveDelay && dist >= s.minDist) {
+        commitIntent();
+      } else {
+        // keep checking; low frequency is fine
+        intentTimerRef.current = setTimeout(check, Math.max(30, leaveDelay / 3));
+      }
+    };
+
+    intentTimerRef.current = setTimeout(check, leaveDelay);
+
+    // Safety: also cancel if we get an actual hover re-entry event quickly
+    // (the consumer calls handleMouseEnter → we cancel there).
+  };
+
   const handleMouseEnter = useCallback(
     (element, index) => {
-      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = setTimeout(() => onHoverStart(element, index), hoverDelay);
+      clearHoverTimer();
+      cancelIntent("enter"); // if intent was pending, cancel
+
+      if (hoverDelay > 0) {
+        hoverTimeoutRef.current = setTimeout(
+          () => onHoverStart(element, index),
+          hoverDelay
+        );
+      } else {
+        onHoverStart(element, index);
+      }
     },
-    [onHoverStart, hoverDelay]
+    [hoverDelay, onHoverStart]
   );
 
   const handleMouseLeave = useCallback(
     (element, index) => {
-      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = setTimeout(() => onHoverEnd(element, index), hoverDelay);
+      clearHoverTimer();
+
+      if (hoverDelay > 0) {
+        hoverTimeoutRef.current = setTimeout(
+          () => onHoverEnd(element, index),
+          hoverDelay
+        );
+      } else {
+        onHoverEnd(element, index);
+      }
+
+      // Begin intent detection (does not affect onHoverEnd timing)
+      startIntent(element, index);
     },
-    [onHoverEnd, hoverDelay]
+    [hoverDelay, onHoverEnd]
   );
 
-  useEffect(() => () => hoverTimeoutRef.current && clearTimeout(hoverTimeoutRef.current), []);
+  // Cleanup on unmount
+  useEffect(
+    () => () => {
+      clearHoverTimer();
+      stopIntentTracking();
+      intentStateRef.current.active = false;
+    },
+    []
+  );
 
-  return { handleMouseEnter, handleMouseLeave };
+  return {
+    handleMouseEnter,
+    handleMouseLeave,
+
+    // Optional escape hatch for callers that want to cancel pending intent
+    cancelUnhoverIntent: () => cancelIntent("manual"),
+  };
 };
 
 

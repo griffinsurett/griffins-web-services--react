@@ -1,6 +1,6 @@
 // src/components/QuoteForm.jsx
 import React, { useState } from "react";
-import Button from "../components/Button";
+import Button from "../components/Buttons/Button";
 import Input from "../components/Form/Input";
 import Textarea from "../components/Form/Textarea";
 import Select from "../components/Form/Select";

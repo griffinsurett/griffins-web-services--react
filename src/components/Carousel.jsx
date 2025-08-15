@@ -6,17 +6,18 @@ import { useVisibility } from "../hooks/useVisibility";
 import { useSideDragNavigation } from "../hooks/useInteractions";
 
 /**
- * Simple 2D carousel with seamless infinite looping (via head/tail clones).
- * Layout: [arrow] [viewport] [arrow]
+ * Simple 2D carousel that pages through groups of slides.
+ * Arrows live OUTSIDE the viewport, left/right of the slides.
  *
- * `slidesPerView` supports responsive breakpoints, e.g. { base: 1, md: 2, lg: 3 }
+ * `slidesPerView` supports responsive breakpoints, e.g.
+ *   { base: 1, md: 2, lg: 3 }
  */
 export default function Carousel({
   items = [],
   renderItem = () => null,
   slidesPerView = { base: 1, md: 2, lg: 3 },
   gap = 24,
-  defaultIndex = 0,      // page index (real)
+  defaultIndex = 0,
   autoplay = true,
   autoAdvanceDelay = 4000,
   showArrows = true,
@@ -28,9 +29,7 @@ export default function Carousel({
   const containerRef = useRef(null);
   const leftZoneRef = useRef(null);
   const rightZoneRef = useRef(null);
-  const trackRef = useRef(null);
 
-  // viewport width for responsive SPV calc
   const [vw, setVw] = useState(
     typeof window !== "undefined" ? window.innerWidth : 1024
   );
@@ -40,7 +39,6 @@ export default function Carousel({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // resolve responsive slides-per-view
   const spv = useMemo(() => {
     const bp = [
       { key: "base", min: 0 },
@@ -57,7 +55,6 @@ export default function Carousel({
     return Math.max(1, Number(current) || 1);
   }, [vw, slidesPerView]);
 
-  // chunk items into pages of size spv (real pages)
   const pages = useMemo(() => {
     const out = [];
     for (let i = 0; i < items.length; i += spv) out.push(items.slice(i, i + spv));
@@ -65,93 +62,46 @@ export default function Carousel({
   }, [items, spv]);
 
   const pageCount = pages.length;
+  const [pageIndex, setPageIndex] = useState(
+    Math.min(defaultIndex, Math.max(0, pageCount - 1))
+  );
 
-  // ── Infinite loop plumbing: clones + virtual index
-  // displayPages = [lastClone, ...pages, firstClone] when pageCount > 1
-  const displayPages = useMemo(() => {
-    if (pageCount <= 1) return pages;
-    return [pages[pageCount - 1], ...pages, pages[0]];
-  }, [pages, pageCount]);
-
-  const displayCount = displayPages.length;
-
-  // virtual index (points into displayPages)
-  const [vIndex, setVIndex] = useState(1); // 1 == first real page
-  // snap to default real page on mount/changes
   useEffect(() => {
-    const safeDefault = Math.min(Math.max(defaultIndex, 0), Math.max(pageCount - 1, 0));
-    setVIndex(pageCount > 1 ? safeDefault + 1 : 0);
-  }, [pageCount, defaultIndex]);
+    if (pageIndex >= pageCount) setPageIndex(pageCount - 1);
+  }, [pageIndex, pageCount]);
 
-  // real page index derived from vIndex
-  const realIndex = pageCount > 1 ? ((vIndex - 1 + pageCount) % pageCount) : 0;
-
-  // scope for engagement hooks
   const scopeId = useMemo(
     () => `carousel-${Math.random().toString(36).slice(2, 8)}`,
     []
   );
 
-  // autoplay only when visible
   const inView = useVisibility(containerRef, { threshold: 0.3 });
-
-  const setRealPage = (i) => {
-    if (pageCount <= 1) return;
-    const normalized = ((i % pageCount) + pageCount) % pageCount;
-    setVIndex(normalized + 1); // map real -> virtual
-  };
 
   const { isAutoplayPaused, isResumeScheduled, userEngaged } = useCarouselAutoplay({
     totalItems: pageCount,
-    currentIndex: realIndex,
-    setIndex: setRealPage,
+    currentIndex: pageIndex,
+    setIndex: setPageIndex,
     autoAdvanceDelay,
     inView: autoplay && inView,
     containerSelector: `[data-autoplay-scope="${scopeId}"]`,
     itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
   });
 
-  // paging helpers (always move the virtual index)
-  const goPrev = () => setVIndex((i) => (pageCount > 1 ? i - 1 : i));
-  const goNext = () => setVIndex((i) => (pageCount > 1 ? i + 1 : i));
+  const goPrev = () =>
+    setPageIndex((p) => (p === 0 ? pageCount - 1 : p - 1));
+  const goNext = () =>
+    setPageIndex((p) => (p === pageCount - 1 ? 0 : p + 1));
 
-  // ── HoverGuard: block hover on cards while the track is animating
-  const TRANSITION_MS = 500; // sync with duration-500
+  // HoverGuard while animating
+  const TRANSITION_MS = 500;
   const [transitioning, setTransitioning] = useState(false);
-  const [instant, setInstant] = useState(false); // disable transition when snapping from clones
-
   useEffect(() => {
-    if (instant) return; // don't show guard for instant snaps
     setTransitioning(true);
     const t = setTimeout(() => setTransitioning(false), TRANSITION_MS + 50);
     return () => clearTimeout(t);
-  }, [vIndex, instant]);
+  }, [pageIndex]);
 
-  // When we hit a clone, snap (no transition) to the corresponding real page.
-  useEffect(() => {
-    if (pageCount <= 1) return;
-    if (vIndex === 0 || vIndex === displayCount - 1) {
-      // schedule after the transition finishes
-      const onEnd = () => {
-        let target = vIndex;
-        if (vIndex === 0) target = pageCount;            // last real
-        if (vIndex === displayCount - 1) target = 1;     // first real
-        setInstant(true);
-        setVIndex(target);
-        // Two RAFs to ensure DOM has applied transform before re-enabling transition
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => setInstant(false));
-        });
-      };
-      const el = trackRef.current;
-      if (!el) return;
-      const handler = () => onEnd();
-      el.addEventListener("transitionend", handler, { once: true });
-      return () => el.removeEventListener("transitionend", handler);
-    }
-  }, [vIndex, pageCount, displayCount]);
-
-  // side-only drag/tap
+  // DRAG across the whole viewport via two 50% overlays (no handlers on cards)
   useSideDragNavigation({
     enabled: drag && pageCount > 1,
     leftElRef: leftZoneRef,
@@ -195,29 +145,19 @@ export default function Carousel({
         <div className="relative overflow-hidden">
           {/* Track */}
           <div
-            ref={trackRef}
-            className={`relative z-20 flex ${
-              instant ? "" : "transition-transform duration-500 ease-in-out"
-            }`}
+            className="relative z-20 flex transition-transform duration-500 ease-in-out"
             style={{
-              width: `${(pageCount > 1 ? displayCount : 1) * 100}%`,
-              transform:
-                pageCount > 1
-                  ? `translateX(-${(vIndex * 100) / displayCount}%)`
-                  : "translateX(0%)",
+              width: `${pageCount * 100}%`,
+              transform: `translateX(-${(pageIndex * 100) / pageCount}%)`,
             }}
           >
-            {(pageCount > 1 ? displayPages : pages).map((page, i, arr) => (
+            {pages.map((page, i) => (
               <div
-                key={`page-${i}`}
+                key={i}
                 data-carousel-item
-                data-active={
-                  pageCount > 1
-                    ? (i === vIndex ? "true" : "false")
-                    : (i === 0 ? "true" : "false")
-                }
+                data-active={i === pageIndex ? "true" : "false"}
                 className="shrink-0"
-                style={{ width: `${100 / (pageCount > 1 ? arr.length : 1)}%` }}
+                style={{ width: `${100 / pageCount}%` }}
               >
                 <div
                   className="grid"
@@ -227,8 +167,8 @@ export default function Carousel({
                   }}
                 >
                   {page.map((item, j) => (
-                    <div key={`item-${i}-${j}`} className="min-w-0">
-                      {renderItem(item, (i - 1) * spv + j /* approximate index */)}
+                    <div key={j} className="min-w-0">
+                      {renderItem(item, i * spv + j)}
                     </div>
                   ))}
                 </div>
@@ -241,19 +181,19 @@ export default function Carousel({
             <div className="absolute inset-0 z-30 pointer-events-auto" aria-hidden="true" />
           )}
 
-          {/* Side-only DRAG ZONES (above guard, inside viewport) */}
+          {/* Full-viewport DRAG ZONES (left 50% + right 50%) */}
           {drag && pageCount > 1 && (
             <>
               <div
                 ref={leftZoneRef}
                 className="absolute top-0 left-0 h-full z-40 cursor-grab touch-pan-x select-none"
-                style={{ width: "32%" }}
+                style={{ width: "50%" }}
                 aria-hidden="true"
               />
               <div
                 ref={rightZoneRef}
                 className="absolute top-0 right-0 h-full z-40 cursor-grab touch-pan-x select-none"
-                style={{ width: "32%" }}
+                style={{ width: "50%" }}
                 aria-hidden="true"
               />
             </>
@@ -276,15 +216,15 @@ export default function Carousel({
         )}
       </div>
 
-      {/* Dots (reflect REAL index) */}
+      {/* Dots */}
       {showDots && pageCount > 1 && (
         <nav className="mt-6 flex justify-center gap-3" aria-label="Carousel Pagination">
           {Array.from({ length: pageCount }).map((_, i) => (
             <button
               key={i}
-              onClick={() => setRealPage(i)}
+              onClick={() => setPageIndex(i)}
               className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                i === realIndex ? "bg-primary scale-[1.30]" : "bg-white/20 hover:bg-white/50"
+                i === pageIndex ? "bg-primary scale-[1.30]" : "bg-white/20 hover:bg-white/50"
               }`}
               aria-label={`Go to page ${i + 1}`}
             />
@@ -299,10 +239,7 @@ export default function Carousel({
           <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
           <div>⏲️ Resume in 5s: {isResumeScheduled ? "✅" : "❌"}</div>
           <div>📱 spv: {spv}</div>
-          <div>📄 real pages: {pageCount}</div>
-          <div>🧭 vIndex: {vIndex}</div>
-          <div>🔁 realIndex: {realIndex}</div>
-          <div>🧩 displayCount: {displayCount}</div>
+          <div>📄 pages: {pageCount}</div>
         </div>
       )}
     </div>

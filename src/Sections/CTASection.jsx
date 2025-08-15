@@ -1,6 +1,6 @@
 // src/components/CTASection.jsx
 import React from "react";
-import Button from "../components/Button";
+import Button from "../components/Buttons/Button";
 import BorderTitle from "../components/BorderTitle";
 
 const CTASection = () => {

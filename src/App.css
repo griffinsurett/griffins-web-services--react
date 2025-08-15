@@ -293,7 +293,11 @@
   }
 
   .button-transition {
-    @apply transition-all duration-450 hover:transform hover:-translate-y-1 hover:shadow-2xl;
+    @apply transition-all duration-450 hover:transform hover:shadow-2xl;
+  }
+
+  .button-hover-transition {
+    @apply hover:-translate-y-1;
   }
 }
 

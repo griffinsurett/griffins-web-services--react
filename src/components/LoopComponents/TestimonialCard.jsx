@@ -1,5 +1,12 @@
 // src/components/LoopComponents/TestimonialCard.jsx
-export default function TestimonialCard({ data }) {
+import React from "react";
+import AnimatedBorder from "../AnimatedBorder";
+
+export default function TestimonialCard({
+  data,
+  className = "",
+  ringDuration = 800, // keep the border sweep snappy (matches FeatureCard)
+}) {
   const { tag, quote, author, role, avatar, rating } = data;
 
   const RatingStar = ({ i }) => (
@@ -13,13 +20,22 @@ export default function TestimonialCard({ data }) {
   );
 
   return (
-    <div className="group text-left outer-card-color outer-card-style outer-card-transition">
-      <div className="inner-card-color absolute inner-card-transition"></div>
+    <AnimatedBorder
+      variant="progress"
+      triggers="hover"
+      duration={ringDuration}
+      borderRadius="rounded-3xl"
+      borderWidth={2}
+      className={`group text-left outer-card-transition !duration-[900ms] ease-out ${className}`}
+      innerClassName="px-8 py-8 lg:px-10 lg:py-10 relative"
+    >
       <div className="card-icon-color icon-medium mb-5 z-10">❝</div>
+
       <p className="secondary-text text-lg leading-relaxed mb-8 italic relative z-10">
         "{quote}"
       </p>
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 relative z-10">
+
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 relative z-10">
         <div className="flex items-center gap-4">
           <div className="icon-small card-icon-color">{avatar}</div>
           <div>
@@ -27,12 +43,13 @@ export default function TestimonialCard({ data }) {
             <p className="secondary-text text-sm">{role}</p>
           </div>
         </div>
+
         <div className="flex gap-1 text-center justify-center items-center">
           {[...Array(rating)].map((_, i) => (
             <RatingStar key={i} i={i} />
           ))}
         </div>
       </div>
-    </div>
+    </AnimatedBorder>
   );
 }
