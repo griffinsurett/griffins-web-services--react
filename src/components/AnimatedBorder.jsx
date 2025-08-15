@@ -5,39 +5,35 @@ import { useHoverInteraction } from "../hooks/useInteractions";
 /**
  * Variants:
  *  - "none"               : no border
- *  - "solid"              : all-at-once border
- *  - "progress"           : conic ring, one sweep (0→100) then hold
+ *  - "solid"              : all-at-once border (fades/expands in/out)
+ *  - "progress"           : sweep 0→100 while active, then FADE OUT on leave/deactivate
  *  - "progress-infinite"  : conic ring, sweeps continuously
+ *  - "progress-b-f"       : Forward 0→100 while active, Reverse 100→0 on leave/deactivate
  *
  * Triggers (string or array; any true shows/runs):
- *  - "hover"              : hover-activated, reverses on leave (default)
- *  - "hover-no-reverse"   : hover-activated, **no reverse** on leave
- *  - "always"             : on from mount (no reverse)
- *  - "controlled"         : external `active` controls visibility (no reverse)
+ *  - "hover"              : hover-driven
+ *  - "always"             : on from mount
+ *  - "controlled"         : external `active` controls visibility
  *
- * Controlled progress (0..100):
- *  - controller: number | () => number
- *
- * Reverse policy:
- *  - If `reverseOn` prop is omitted, it’s derived from triggers:
- *      • includes "hover"            → "leave"
- *      • includes "hover-no-reverse" → "never"
- *      • otherwise                   → "never"
- *  - You can still override with reverseOn="leave" | "intent" | "never"
+ * Optional:
+ *  - controller: number | () => number  // provide progress (0..100) yourself
+ *  - reverseOn="leave" | "intent" | "never" (overrides default reverse behavior)
  */
 const AnimatedBorder = ({
   children,
 
   // Behavior
-  variant = "none",           // "none" | "solid" | "progress" | "progress-infinite"
-  triggers = "hover",         // "hover" | "hover-no-reverse" | "always" | "controlled" | string[]
-  active = false,             // used by "controlled"
+  variant = "none",           // "none" | "solid" | "progress" | "progress-infinite" | "progress-b-f"
+  triggers = "hover",         // "hover" | "always" | "controlled" | string[]
+  active = false,             // for "controlled"
 
   // Controlled progress (0..100)
   controller,                 // number OR () => number
 
-  // Uncontrolled animation timing
-  duration = 2000,            // ms per sweep
+  // Timings
+  duration = 2000,            // ms per sweep (progress variants)
+  solidTransition = 180,      // ms for solid fade/size
+  fadeOutMs = 220,            // ms for progress fade-out
 
   // Styling
   color = "var(--color-accent)",
@@ -49,12 +45,11 @@ const AnimatedBorder = ({
   // Hover behavior
   hoverDelay = 0,
   unhoverIntent,              // optional { enabled, ... } from hook
-  reverseOn,                  // optional override: "leave" | "intent" | "never"
+  reverseOn,                  // "leave" | "intent" | "never" (override)
 
-  // passthrough DOM events
+  // passthrough
   onMouseEnter,
   onMouseLeave,
-
   ...rest
 }) => {
   // ── Setup
@@ -62,9 +57,9 @@ const AnimatedBorder = ({
   const triggerSet = new Set(triggerList.map((t) => String(t || "").toLowerCase()));
   const clamp = (n) => (Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0);
 
-  // Extended hover modes
-  const hoverNoReverse = triggerSet.has("hover-no-reverse");
-  const wantsHover = triggerSet.has("hover") || hoverNoReverse;
+  const wantsHover = triggerSet.has("hover");
+  const isAlways = triggerSet.has("always");
+  const isControlledTrigger = triggerSet.has("controlled");
 
   const [hovered, setHovered] = useState(false);
   const [internalProgress, setInternalProgress] = useState(0);
@@ -76,23 +71,34 @@ const AnimatedBorder = ({
   const lastTsRef = useRef(0);
 
   const bw = typeof borderWidth === "number" ? `${borderWidth}px` : borderWidth;
-  const isProgress = variant === "progress" || variant === "progress-infinite";
-  const isInfinite = variant === "progress-infinite";
 
-  const isAlways = triggerSet.has("always");
+  const isProgress =
+    variant === "progress" ||
+    variant === "progress-infinite" ||
+    variant === "progress-b-f";
+
+  const isInfinite = variant === "progress-infinite";
   const isHovering = wantsHover && hovered;
-  const isControlled = triggerSet.has("controlled") && !!active;
+  const isControlledActive = isControlledTrigger && !!active;
 
   const controllerIsFn = typeof controller === "function";
   const controllerIsNum = typeof controller === "number";
   const controllerProvided = controllerIsFn || controllerIsNum;
 
-  // Reverse-on-leave state
+  // Direction (+1 forward, -1 reverse), reverse used only by progress-b-f
+  const [dir, setDir] = useState(1);
   const [reversing, setReversing] = useState(false);
-  const [dir, setDir] = useState(1); // +1 forward, -1 reverse
 
-  // Only considered “triggered” when visible drivers are active
-  const triggered = variant !== "none" && (isAlways || isHovering || isControlled);
+  // PROGRESS-only helpers
+  const [fadingOut, setFadingOut] = useState(false);
+  const [freezeAt, setFreezeAt] = useState(null); // number | null
+  const latestPercentRef = useRef(0);
+
+  // "progress" doesn't reverse; it can hold at 100 while still active
+  const [holdAtFull, setHoldAtFull] = useState(false);
+
+  // Triggered = when we should be visibly animating/visible
+  const triggered = variant !== "none" && (isAlways || isHovering || isControlledActive);
 
   // Keep providedPercent in sync for numeric controller
   useEffect(() => {
@@ -113,7 +119,57 @@ const AnimatedBorder = ({
     return () => cancelAnimationFrame(frame);
   }, [triggered, isProgress, controllerIsFn, controller]);
 
-  // Internal animation (uncontrolled)
+  // Default reverse policy derived from variant (overridable)
+  // - progress: never reverse (we fade out)
+  // - progress-b-f: reverse on leave by default
+  // - progress-infinite: never reverse
+  const derivedReversePolicy = useMemo(() => {
+    if (reverseOn) return reverseOn;
+    if (variant === "progress-b-f" && wantsHover) return "leave";
+    return "never";
+  }, [reverseOn, variant, wantsHover]);
+
+  // progress-b-f: reverse when deactivated (controlled)
+  useEffect(() => {
+    if (variant !== "progress-b-f") return;
+    if (!isControlledTrigger) return;
+    if (controllerProvided) return;
+
+    if (active) {
+      setDir(1);
+      setReversing(false);
+    } else {
+      setDir(-1);
+      setReversing(true);
+    }
+  }, [variant, isControlledTrigger, controllerProvided, active]);
+
+  // PROGRESS (controlled): fade out on deactivate
+  useEffect(() => {
+    if (variant !== "progress") return;
+    if (!isControlledTrigger) return;
+    if (controllerProvided) return;
+
+    if (active) {
+      // start forward again
+      setFadingOut(false);
+      setFreezeAt(null);
+      setHoldAtFull(false);
+      setDir(1);
+    } else {
+      // start fade out from current percent
+      setFreezeAt(latestPercentRef.current);
+      setFadingOut(true);
+      setHoldAtFull(false);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+        lastTsRef.current = 0;
+      }
+    }
+  }, [variant, isControlledTrigger, controllerProvided, active]);
+
+  // Uncontrolled animation runner
   const shouldAnimateInternal =
     isProgress && !controllerProvided && (triggered || reversing);
 
@@ -134,20 +190,21 @@ const AnimatedBorder = ({
           if (isInfinite) {
             next = next % 100;
             if (next < 0) next += 100;
-          } else {
-            if (next >= 100) {
-              next = 100;
-              stopForwardNow = true;
-            }
+          } else if (next >= 100) {
+            next = 100;
+            stopForwardNow = true;
           }
-        } else {
-          if (next <= 0) {
-            next = 0;
-            stopReverseNow = true;
-          }
+        } else if (next <= 0) {
+          next = 0;
+          stopReverseNow = true;
         }
         return next;
       });
+
+      // Handle stops
+      if (stopForwardNow && variant === "progress") {
+        setHoldAtFull(true);
+      }
 
       if (stopReverseNow || (stopForwardNow && !isInfinite)) {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -159,7 +216,7 @@ const AnimatedBorder = ({
 
       rafRef.current = requestAnimationFrame(step);
     },
-    [dir, duration, isInfinite]
+    [dir, duration, isInfinite, variant]
   );
 
   useEffect(() => {
@@ -172,69 +229,126 @@ const AnimatedBorder = ({
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
       lastTsRef.current = 0;
-      if (!triggered && !reversing) setInternalProgress(0);
+      // Reset when fully inactive for non-progress (progress resets after fade)
+      if (!triggered && !reversing && variant !== "progress") {
+        setInternalProgress(0);
+      }
     }
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [shouldAnimateInternal, step, triggered, reversing]);
+  }, [shouldAnimateInternal, step, triggered, reversing, variant]);
 
+  // effective percent
   const effectivePercent = isProgress
     ? clamp(controllerIsFn ? providedPercent : controllerIsNum ? controller : internalProgress)
     : 0;
 
-  // Border shows while triggered or while reversing animation is finishing
+  // Track latest percent so we can freeze at that value for progress fade-out
+  useEffect(() => {
+    latestPercentRef.current = effectivePercent;
+  }, [effectivePercent]);
+
+  // Fade-out lifecycle for progress
+  useEffect(() => {
+    if (variant !== "progress") return;
+    if (!fadingOut) return;
+
+    const t = setTimeout(() => {
+      setFadingOut(false);
+      setFreezeAt(null);
+      setInternalProgress(0);
+      setHoldAtFull(false);
+    }, fadeOutMs);
+
+    return () => clearTimeout(t);
+  }, [variant, fadingOut, fadeOutMs]);
+
+  // When entering (hover/activate), cancel fade/freeze
+  const beginActive = () => {
+    setDir(1);
+    setReversing(false);
+    setFadingOut(false);
+    setFreezeAt(null);
+  };
+
+  // When leaving (hover) handle per variant
+  const handleLeaveVariant = () => {
+    if (controllerProvided) return;
+
+    if (variant === "progress-b-f") {
+      if (derivedReversePolicy === "leave") {
+        setDir(-1);
+        setReversing(true);
+      }
+      return;
+    }
+
+    if (variant === "progress") {
+      // fade out from current value
+      setHoldAtFull(false);
+      setFreezeAt(latestPercentRef.current);
+      setFadingOut(true);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+        lastTsRef.current = 0;
+      }
+    }
+  };
+
+  // Visibility
   const showBorder =
-    variant !== "none" && (isAlways || isHovering || isControlled || reversing);
+    variant === "progress"
+      ? triggered || fadingOut // keep mounted during fade
+      : variant !== "none" && (isAlways || isHovering || isControlledActive || reversing);
 
-  // Derived default reverse policy (unless user overrode via prop)
-  const derivedReversePolicy = useMemo(() => {
-    if (reverseOn) return reverseOn; // explicit override
-    if (hoverNoReverse) return "never";
-    if (wantsHover) return "leave";
-    return "never"; // always/controlled/non-hover → never reverse
-  }, [reverseOn, hoverNoReverse, wantsHover]);
+  // Styles
+  const baseMask = {
+    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+    maskComposite: "exclude",
+    WebkitMaskComposite: "xor",
+  };
 
-  const overlayStyle =
-    variant === "solid"
-      ? {
-          background: color,
-          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          WebkitMask:
-            "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          maskComposite: "exclude",
-          WebkitMaskComposite: "xor",
-          padding: bw,
-        }
-      : isProgress
-      ? {
-          background: `conic-gradient(
-            from 0deg,
-            ${color} 0deg,
-            ${color} ${effectivePercent * 3.6}deg,
-            transparent ${effectivePercent * 3.6}deg,
-            transparent 360deg
-          )`,
-          mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          WebkitMask:
-            "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-          maskComposite: "exclude",
-          WebkitMaskComposite: "xor",
-          padding: bw,
-        }
-      : {};
+  const overlayStyleSolid = {
+    background: color,
+    ...baseMask,
+    padding: triggered ? bw : "0px",
+    opacity: triggered ? 1 : 0,
+    transition: `opacity ${solidTransition}ms cubic-bezier(.2,0,0,1), padding ${solidTransition}ms cubic-bezier(.2,0,0,1)`,
+    willChange: "opacity, padding",
+  };
 
-  // ── Hover wiring (with optional unhover intent)
+  const displayPercent =
+    freezeAt != null ? freezeAt : effectivePercent;
+
+  const overlayStyleProgress = {
+    background: `conic-gradient(
+      from 0deg,
+      ${color} 0deg,
+      ${color} ${displayPercent * 3.6}deg,
+      transparent ${displayPercent * 3.6}deg,
+      transparent 360deg
+    )`,
+    ...baseMask,
+    padding: bw,
+    // For progress: fade out when not triggered (but still mounted due to `fadingOut`)
+    opacity: variant === "progress" ? (triggered ? 1 : 0) : 1,
+    transition: variant === "progress" ? `opacity ${fadeOutMs}ms cubic-bezier(.2,0,0,1)` : undefined,
+    willChange: variant === "progress" ? "opacity" : undefined,
+  };
+
+  // Hover intent plumbing (only matters if reverseOn="intent")
   const mergedUnhoverIntent = useMemo(() => {
     if (!unhoverIntent?.enabled) return unhoverIntent;
     const userCommit = unhoverIntent.onUnhoverCommit;
     const userCancel = unhoverIntent.onUnhoverCancel;
-
     return {
       ...unhoverIntent,
       onUnhoverCommit: (el, idx, meta) => {
-        if (derivedReversePolicy === "intent" && isProgress && !controllerProvided) {
+        if (derivedReversePolicy === "intent" && variant === "progress-b-f" && !controllerProvided) {
           setDir(-1);
           setReversing(true);
         }
@@ -244,51 +358,50 @@ const AnimatedBorder = ({
         userCancel?.(el, idx, meta);
       },
     };
-  }, [unhoverIntent, derivedReversePolicy, isProgress, controllerProvided]);
+  }, [unhoverIntent, derivedReversePolicy, variant, controllerProvided]);
 
   const { handleMouseEnter, handleMouseLeave } = useHoverInteraction({
     hoverDelay,
     unhoverIntent: mergedUnhoverIntent,
   });
 
+  // Mount policy:
+  //  - solid: always mount (so it can animate opacity/padding)
+  //  - others: mount while active/reversing; for progress also during fadingOut
+  const mountOverlay =
+    variant === "solid"
+      ? variant !== "none"
+      : showBorder;
+
   return (
     <div
       className={`relative ${className}`}
       onMouseEnter={(e) => {
         setHovered(true);
-        setDir(1);
-        setReversing(false);
+        beginActive();
         onMouseEnter?.(e);
         handleMouseEnter(e.currentTarget);
       }}
       onMouseLeave={(e) => {
         setHovered(false);
         onMouseLeave?.(e);
-
-        // Reverse only for hover modes, and only per the derived policy.
-        if (isProgress && !controllerProvided) {
-          if (derivedReversePolicy === "leave") {
-            setDir(-1);
-            setReversing(true);
-          }
-          // "intent": handled in mergedUnhoverIntent on commit
-          // "never": do nothing
-        }
-
+        handleLeaveVariant();
         handleMouseLeave(e.currentTarget);
       }}
       {...rest}
     >
-      {showBorder && variant !== "none" && (
+      {mountOverlay && variant !== "none" && (
         <div
-          className={`absolute inset-0 ${borderRadius} pointer-events-none`}
-          style={overlayStyle}
+          className={`absolute inset-0 ${borderRadius} pointer-events-none z-20`}
+          style={
+            variant === "solid"
+              ? overlayStyleSolid
+              : overlayStyleProgress
+          }
         />
       )}
 
-      <div
-        className={`card-bg ${borderRadius} overflow-hidden relative z-10 ${innerClassName}`}
-      >
+      <div className={`relative z-10 overflow-hidden ${borderRadius} ${innerClassName} card-bg`}>
         {children}
       </div>
     </div>

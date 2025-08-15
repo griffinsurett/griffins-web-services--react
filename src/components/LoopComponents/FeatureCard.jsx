@@ -11,7 +11,7 @@ export default function FeatureCard({
 
   return (
     <AnimatedBorder
-      variant="progress"
+      variant="progress-b-f"
       triggers="hover"
       duration={ringDuration}
       borderRadius="rounded-3xl"

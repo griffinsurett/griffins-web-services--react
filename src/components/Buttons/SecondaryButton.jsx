@@ -6,37 +6,42 @@ import AnimatedBorder from "../AnimatedBorder";
 const SecondaryButton = ({
   Base,
   className = "",
+  fullWidth = true, // match primary sizing on mobile
   animatedBorder = {
     color: "var(--color-accent)",
-    duration: 800,
+    duration: 700,
     borderWidth: 2,
-    borderRadius: "rounded-full",
+    borderRadius: "rounded-full", // ⬅ match Base's rounded-full so outlines line up
   },
   ...props
 }) => {
   const {
     color = "var(--color-accent)",
-    duration = 800,
+    duration = 700,
     borderWidth = 2,
     borderRadius = "rounded-full",
   } = animatedBorder || {};
 
-  const innerClasses =
+  const containerClasses = fullWidth ? "block w-full lg:w-auto" : "inline-block";
+  const innerWrapWidth   = fullWidth ? "w-full" : "";
+
+  const innerButtonClasses =
     `bg-transparent text-white ${borderRadius} ` +
     `hover:bg-accent hover:text-black`;
 
   return (
     <AnimatedBorder
       variant="progress"
-      triggers="always"          // run once on mount
+      triggers="always"              // run once on mount (no reverse)
       duration={duration}
       color={color}
       borderWidth={borderWidth}
       borderRadius={borderRadius}
-      className="inline-block"
-      innerClassName={`bg-transparent shadow-none p-0 ${borderRadius}`}
+      className={containerClasses}
+      // ⬇️ Overwrite AnimatedBorder's default `card-bg` with a truly plain wrapper
+      innerClassName={`!bg-transparent !border-transparent shadow-none p-0 ${borderRadius} ${innerWrapWidth}`}
     >
-      <Base className={`${innerClasses} ${className}`} {...props} />
+      <Base className={`${innerButtonClasses} ${className}`} {...props} />
     </AnimatedBorder>
   );
 };
