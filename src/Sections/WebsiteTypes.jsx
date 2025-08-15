@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import EnhancedAccordionItem from "../components/LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "../components/VideoPlayer";
 import useAccordionAutoplay from "../hooks/useAccordionAutoplay";
-import { useScrollAnimation } from "../hooks/useScrollAnimation";
+import { useVisibility } from "../hooks/useVisibility";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
 import BorderTitle from "../components/BorderTitle";
 
@@ -24,11 +24,11 @@ const WebsiteTypes = () => {
   ];
 
   // Just need IO to know when the section is visible
-  const isInView = useScrollAnimation(sectionRef, {
-    threshold: 0.3,
-    onForward: () => {},
-    onBackward: () => {},
-  });
+  const isInView = useVisibility(sectionRef, {
+     threshold: 0.3,
+     onForward: () => {},
+     onBackward: () => {},
+   });
 
   const desktopVideoRef = useRef(null);
   const mobileVideoRef = useRef(null);

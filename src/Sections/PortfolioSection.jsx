@@ -1,7 +1,7 @@
 // src/Sections/PortfolioSection.jsx
 import React, { useRef } from "react";
 import PortfolioCarousel from "../components/PortfolioCarousel";
-import { useScrollAnimation } from "../hooks/useScrollAnimation";
+import { useVisibility } from "../hooks/useVisibility";
 import Placeholder from "../assets/placeholder.jpg";
 import ProntoDesktop from "../assets/ProntoJunkRemoval/pronto-desktop.jpg"
 import FariasDesktop from "../assets/FariasDemolition/Farias-Desktop.jpg"
@@ -19,10 +19,10 @@ export default function PortfolioSection() {
   ];
 
   // Keep section-specific concerns here (e.g., header animations)
-  useScrollAnimation(sectionRef, {
-    threshold: 0.3,
-    onForward: () => {},
-    onBackward: () => {},
+useVisibility(sectionRef, {
+     threshold: 0.3,
+     onForward: () => {},
+     onBackward: () => {},
   });
 
   return (

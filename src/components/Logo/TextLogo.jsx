@@ -1,6 +1,6 @@
 // src/components/TextLogo.jsx
 import React, { useRef, useState } from "react";
-import { useScrollAnimation } from "../../hooks/useScrollAnimation";
+import { useVisibility } from "../../hooks/useVisibility";
 
 export default function TextLogo({
   title = "",
@@ -15,11 +15,11 @@ export default function TextLogo({
   const ref = useRef(null);
 
   // hide when scrolling down, show when scrolling up
-  useScrollAnimation(ref, {
-    threshold: 0,                  // element enters immediately
-    pauseDelay: fadeDuration,      // so we don’t flip-flop too fast
-    onForward:  () => setHidden(true),
-    onBackward: () => setHidden(false),
+  useVisibility(ref, {
+     threshold: 0,
+     pauseDelay: fadeDuration,
+     onForward:  () => setHidden(true),
+     onBackward: () => setHidden(false),
   });
 
   return (
