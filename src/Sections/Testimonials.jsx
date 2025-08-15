@@ -1,7 +1,8 @@
-// src/components/Testimonials.jsx
+// src/Sections/Testimonials.jsx
 import React from "react";
 import TestimonialCard from "../components/LoopComponents/TestimonialCard";
 import BorderTitle from "../components/BorderTitle";
+import Carousel from "../components/Carousel";
 
 const Testimonials = () => {
   const testimonials = [
@@ -23,16 +24,25 @@ const Testimonials = () => {
       avatar: "A",
       rating: 5,
     },
+    {
+      tag: "Non-Profit",
+      quote:
+        "Griffin's Web helped us create a stunning website that truly reflects our mission. The team was incredibly supportive and responsive throughout the process.",
+      author: "Emily Johnson",
+      role: "Director, Community Outreach",
+      avatar: "E",
+      rating: 5,
+    },
   ];
 
   return (
     <section className="outer-section bg-secondary relative">
-      <div className="section-color-border"></div>
+      <div className="section-color-border" />
       <div className="inner-section">
-        <div className="text-section">       
+        <div className="text-section">
           <BorderTitle>Testimonials</BorderTitle>
           <h2 className="h2 mb-6">
-            What Our <span className="text-accent-heading">Clients Say</span>
+            What Our <span className="emphasized-text">Clients Say</span>
           </h2>
           <p className="large-text">
             Don't just take our word for it - hear from businesses who've
@@ -40,11 +50,17 @@ const Testimonials = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <TestimonialCard key={index} data={testimonial} />
-          ))}
-        </div>
+        <Carousel
+          items={testimonials}
+          renderItem={(t) => <TestimonialCard data={t} />}
+          slidesPerView={{ base: 1, md: 2 }}
+          gap={32}
+          autoplay
+          autoAdvanceDelay={4500}
+          showArrows={false}
+          showDots
+          drag
+        />
       </div>
     </section>
   );

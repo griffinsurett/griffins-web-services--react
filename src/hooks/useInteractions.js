@@ -241,3 +241,123 @@ export const useHoverInteraction = ({
   return { handleMouseEnter, handleMouseLeave };
 };
 
+
+/** ──────────────────────────────────────────────────────────────────────────
+ * NEW: Side-only drag/tap navigation
+ *
+ * Attaches pointer handlers to two "side zones" (left/right) so users can
+ * drag horizontally (or tap) to navigate. The active/center area remains
+ * untouched, preserving its vertical scroll behavior.
+ *
+ * Usage:
+ *   const leftRef = useRef(null);
+ *   const rightRef = useRef(null);
+ *   useSideDragNavigation({
+ *     enabled: drag,
+ *     leftElRef: leftRef,
+ *     rightElRef: rightRef,
+ *     onLeft: goPrev,
+ *     onRight: goNext,
+ *     dragThreshold: 40,
+ *     tapThreshold: 12,
+ *   });
+ */
+export const useSideDragNavigation = ({
+  enabled = true,
+  leftElRef,
+  rightElRef,
+  onLeft = () => {},
+  onRight = () => {},
+  dragThreshold = 40,
+  tapThreshold = 12,
+} = {}) => {
+  const stateRef = useRef({
+    active: false,
+    zone: null,   // "left" | "right"
+    id: null,
+    startX: 0,
+    startY: 0,
+    moved: false,
+    slid: false,
+  });
+
+  const attach = useCallback((el, zone) => {
+    if (!el) return () => {};
+
+    const down = (e) => {
+      if (!enabled) return;
+      const s = stateRef.current;
+      s.active = true;
+      s.zone   = zone;
+      s.id     = e.pointerId;
+      s.startX = e.clientX;
+      s.startY = e.clientY;
+      s.moved  = false;
+      s.slid   = false;
+      el.setPointerCapture?.(e.pointerId);
+    };
+
+    const move = (e) => {
+      const s = stateRef.current;
+      if (!s.active || s.id !== e.pointerId || s.zone !== zone) return;
+
+      const dx = e.clientX - s.startX;
+      const dy = e.clientY - s.startY;
+      if (!s.moved && (Math.abs(dx) > 2 || Math.abs(dy) > 2)) s.moved = true;
+
+      // Let vertical movement scroll the page; only hijack for horizontal intent.
+      if (Math.abs(dy) > Math.abs(dx)) return;
+
+      // Horizontal gesture: prevent default to reduce touch scroll jank.
+      e.preventDefault?.();
+
+      if (s.slid) return;
+
+      if (Math.abs(dx) >= dragThreshold) {
+        if (zone === "left") onLeft();
+        else onRight();
+        s.slid = true;
+      }
+    };
+
+    const end = (e) => {
+      const s = stateRef.current;
+      if (!s.active || s.id !== e.pointerId || s.zone !== zone) return;
+
+      const dx = e.clientX - s.startX;
+      const dy = e.clientY - s.startY;
+
+      if (!s.slid && Math.hypot(dx, dy) <= tapThreshold) {
+        if (zone === "left") onLeft();
+        else onRight();
+      }
+
+      try { el.releasePointerCapture?.(s.id); } catch {}
+      s.active = false;
+      s.zone   = null;
+      s.id     = null;
+    };
+
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerup", end);
+    el.addEventListener("pointercancel", end);
+
+    return () => {
+      el.removeEventListener("pointerdown", down);
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerup", end);
+      el.removeEventListener("pointercancel", end);
+    };
+  }, [enabled, onLeft, onRight, dragThreshold, tapThreshold]);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const cleanLeft  = attach(leftElRef?.current,  "left");
+    const cleanRight = attach(rightElRef?.current, "right");
+    return () => {
+      cleanLeft && cleanLeft();
+      cleanRight && cleanRight();
+    };
+  }, [enabled, leftElRef, rightElRef, attach]);
+};

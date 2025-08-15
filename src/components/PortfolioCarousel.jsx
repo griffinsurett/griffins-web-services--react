@@ -3,10 +3,11 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useCarouselAutoplay from "../hooks/useCarouselAutoplay";
 import { useVisibility } from "../hooks/useVisibility";
+import { useSideDragNavigation } from "../hooks/useInteractions";
 import PortfolioItemComponent from "./LoopComponents/PortfolioItemComponent";
 
 /**
- * 3D carousel with engagement-aware autoplay.
+ * 3D carousel with engagement-aware autoplay + side-only drag/tap navigation.
  *
  * Arrow positioning:
  * - < 1280px: keep arrows just outside the ACTIVE (center) slide
@@ -19,6 +20,7 @@ export default function PortfolioCarousel({
   autoAdvanceDelay = 4000,
   showArrows = true,
   showDots = true,
+  drag = false,              // ⬅️ NEW: enable horizontal drag/tap on side zones
   className = "",
 }) {
   const containerRef = useRef(null);
@@ -102,6 +104,33 @@ export default function PortfolioCarousel({
     ? `calc(50% + ${tx}px)`
     : `calc(50% + ${sideOffsetFromCenterSlide}px)`;
 
+  // ── Side drag zones (transparent overlays)
+  const leftZoneRef  = useRef(null);
+  const rightZoneRef = useRef(null);
+
+  // Bind side-only drag/tap handlers
+  useSideDragNavigation({
+    enabled: drag && items.length > 1,
+    leftElRef: leftZoneRef,
+    rightElRef: rightZoneRef,
+    onLeft: goToPrevious,
+    onRight: goToNext,
+    dragThreshold: Math.max(40, Math.round(vw * 0.05)),
+    tapThreshold: 12,
+  });
+
+  const sideZoneWidth = Math.max(140, Math.min(sideW, 520)); // px
+  const sideZoneStyle = (leftPx) => ({
+    left: `calc(50% ${leftPx >= 0 ? "+" : "-"} ${Math.abs(leftPx)}px)`,
+    transform: "translateX(-50%)",
+    width: `${sideZoneWidth}px`,
+    top: 0,
+    height: "100%",
+  });
+
+  const leftZoneLeftPx  = isLarge ? tx : sideOffsetFromCenterSlide;
+  const rightZoneLeftPx = isLarge ? tx : sideOffsetFromCenterSlide;
+
   return (
     <div
       ref={containerRef}
@@ -130,7 +159,27 @@ export default function PortfolioCarousel({
           />
         ))}
 
-        {/* Arrows */}
+        {/* Side-only DRAG ZONES (behind arrows; above slides) */}
+        {drag && items.length > 1 && (
+          <>
+            <div
+              ref={leftZoneRef}
+              className="absolute z-30 cursor-grab touch-pan-x select-none"
+              style={sideZoneStyle(-leftZoneLeftPx)}
+              aria-hidden="true"
+              data-drag-zone="left"
+            />
+            <div
+              ref={rightZoneRef}
+              className="absolute z-30 cursor-grab touch-pan-x select-none"
+              style={sideZoneStyle(rightZoneLeftPx)}
+              aria-hidden="true"
+              data-drag-zone="right"
+            />
+          </>
+        )}
+
+        {/* Arrows (kept above drag zones) */}
         {showArrows && items.length > 1 && (
           <>
             <button
@@ -181,7 +230,7 @@ export default function PortfolioCarousel({
         </nav>
       )}
 
-      {/* Debug */}
+      {/* (Optional) Debug */}
       <div className="mt-4 text-xs opacity-70">
         <div>⏸️ Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
         <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>

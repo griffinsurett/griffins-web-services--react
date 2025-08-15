@@ -3,9 +3,9 @@ import React, { useRef } from "react";
 import { useAutoScroll } from "../../hooks/useAutoScroll";
 
 /**
- * Single slide for the 3D carousel, now with a scrollable inner viewport.
- * - Shows the image from the TOP
- * - No cropping (no object-cover); full image is viewable via vertical scroll
+ * Single slide for the 3D carousel, now with a scrollable inner viewport
+ * ONLY when the slide is ACTIVE. Inactive side slides do not intercept
+ * wheel/touch scroll, allowing the page to scroll normally.
  */
 export default function PortfolioItemComponent({
   item,
@@ -36,19 +36,15 @@ export default function PortfolioItemComponent({
   const topClass = isActive ? "top-0" : "top-1/2";
   const baseTranslate = isActive ? "translate(-50%, 0)" : "translate(-50%, -50%)";
 
-  // 🔁 Auto-scroll ONLY while active & visible.
-  // - Wait startDelay before first start
-  // - Slow, “video-like” scroll (top → bottom in ~30s)
-  // - ⛔ When the user scrolls, pause and DO NOT resume while this item stays active
-  // - 🔄 When it becomes inactive/out-of-view, reset to top for the next cycle
+  // Auto-scroll ONLY while active & visible. When inactive, it resets to top.
   useAutoScroll({
     ref: viewportRef,
     active: isActive,
     cycleDuration: 30,        // slow scroll (seconds top → bottom)
     loop: false,              // stop at bottom
-    startDelay: 1500,         // don't start immediately
-    resumeDelay: 0,           // ignored because…
-    resumeOnUserInput: false, // ⬅️ never resume during current active cycle
+    startDelay: 1500,
+    resumeDelay: 0,
+    resumeOnUserInput: false, // never resume during current active cycle
     threshold: 0.35,
     resetOnInactive: true,
   });
@@ -91,6 +87,18 @@ export default function PortfolioItemComponent({
     };
   }
 
+  // Only the ACTIVE slide should allow inner scrolling and capture touch/wheel.
+  const viewportClassesActive = `
+    w-full h-full bg-white
+    overflow-y-auto overscroll-contain
+    touch-pan-y m-0 p-0
+  `;
+  const viewportClassesInactive = `
+    w-full h-full bg-white
+    overflow-hidden pointer-events-none select-none
+    m-0 p-0
+  `;
+
   return (
     <div
       className={`${slideBase} ${topClass}`}
@@ -98,27 +106,22 @@ export default function PortfolioItemComponent({
       data-carousel-item
       data-index={i}
       data-active={isActive ? "true" : "false"}
+      // Clicking a side slide selects it; pointer events remain enabled on container
       onClick={() => i !== activeIndex && onSelect(i)}
     >
-      {/* Scrollable viewport that starts at the TOP */}
+      {/* Scrollable viewport only when ACTIVE. Inactive viewports do not intercept scroll. */}
       <figure
         ref={viewportRef}
-        className="
-          w-full h-full bg-white
-          overflow-y-auto overscroll-contain
-          touch-pan-y m-0 p-0
-        "
+        className={isActive ? viewportClassesActive : viewportClassesInactive}
+        aria-hidden={isActive ? "false" : "true"}
+        tabIndex={isActive ? 0 : -1}
       >
         <img
           src={item.image}
           alt={item.title}
           loading="lazy"
           draggable={false}
-          className="
-            block
-            w-full h-auto
-            select-none
-          "
+          className="block w-full h-auto select-none"
         />
       </figure>
     </div>

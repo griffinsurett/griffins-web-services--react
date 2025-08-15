@@ -189,7 +189,11 @@
 
   /* Card components */
   .outer-card-transition {
-    @apply transition-all hover:transform hover:-translate-y-3 main-duration;
+    @apply transition-all hover:transform main-duration;
+  }
+
+  .outer-card-hover-transition {
+    @apply hover:-translate-y-3;
   }
 
   .outer-card-color {

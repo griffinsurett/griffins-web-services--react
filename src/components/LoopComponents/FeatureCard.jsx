@@ -17,7 +17,7 @@ export default function FeatureCard({
       borderRadius="rounded-3xl"
       borderWidth={2}
       // Slow down the hover lift/transform without touching the ring speed
-      className={`group text-center outer-card-transition !duration-[900ms] ease-out ${className}`}
+      className={`group text-center outer-card-transition outer-card-hover-transition !duration-[900ms] ease-out ${className}`}
       innerClassName="h-85 mx-auto px-10 flex flex-col justify-center items-center"
     >
       <div className="icon-large z-10 mb-5 card-icon-color">{icon}</div>
