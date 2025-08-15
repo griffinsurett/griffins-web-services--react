@@ -5,7 +5,7 @@ import { useHoverInteraction } from "../hooks/useInteractions";
 /**
  * Variants:
  *  - "none"               : no border
- *  - "solid"              : all-at-once border (fades/expands in/out)
+ *  - "solid"              : all-at-once border (smooth Tailwind transition)
  *  - "progress"           : sweep 0→100 while active, then FADE OUT on leave/deactivate
  *  - "progress-infinite"  : conic ring, sweeps continuously
  *  - "progress-b-f"       : Forward 0→100 while active, Reverse 100→0 on leave/deactivate
@@ -32,13 +32,12 @@ const AnimatedBorder = ({
 
   // Timings
   duration = 2000,            // ms per sweep (progress variants)
-  solidTransition = 180,      // ms for solid fade/size
   fadeOutMs = 220,            // ms for progress fade-out
 
   // Styling
   color = "var(--color-accent)",
-  borderRadius = "rounded-3xl",
-  borderWidth = 2,            // px or string
+  borderRadius = "rounded-3xl",  // tailwind radius class
+  borderWidth = 2,               // px or string
   className = "",
   innerClassName = "",
 
@@ -93,8 +92,6 @@ const AnimatedBorder = ({
   const [fadingOut, setFadingOut] = useState(false);
   const [freezeAt, setFreezeAt] = useState(null); // number | null
   const latestPercentRef = useRef(0);
-
-  // "progress" doesn't reverse; it can hold at 100 while still active
   const [holdAtFull, setHoldAtFull] = useState(false);
 
   // Triggered = when we should be visibly animating/visible
@@ -151,13 +148,11 @@ const AnimatedBorder = ({
     if (controllerProvided) return;
 
     if (active) {
-      // start forward again
       setFadingOut(false);
       setFreezeAt(null);
       setHoldAtFull(false);
       setDir(1);
     } else {
-      // start fade out from current percent
       setFreezeAt(latestPercentRef.current);
       setFadingOut(true);
       setHoldAtFull(false);
@@ -201,10 +196,7 @@ const AnimatedBorder = ({
         return next;
       });
 
-      // Handle stops
-      if (stopForwardNow && variant === "progress") {
-        setHoldAtFull(true);
-      }
+      if (stopForwardNow && variant === "progress") setHoldAtFull(true);
 
       if (stopReverseNow || (stopForwardNow && !isInfinite)) {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -229,7 +221,6 @@ const AnimatedBorder = ({
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
       lastTsRef.current = 0;
-      // Reset when fully inactive for non-progress (progress resets after fade)
       if (!triggered && !reversing && variant !== "progress") {
         setInternalProgress(0);
       }
@@ -286,8 +277,6 @@ const AnimatedBorder = ({
     }
 
     if (variant === "progress") {
-      // fade out from current value
-      setHoldAtFull(false);
       setFreezeAt(latestPercentRef.current);
       setFadingOut(true);
       if (rafRef.current) {
@@ -298,10 +287,10 @@ const AnimatedBorder = ({
     }
   };
 
-  // Visibility
+  // Visibility logic
   const showBorder =
     variant === "progress"
-      ? triggered || fadingOut // keep mounted during fade
+      ? triggered || fadingOut
       : variant !== "none" && (isAlways || isHovering || isControlledActive || reversing);
 
   // Styles
@@ -312,17 +301,15 @@ const AnimatedBorder = ({
     WebkitMaskComposite: "xor",
   };
 
+  // Solid: animate opacity + padding via Tailwind transition classes
   const overlayStyleSolid = {
     background: color,
     ...baseMask,
     padding: triggered ? bw : "0px",
     opacity: triggered ? 1 : 0,
-    transition: `opacity ${solidTransition}ms cubic-bezier(.2,0,0,1), padding ${solidTransition}ms cubic-bezier(.2,0,0,1)`,
-    willChange: "opacity, padding",
   };
 
-  const displayPercent =
-    freezeAt != null ? freezeAt : effectivePercent;
+  const displayPercent = freezeAt != null ? freezeAt : effectivePercent;
 
   const overlayStyleProgress = {
     background: `conic-gradient(
@@ -334,7 +321,6 @@ const AnimatedBorder = ({
     )`,
     ...baseMask,
     padding: bw,
-    // For progress: fade out when not triggered (but still mounted due to `fadingOut`)
     opacity: variant === "progress" ? (triggered ? 1 : 0) : 1,
     transition: variant === "progress" ? `opacity ${fadeOutMs}ms cubic-bezier(.2,0,0,1)` : undefined,
     willChange: variant === "progress" ? "opacity" : undefined,
@@ -368,10 +354,7 @@ const AnimatedBorder = ({
   // Mount policy:
   //  - solid: always mount (so it can animate opacity/padding)
   //  - others: mount while active/reversing; for progress also during fadingOut
-  const mountOverlay =
-    variant === "solid"
-      ? variant !== "none"
-      : showBorder;
+  const mountOverlay = variant === "solid" ? variant !== "none" : showBorder;
 
   return (
     <div
@@ -392,12 +375,14 @@ const AnimatedBorder = ({
     >
       {mountOverlay && variant !== "none" && (
         <div
-          className={`absolute inset-0 ${borderRadius} pointer-events-none z-20`}
-          style={
+          className={`absolute inset-0 ${borderRadius} pointer-events-none z-20 ${
             variant === "solid"
-              ? overlayStyleSolid
-              : overlayStyleProgress
-          }
+              ? "transition-all duration-800 ease-in-out"
+              : variant === "progress"
+              ? "transition-all"
+              : ""
+          }`}
+          style={variant === "solid" ? overlayStyleSolid : overlayStyleProgress}
         />
       )}
 
