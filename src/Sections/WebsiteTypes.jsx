@@ -5,6 +5,8 @@ import VideoPlayer from "../components/VideoPlayer";
 import useAccordionAutoplay from "../hooks/useAccordionAutoplay";
 import { useVisibility } from "../hooks/useVisibility";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
+import Heading from "../components/Heading";
+
 import BorderTitle from "../components/BorderTitle";
 
 const demoVideo = EarRape;
@@ -142,9 +144,13 @@ const WebsiteTypes = () => {
       <div className="inner-section">
         <div className="text-section">
           <BorderTitle>Website Types</BorderTitle>
-          <h2 className="h2 mb-6">
-            Websites We <span className="emphasized-text">Build</span>
-          </h2>
+          <Heading
+            tagName="h2"
+            className="mb-6"
+            before="Websites We "
+            text="Build"
+            textClass="emphasized-text"
+          />
           <p className="large-text">
             From simple landing pages to complex web applications - we create
             websites tailored to your specific needs and industry.

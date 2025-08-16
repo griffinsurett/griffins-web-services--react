@@ -264,7 +264,7 @@
 
   /* Typography - updated with color variables */
   .h1 {
-    @apply text-5xl md:text-7xl font-extrabold leading-tight text-primary-heading;
+    @apply text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight text-primary-heading;
   }
   .h2 {
     @apply text-3xl md:text-4xl lg:text-5xl font-bold text-primary-heading;

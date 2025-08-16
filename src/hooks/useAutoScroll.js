@@ -1,5 +1,6 @@
 // src/hooks/useAutoScroll.js
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useVisibility } from "./useVisibility";
 
 /**
  * Auto-scroll a scrollable element while it is active & visible.
@@ -13,26 +14,24 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *  - startDelay:       ms before FIRST start each time the item becomes active+visible
  *  - resumeDelay:      ms after disengage (wheel/scroll/touch/click) to resume
  *  - resumeOnUserInput:boolean — if false, do NOT resume after user input (default false)
- *  - threshold:        IntersectionObserver threshold to consider "visible"
+ *  - threshold:        threshold to consider "visible"
+ *  - visibleRootMargin:number|string|object — IO rootMargin for early/late inView
+ *        * number N => shrink top/bottom by N px   => "-Npx 0px -Npx 0px"
+ *        * string    => pass through (e.g. "-120px 0px -80px 0px")
+ *        * object    => { top,right,bottom,left } (numbers -> "px")
  *  - resetOnInactive:  when active=false OR inView=false, snap back to top
  */
 export function useAutoScroll({
   ref,
   active = false,
-  /**
-   * px/sec or (host) => px/sec
-   * If you also provide `cycleDuration`, that takes priority when it's > 0.
-   */
-  speed = 40,
-  /**
-   * Seconds to go from top → bottom. Overrides `speed` when > 0.
-   */
-  cycleDuration = 0,
+  speed = 40,           // px/sec or (host)=>px/sec
+  cycleDuration = 0,    // seconds; overrides speed when > 0
   loop = false,
   startDelay = 1500,
   resumeDelay = 1200,
-  resumeOnUserInput = false,   // ⬅️ NEW: default = never resume while active
+  resumeOnUserInput = false,
   threshold = 0.3,
+  visibleRootMargin = 0,   // 🆕 control the visible band using IO rootMargin
   resetOnInactive = true,
 } = {}) {
   const rafRef = useRef(null);
@@ -40,12 +39,28 @@ export function useAutoScroll({
   const startTimerRef = useRef(null);
   const resumeTimerRef = useRef(null);
 
-  const internalScrollRef = useRef(false);     // marks programmatic scrolls
-  const startedThisCycleRef = useRef(false);   // has first start occurred for this active+visible cycle?
+  const internalScrollRef = useRef(false);   // marks programmatic scrolls
+  const startedThisCycleRef = useRef(false); // first start per active+visible cycle?
 
-  const [inView, setInView] = useState(false);
   const [paused, setPaused] = useState(false); // pause due to user input
   const [resumeScheduled, setResumeScheduled] = useState(false);
+
+  // ── normalize IO rootMargin
+  const toPx = (v) => (typeof v === "number" ? `${v}px` : `${v}`);
+  const rootMargin = useMemo(() => {
+    if (typeof visibleRootMargin === "number") {
+      const n = Math.max(0, visibleRootMargin | 0);
+      return `-${n}px 0px -${n}px 0px`; // shrink top & bottom by N
+    }
+    if (visibleRootMargin && typeof visibleRootMargin === "object") {
+      const { top = 0, right = 0, bottom = 0, left = 0 } = visibleRootMargin;
+      return `${toPx(top)} ${toPx(right)} ${toPx(bottom)} ${toPx(left)}`;
+    }
+    return visibleRootMargin || "0px";
+  }, [visibleRootMargin]);
+
+  // ── visibility via our hook
+  const inView = useVisibility(ref, { threshold, rootMargin });
 
   const resolvePxPerSecond = useCallback(
     (host) => {
@@ -60,19 +75,6 @@ export function useAutoScroll({
     },
     [speed, cycleDuration]
   );
-
-  // Visibility via IntersectionObserver
-  useEffect(() => {
-    const el = ref?.current;
-    if (!el) return;
-
-    const io = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ref, threshold]);
 
   const clearRAF = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -92,7 +94,7 @@ export function useAutoScroll({
   }, []);
 
   const scheduleResume = useCallback(() => {
-    if (!resumeOnUserInput) return; // ⬅️ respect no-resume mode
+    if (!resumeOnUserInput) return; // respect no-resume mode
     clearResume();
     setResumeScheduled(true);
     resumeTimerRef.current = setTimeout(() => {
@@ -184,7 +186,7 @@ export function useAutoScroll({
     }
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // Engagement: pause on real user input; DO NOT resume unless resumeOnUserInput=true
+  // Engagement: pause on real user input; optional timed resume
   useEffect(() => {
     const host = ref?.current;
     if (!host) return;

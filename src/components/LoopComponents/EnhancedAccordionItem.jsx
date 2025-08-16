@@ -1,3 +1,4 @@
+// EnhancedAccordionItem.jsx
 import React from "react";
 import AnimatedBorder from "../AnimatedBorder";
 

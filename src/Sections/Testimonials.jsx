@@ -3,6 +3,7 @@ import React from "react";
 import TestimonialCard from "../components/LoopComponents/TestimonialCard";
 import BorderTitle from "../components/BorderTitle";
 import Carousel from "../components/Carousel";
+import Heading from "../components/Heading";
 
 const Testimonials = () => {
   const testimonials = [
@@ -59,12 +60,15 @@ const Testimonials = () => {
       <div className="inner-section">
         <div className="text-section">
           <BorderTitle>Testimonials</BorderTitle>
-          <h2 className="h2 mb-6">
-            What Our <span className="emphasized-text">Clients Say</span>
-          </h2>
+          <Heading
+            tagName="h2"
+            className="mb-6"
+            before="What Our "
+            text="Clients Say"
+            textClass="emphasized-text"
+          />
           <p className="large-text">
-            Don't just take our word for it - hear from businesses who've
-            transformed their online presence with Griffin's Web Services.
+            Don't just take our word for it - hear from businesses who've transformed...
           </p>
         </div>
 

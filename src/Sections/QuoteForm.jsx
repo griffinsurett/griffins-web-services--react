@@ -5,6 +5,7 @@ import Input from "../components/Form/Input";
 import Textarea from "../components/Form/Textarea";
 import Select from "../components/Form/Select";
 import BorderTitle from "../components/BorderTitle";
+import Heading from "../components/Heading";
 
 const QuoteForm = () => {
   const [formData, setFormData] = useState({
@@ -67,9 +68,13 @@ const QuoteForm = () => {
       <div className="inner-section">
         <div className="text-section">
           <BorderTitle>Get A Quote</BorderTitle>
-          <h2 className="h2 mb-6">
-            Ready to Get <span className="text-accent-heading">Started?</span>
-          </h2>
+          <Heading
+            tagName="h2"
+            className="mb-6"
+            before="Ready to Get "
+            text="Started?"
+            textClass="heading-accent-text"
+          />
           <p className="large-text secondary-text">
             Tell us about your project and we'll provide you with a detailed
             quote within 24 hours.

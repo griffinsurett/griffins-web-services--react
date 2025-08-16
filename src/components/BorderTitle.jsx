@@ -1,25 +1,23 @@
 // src/components/BorderTitle.jsx
-// "px-5 py-2 text-sm uppercase tracking-wider mb-6"
 import React from "react";
 import AnimatedBorder from "./AnimatedBorder";
+import Heading from "./Heading";
 
 /**
  * BorderTitle
- * - Delegates all visibility logic to AnimatedBorder.
- * - In view: progress-b-f runs forward; out of view: reverses.
- * - Optional hover sweep overlay for extra flair.
+ * - Decorative pill label; still not a semantic heading element.
+ * - Uses <Heading tagName="span"> so our typography utilities stay consistent.
  */
 export default function BorderTitle({
   children,
   className = "",
-  duration = 1200,                 // ms for the progress sweep
-  hoverSweep = true,               // show animated sweep on hover
-  pillPadding = "text-sm px-5 py-2 tracking-wider", // spacing around the text
+  duration = 1200,
+  hoverSweep = true,
+  pillClassName = "text-sm px-5 py-2 tracking-wider",
 }) {
   return (
     <div className="inline-block mb-3">
       <div className="relative inline-block">
-        {/* Always mounted. AnimatedBorder handles visible → forward, not visible → reverse */}
         <AnimatedBorder
           variant="progress-b-f"
           triggers="visible"
@@ -28,14 +26,16 @@ export default function BorderTitle({
           borderWidth={2}
           color="var(--color-accent)"
           className="inline-block"
-          innerClassName={`bg-transparent border-transparent ${pillPadding}`}
+          innerClassName={`bg-transparent border-transparent ${pillClassName}`}
         >
-          <span className={`uppercase tracking-wider font-semibold primary-text ${className}`}>
+          <Heading
+            tagName="span"
+            className={`uppercase tracking-wider font-semibold primary-text ${className}`}
+          >
             {children}
-          </span>
+          </Heading>
         </AnimatedBorder>
 
-        {/* Optional: hover sweep overlay */}
         {hoverSweep && (
           <div className="absolute inset-0 pointer-events-none">
             <AnimatedBorder

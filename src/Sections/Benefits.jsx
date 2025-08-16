@@ -1,10 +1,10 @@
-// src/components/Benefits.jsx
 import React from "react";
 import FeatureCard from "../components/LoopComponents/FeatureCard";
 import BorderTitle from "../components/BorderTitle";
+import Heading from "../components/Heading";
 
 const Benefits = () => {
-  const benefits = [
+   const benefits = [
     {
       icon: "📱",
       title: "Mobile First",
@@ -42,20 +42,22 @@ const Benefits = () => {
         "Round-the-clock support and maintenance included. We're here to help your website evolve as your business grows.",
     },
   ];
-
+  
   return (
     <section className="outer-section primary-bg">
       <div className="section-color-border"></div>
       <div className="inner-section">
         <div className="text-section">
           <BorderTitle>Benefits</BorderTitle>
-          <h2 className="h2 mb-6">
-            Why Choose{" "}
-            <span className="text-accent-heading">Griffin's Web?</span>
-          </h2>
+          <Heading
+            tagName="h2"
+            className="mb-6"
+            before="Why Choose "
+            text="Griffin's Web Services?"
+            textClass="emphasized-text"
+          />
           <p className="large-text">
-            We don't just build websites - we craft digital experiences that
-            drive real results for your business.
+            We don't just build websites - we craft digital experiences...
           </p>
         </div>
 

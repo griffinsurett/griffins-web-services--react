@@ -2,6 +2,7 @@
 import React from "react";
 import Button from "../components/Buttons/Button";
 import BorderTitle from "../components/BorderTitle";
+import Heading from "../components/Heading";
 
 const CTASection = () => {
   return (
@@ -10,10 +11,11 @@ const CTASection = () => {
       <div className="inner-section">
         <div className="mb-12">
           <BorderTitle>Get Started</BorderTitle>
-          <h2 className="h2 mb-6">Ready to Transform Your Online Presence?</h2>
+          <Heading tagName="h2" className="mb-6">
+            Ready to Transform Your Online Presence?
+          </Heading>
           <p className="large-text secondary-text">
-            Join hundreds of successful businesses who trust Griffin's Web
-            Services for their digital growth.
+            Join hundreds of successful businesses who trust Griffin's Web Services...
           </p>
         </div>
         <Button variant="primary" className="text-center">

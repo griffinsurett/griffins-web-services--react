@@ -3,6 +3,7 @@ import React from "react";
 import Button from "../components/Buttons/Button";
 import AccordionItem from "../components/LoopComponents/AccordionItem";
 import BorderTitle from "../components/BorderTitle";
+import Heading from "../components/Heading";
 
 const FAQ = () => {
   const faqs = [
@@ -22,27 +23,30 @@ const FAQ = () => {
     <section className="outer-section secondary-bg relative">
       <div className="section-color-border" />
       <div className="inner-section">
-        {/* Header */}
         <div className="text-section">
           <BorderTitle>FAQ</BorderTitle>
-          <h2 className="h2 mb-6">
-            Frequently Asked{" "}
-            <span className="heading-accent-text">Questions</span>
-          </h2>
-          <p className="large-text">
-            Got questions? We've got answers. Here are the most common questions
-            we receive about our web services.
-          </p>
+          <Heading
+            tagName="h2"
+            className="mb-6"
+            before="Frequently Asked "
+            text="Questions"
+            textClass="emphasized-text"
+          />
+          <p className="large-text">Got questions? We've got answers...</p>
         </div>
 
-        {/* Accordion */}
         <div className="space-y-4">
           {faqs.map((faq, idx) => (
-            <AccordionItem key={idx} data={faq} />
+            <AccordionItem
+              key={idx}
+              data={faq}
+              name="faq" // shared group -> one open at a time
+              value={String(idx)} // radio value
+              defaultOpen={idx === 0} // open the first by default (optional)
+            />
           ))}
         </div>
 
-        {/* Footer CTA */}
         <div className="text-center mt-12">
           <p className="secondary-text mb-6">
             Still have questions? We're here to help!
