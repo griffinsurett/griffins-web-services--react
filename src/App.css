@@ -19,7 +19,6 @@
 
   /* Accent Colors - Keep exactly the same */
   --color-accent: var(--main-accent); /* #5e76f6 */
-  --accent-options: var(--main-accent) #10b981 #ec4899 #ff5f1f #f59e0b;
 
   --color-primary: var(--color-accent);
   --color-primary-secondary: color-mix(
