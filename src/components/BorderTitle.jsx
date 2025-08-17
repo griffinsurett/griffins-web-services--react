@@ -24,7 +24,7 @@ export default function BorderTitle({
           duration={duration}
           borderRadius="rounded-full"
           borderWidth={2}
-          color="var(--color-accent)"
+          color="var(--color-primary)"
           className="inline-block"
           innerClassName={`bg-transparent border-transparent ${pillClassName}`}
         >

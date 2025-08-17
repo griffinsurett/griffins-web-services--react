@@ -133,8 +133,8 @@ export default function Carousel({
               onClick={goPrev}
               aria-label="Previous"
               className="w-10 h-10 md:w-12 md:h-12 rounded-full
-                         bg-white/10 border border-white/20 secondary-text backdrop-blur-sm
-                         hover:bg-white/20 transition"
+                         muted-control-bg muted-control-border secondary-text backdrop-blur-sm
+                         muted-control-hover transition"
             >
               <ChevronLeft className="mx-auto my-auto w-5 h-5 md:w-6 md:h-6" />
             </button>
@@ -207,8 +207,8 @@ export default function Carousel({
               onClick={goNext}
               aria-label="Next"
               className="w-10 h-10 md:w-12 md:h-12 rounded-full
-                         bg-white/10 border border-white/20 secondary-text backdrop-blur-sm
-                         hover:bg-white/20 transition"
+                         faded-bg secondary-text backdrop-blur-sm
+                         transition"
             >
               <ChevronRight className="mx-auto my-auto w-5 h-5 md:w-6 md:h-6" />
             </button>
@@ -224,7 +224,9 @@ export default function Carousel({
               key={i}
               onClick={() => setPageIndex(i)}
               className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                i === pageIndex ? "bg-primary scale-[1.30]" : "bg-white/20 hover:bg-white/50"
+                i === pageIndex 
+                  ? "bg-primary scale-[1.30]" 
+                  : "faded-bg"
               }`}
               aria-label={`Go to page ${i + 1}`}
             />

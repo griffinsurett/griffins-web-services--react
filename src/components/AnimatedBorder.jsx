@@ -47,7 +47,7 @@ const AnimatedBorder = ({
   reverseOn, // "leave" | "intent" | "never"
 
   // Visibility engage window (IO root margin)
-  visibleRootMargin = 100, // number|string|{top,right,bottom,left}
+  visibleRootMargin = 75, // number|string|{top,right,bottom,left}
 
   // passthrough
   onMouseEnter,

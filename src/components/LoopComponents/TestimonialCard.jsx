@@ -29,7 +29,10 @@ export default function TestimonialCard({
       className={`group text-left outer-card-transition !duration-[900ms] ease-out ${className}`}
       innerClassName="px-8 py-8 lg:px-10 lg:py-10 relative"
     >
-      <div className="card-icon-color icon-medium mb-5 z-10">❝</div>
+      {/* Inner gradient overlay - shows accent hint on hover */}
+      <div className="inner-card-style inner-card-transition inner-card-color" />
+
+      <div className="card-icon-color icon-medium mb-5 z-10 relative">❝</div>
 
       <p className="secondary-text text-lg leading-relaxed mb-8 italic relative z-10">
         "{quote}"

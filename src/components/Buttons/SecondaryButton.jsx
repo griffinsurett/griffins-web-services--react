@@ -26,7 +26,7 @@ const SecondaryButton = ({
   const innerWrapWidth   = fullWidth ? "w-full" : "";
 
   const innerButtonClasses =
-    `bg-transparent text-white ${borderRadius} ` +
+    `bg-transparent primary-text ${borderRadius} ` +
     `hover:bg-accent hover:text-black`;
 
   return (

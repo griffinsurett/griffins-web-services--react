@@ -32,7 +32,7 @@ export default function PortfolioSection() {
           <BorderTitle>Our Projects</BorderTitle>
           <Heading
             tagName="h2"
-            className="text-white mb-6"
+            className="mb-6"
             before="Our "
             text="Portfolio"
             textClass="emphasized-text"

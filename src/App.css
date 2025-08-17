@@ -1,4 +1,10 @@
+/* App.css */
 @import "tailwindcss";
+/* ───────────────────────────────────────────────────── */
+/* 0. CUSTOM VARIANTS FOR LIGHT + DARK                  */
+/* ───────────────────────────────────────────────────── */
+@custom-variant light  (&:where([data-theme="light"], [data-theme="light"] *));
+@custom-variant dark   (&:where([data-theme="dark"],  [data-theme="dark"]  *));
 
 @theme {
   /* Base Colors - Raw color definitions */
@@ -9,8 +15,11 @@
   --color-secondary-light: var(--color-zinc-100); /* Light off-white */
   --color-tertiary-light: var(--color-zinc-200); /* Muted off-white */
 
+  --main-accent: #5e76f6; /* Primary accent color */
+
   /* Accent Colors - Keep exactly the same */
-  --color-accent: #5e76f6; /* #5e76f6 */
+  --color-accent: var(--main-accent); /* #5e76f6 */
+  --accent-options: var(--main-accent) #10b981 #ec4899 #ff5f1f #f59e0b;
 
   --color-primary: var(--color-accent);
   --color-primary-secondary: color-mix(
@@ -19,77 +28,85 @@
     black
   );
 
-  --color-bg: var(--color-primary-dark);
-  --color-secondary-bg: var(--color-secondary-dark);
-  --color-tertiary-bg: var(--color-tertiary-dark);
-  --color-bg-card: rgba(255, 255, 255, 0.05);
-
-  --color-primary-text: var(--color-primary-light);
-  --color-secondary-text: var(--color-secondary-light);
-  --color-muted-text: var(--color-tertiary-light);
-
-  --color-primary-heading: var(--color-primary-light);
-  --color-accent-heading: var(--color-primary);
-
   /* Additional utility colors */
   --color-border-dim: rgba(255, 255, 255, 0.2);
 }
 
 @layer base {
   body {
-    @apply bg-bg overflow-x-hidden;
+    @apply primary-bg overflow-x-hidden;
   }
   ::selection {
     color: var(--color-accent);
     transition: all 0.3s ease-in-out;
   }
+    /* Theme-specific PRIMARY token */
+  [data-theme="light"] {
+    --color-primary: var(--color-zinc-900);
+  }
+  [data-theme="dark"] {
+    --color-primary: var(--color-accent);
+  }
 }
 
-/* Background utilities */
+/* Theme-aware Background utilities */
 @utility primary-bg {
-  background-color: var(--color-bg);
+  @apply dark:bg-black light:bg-zinc-50;
 }
 
 @utility secondary-bg {
-  background-color: var(--color-secondary-bg);
+  @apply dark:bg-zinc-950 light:bg-zinc-100;
 }
 
 @utility tertiary-bg {
-  background-color: var(--color-tertiary-bg);
+  @apply dark:bg-zinc-900 light:bg-zinc-200;
 }
 
-@utility bg-card {
-  background-color: var(--color-bg-card);
+@utility faded-bg {
+  @apply dark:bg-white/10 dark:hover:bg-white/20;
+  @apply light:bg-black/10 light:hover:bg-black/20;
+  @apply transition-all hover:transform main-duration;
 }
 
-/* Text color utilities */
+@utility faded-bg2 {
+  @apply bg-white/20 hover:bg-white/50;
+}
+
+@utility card-bg {
+  @apply dark:bg-white/5 light:bg-black/5 border border-accent/20;
+}
+
 @utility primary-text {
-  color: var(--color-primary-text);
+  @apply dark:text-zinc-50 light:text-zinc-900;
 }
 
 @utility secondary-text {
-  color: var(--color-secondary-text);
+  @apply dark:text-zinc-100 light:text-zinc-700;
 }
 
 @utility muted-text {
-  color: var(--color-muted-text);
+  @apply dark:text-zinc-200 light:text-zinc-600;
 }
 
-/* Heading color utilities */
+/* Theme-aware Heading color utilities */
 @utility heading-text {
-  color: var(--color-primary-heading);
+  @apply dark:text-zinc-50 light:text-zinc-900;
 }
 
 @utility heading-accent-text {
-  color: var(--color-accent-heading);
+  color: var(--color-primary);
 }
 
-@utility bg-bg2 {
-  @apply bg-zinc-950;
+@utility logo-class {
+  @apply light:invert;
 }
 
 @utility rounded-border {
   @apply inline-block border border-primary text-primary rounded-full font-medium;
+}
+
+@utility faded-border {
+  @apply border-1 dark:border-white/10 light:border-black/20;
 }
 
 @utility paragraph-spacing {
@@ -108,13 +125,14 @@
   @apply absolute top-0 left-0 right-0 h-px;
 }
 
-/* The main form field styling - updated with color variables */
+/* The main form field styling - updated with theme-aware colors */
 @utility form-field {
-  @apply w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 focus:outline-none focus:bg-bg/70 main-duration transition-all;
-  color: var(--color-muted-text);
+  @apply w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 focus:outline-none main-duration transition-all;
+  @apply dark:focus:bg-black/70 light:focus:bg-white/70;
+  @apply muted-text;
 
   &::placeholder {
-    color: var(--color-muted-text);
+    @apply muted-text;
   }
 
   /* Fix for select dropdown arrow spacing */
@@ -129,13 +147,12 @@
   }
 }
 
-@utility card-bg {
-  background-color: var(--color-bg-card);
-  @apply border border-accent/20;
-}
-
 @utility form-field-error {
   @apply border-red-500 focus:border-red-500;
+}
+
+@utility form-option {
+  @apply primary-bg primary-text;
 }
 
 @layer components {
@@ -144,7 +161,7 @@
     background-image: linear-gradient(
       323.34deg,
       var(--color-accent) -85.13%,
-      var(--color-bg) 40.1%
+      transparent 40.1%
     );
   }
 
@@ -180,11 +197,7 @@
   }
 
   .emphasized-text {
-    @apply font-bold heading-accent-text;
-  }
-
-  .form-option {
-    @apply bg-bg primary-text;
+    @apply font-bold text-accent;
   }
 
   /* Card components */
@@ -213,7 +226,7 @@
   }
 
   .inner-card-color {
-    @apply inset-0 bg-gradient-to-br from-primary/10 to-transparent;
+    @apply inset-0 bg-gradient-to-br from-accent/10 to-transparent;
   }
 
   .card-icon-color {
@@ -262,18 +275,18 @@
     @apply cursor-pointer;
   }
 
-  /* Typography - updated with color variables */
+  /* Typography - updated with theme-aware color utilities */
   .h1 {
-    @apply text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight text-primary-heading;
+    @apply text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight heading-text;
   }
   .h2 {
-    @apply text-3xl md:text-4xl lg:text-5xl font-bold text-primary-heading;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold heading-text;
   }
   .h3 {
-    @apply text-xl font-semibold text-primary-heading;
+    @apply text-xl font-semibold heading-text;
   }
   .h4 {
-    @apply font-semibold text-lg text-primary-heading;
+    @apply font-semibold text-lg heading-text;
   }
 
   p {
@@ -300,4 +313,3 @@
     @apply hover:-translate-y-1;
   }
 }
-

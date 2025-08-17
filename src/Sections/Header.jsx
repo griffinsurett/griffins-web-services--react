@@ -3,6 +3,7 @@ import React from "react";
 import HamburgerIcon from "../components/Menu/HamburgerIcon";
 import HamburgerMenu from "../components/Menu/HamburgerMenu";
 import Logo from "../components/Logo/Logo";
+import ThemeControls from "../components/ThemeControls/ThemeControls";
 
 export default function Header() {
   const checkboxId = "nav-toggle";
@@ -15,6 +16,8 @@ export default function Header() {
 
           {/* Hidden checkbox for state */}
           <input id={checkboxId} type="checkbox" className="hidden" />
+
+          <ThemeControls />
 
           {/* Hamburger/X Button */}
           <HamburgerIcon
