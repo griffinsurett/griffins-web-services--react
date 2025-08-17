@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 // Define all accent colors in JavaScript (no CSS dependency)
 const ACCENT_COLORS = [
   "var(--main-accent)", // Main default (keep this one in CSS too)
-  "#10b981", // Emerald
-  "#ec4899", // Pink
-  "#ff5f1f", // Orange
-  "#f59e0b", // Amber
+  "var(--color-teal-500)", // Teal (also in CSS)
+  "var(--color-emerald-500)", // Emerald
+  "var(--color-pink-500)", // Pink
+  "var(--color-orange-500)", // Orange
+  "var(--color-amber-500)", // Amber
 ];
 
 export function useAccentColor() {
