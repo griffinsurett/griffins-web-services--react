@@ -62,7 +62,7 @@ const EnhancedAccordionItem = ({
           <div
             className={`
               w-8 h-8 rounded-full flex items-center justify-center
-              transition-all duration-[600ms] text-xl font-normal leading-none
+              transition-all duration-[600ms] text-xl font-normal leading-none text-primary
               ${
                 isActive
                   ? "bg-primary dark:text-zinc-900 light:text-accent"
