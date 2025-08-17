@@ -65,7 +65,7 @@ const EnhancedAccordionItem = ({
               transition-all duration-[600ms] text-xl font-normal leading-none
               ${
                 isActive
-                  ? "bg-primary text-zinc-900"
+                  ? "bg-primary dark:text-zinc-900 light:text-accent"
                   : "bg-primary/20 group-hover:bg-accent/30 text-accent "
               }
             `}
