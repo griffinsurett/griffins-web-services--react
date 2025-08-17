@@ -55,7 +55,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="outer-section primary-bg relative">
+    <section className="outer-section bg-bg relative">
       <div className="section-color-border" />
       <div className="inner-section">
         <div className="text-section">
@@ -68,7 +68,8 @@ const Testimonials = () => {
             textClass="emphasized-text"
           />
           <p className="large-text">
-            Don't just take our word for it - hear from businesses who've transformed...
+            Don't just take our word for it - hear from businesses who've
+            transformed...
           </p>
         </div>
 

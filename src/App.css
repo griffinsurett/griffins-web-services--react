@@ -8,18 +8,18 @@
 
 @theme {
   /* Base Colors - Raw color definitions */
-  --color-primary-dark: var(--color-black); /* ~1% brightness */
-  --color-secondary-dark: var(--color-zinc-950); /* ~3.5% brightness */
-  --color-tertiary-dark: var(--color-zinc-900); /* ~4.3% brightness */
-  --color-primary-light: var(--color-zinc-50); /* Off-white */
-  --color-secondary-light: var(--color-zinc-100); /* Light off-white */
-  --color-tertiary-light: var(--color-zinc-200); /* Muted off-white */
+  --color-primary-dark: var(--color-black);
+  --color-secondary-dark: var(--color-zinc-950);
+  --color-tertiary-dark: var(--color-zinc-900);
+  --color-primary-light: var(--color-zinc-50);
+  --color-secondary-light: var(--color-zinc-100);
+  --color-tertiary-light: var(--color-zinc-200);
 
-  --main-accent: #5e76f6; /* Primary accent color */
+  --main-accent: #5e76f6;
 
-  /* Accent Colors - Keep exactly the same */
-  --color-accent: var(--main-accent); /* #5e76f6 */
-
+  /* Colors that Tailwind will automatically generate utilities for */
+  /* These follow the --color-{name} pattern */
+  --color-accent: var(--main-accent);
   --color-primary: var(--color-accent);
   --color-primary-secondary: color-mix(
     in srgb,
@@ -27,57 +27,59 @@
     black
   );
 
+  /* Text colors */
+  --color-heading: var(--color-primary-dark);
+  --color-text: var(--color-secondary-dark);
+  --color-muted: var(--color-tertiary-dark);
+
+  /* Your custom background colors */
+  --color-bg: var(--color-primary-dark);
+  --color-bg2: var(--color-secondary-dark);
+  --color-bg3: var(--color-tertiary-dark);
+
   /* Additional utility colors */
   --color-border-dim: rgba(255, 255, 255, 0.2);
 }
 
 @layer base {
   body {
-    @apply primary-bg overflow-x-hidden;
+    @apply bg-bg overflow-x-hidden;
   }
   ::selection {
     color: var(--color-accent);
     transition: all 0.3s ease-in-out;
   }
-    /* Theme-specific PRIMARY token */
+  /* Theme-specific PRIMARY token */
   [data-theme="light"] {
+    /* primary color */
     --color-primary: var(--color-zinc-900);
+
+    /* text colors */
+    --color-heading: var(--color-primary-light);
+    --color-text: var(--color-secondary-light);
+    --color-muted: var(--color-tertiary-light);
+
+    /* background colors */
+    --color-bg: var(--color-primary-light);
+    --color-bg2: var(--color-secondary-light);
+    --color-bg3: var(--color-tertiary-light);
   }
   [data-theme="dark"] {
+    /* primary color */
     --color-primary: var(--color-accent);
+
+    /* text colors */
+    --color-heading: var(--color-primary-dark);
+    --color-text: var(--color-secondary-dark);
+    --color-muted: var(--color-tertiary-dark);
+
+    /* background colors */
+    --color-bg: var(--color-primary-dark);
+    --color-bg2: var(--color-secondary-dark);
+    --color-bg3: var(--color-tertiary-dark);
   }
 }
 
-/* Theme-aware Background utilities */
-@utility primary-bg {
-  @apply dark:bg-black light:bg-zinc-50;
-}
-
-@utility secondary-bg {
-  @apply dark:bg-zinc-950 light:bg-zinc-100;
-}
-
-@utility tertiary-bg {
-  @apply dark:bg-zinc-900 light:bg-zinc-200;
-}
-
-@utility faded-bg {
-  @apply dark:bg-white/10 dark:hover:bg-white/12;
-  @apply light:bg-black/10 light:hover:bg-black/12;
-  @apply transition-all hover:transform main-duration;
-}
-
-@utility faded-bg2 {
-  @apply bg-white/20 hover:bg-white/50;
-}
-
-@utility faded-accent-border {
-  @apply border border-accent/20;
-}
-
-@utility card-bg {
-  @apply dark:bg-white/5 light:bg-black/5 faded-accent-border;
-}
 
 @utility primary-text {
   @apply dark:text-zinc-50 light:text-zinc-900;
@@ -98,6 +100,37 @@
 
 @utility heading-accent-text {
   color: var(--color-primary);
+}
+
+/* Theme-aware Background utilities */
+/* @utility primary-bg {
+  @apply dark:bg-black light:bg-zinc-50;
+}
+
+@utility bg-bg2 {
+  @apply dark:bg-zinc-950 light:bg-zinc-100;
+}
+
+@utility bg-bg3 {
+  @apply dark:bg-zinc-900 light:bg-zinc-200;
+} */
+
+@utility faded-bg {
+  @apply dark:bg-white/10 dark:hover:bg-white/12;
+  @apply light:bg-black/10 light:hover:bg-black/12;
+  @apply transition-all hover:transform main-duration;
+}
+
+@utility faded-bg2 {
+  @apply bg-white/20 hover:bg-white/50;
+}
+
+@utility faded-accent-border {
+  @apply border border-accent/20;
+}
+
+@utility card-bg {
+  @apply dark:bg-white/5 light:bg-black/5 faded-accent-border;
 }
 
 @utility logo-class {
@@ -139,7 +172,10 @@
   }
 
   /* Fix for select dropdown arrow spacing */
- &[type="select"], select& { appearance: none; }
+  &[type="select"],
+  select& {
+    appearance: none;
+  }
 }
 
 @utility form-field-error {
@@ -147,7 +183,7 @@
 }
 
 @utility form-option {
-  @apply primary-bg primary-text;
+  @apply bg-bg primary-text;
 }
 
 @layer components {

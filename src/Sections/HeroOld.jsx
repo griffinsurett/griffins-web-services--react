@@ -6,7 +6,7 @@ import { siteData } from "../siteData";
 
 const Hero = () => {
   return (
-    <section className="min-h-screen flex items-center justify-center text-center px-5 pt-32 pb-20 primary-bg relative">
+    <section className="min-h-screen flex items-center justify-center text-center px-5 pt-32 pb-20 bg-bg relative">
       <div className="absolute inset-0 hero-gradient-bg"></div>
       <div className="inner-section relative z-10">
         <Heading

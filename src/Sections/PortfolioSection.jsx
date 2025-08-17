@@ -17,12 +17,16 @@ export default function PortfolioSection() {
     { id: 3, title: "JSV Quick Solar", image: JSVDesktop },
   ];
 
-  useVisibility(sectionRef, { threshold: 0.3, onForward: () => {}, onBackward: () => {} });
+  useVisibility(sectionRef, {
+    threshold: 0.3,
+    onForward: () => {},
+    onBackward: () => {},
+  });
 
   return (
     <section
       ref={sectionRef}
-      className="w-screen overflow-x-hidden outer-section primary-bg relative"
+      className="w-screen overflow-x-hidden outer-section bg-bg relative"
       data-portfolio-section
     >
       <div className="section-color-border"></div>
@@ -38,7 +42,8 @@ export default function PortfolioSection() {
             textClass="emphasized-text"
           />
           <p className="large-text mx-auto">
-            Discover the websites we've crafted for businesses across different industries
+            Discover the websites we've crafted for businesses across different
+            industries
           </p>
         </header>
 

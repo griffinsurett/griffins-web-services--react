@@ -63,7 +63,7 @@ const QuoteForm = () => {
   ];
 
   return (
-    <section className="outer-section primary-bg relative">
+    <section className="outer-section bg-bg relative">
       <div className="section-color-border"></div>
       <div className="inner-section">
         <div className="text-section">
@@ -83,7 +83,7 @@ const QuoteForm = () => {
 
         <form
           onSubmit={handleSubmit}
-          className="group secondary-bg faded-accent-border outer-card-style outer-card-transition"
+          className="group bg-bg2 faded-accent-border outer-card-style outer-card-transition"
         >
           <div className="inner-card-style"></div>
 

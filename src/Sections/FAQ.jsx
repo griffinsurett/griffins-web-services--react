@@ -20,7 +20,7 @@ const FAQ = () => {
   ];
 
   return (
-    <section className="outer-section secondary-bg relative">
+    <section className="outer-section bg-bg2 relative">
       <div className="section-color-border" />
       <div className="inner-section">
         <div className="text-section">

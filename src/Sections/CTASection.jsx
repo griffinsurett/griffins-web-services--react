@@ -6,7 +6,7 @@ import Heading from "../components/Heading";
 
 const CTASection = () => {
   return (
-    <section className="outer-section hero-gradient-bg primary-bg text-center relative">
+    <section className="outer-section hero-gradient-bg bg-bg text-center relative">
       <div className="section-color-border"></div>
       <div className="inner-section">
         <div className="mb-12">
@@ -15,7 +15,8 @@ const CTASection = () => {
             Ready to Transform Your Online Presence?
           </Heading>
           <p className="large-text secondary-text">
-            Join hundreds of successful businesses who trust Griffin's Web Services...
+            Join hundreds of successful businesses who trust Griffin's Web
+            Services...
           </p>
         </div>
         <Button variant="primary" className="text-center">

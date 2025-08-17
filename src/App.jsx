@@ -23,7 +23,7 @@ const GriffinsLanding = () => {
   }, []);
 
   return (
-    <div className="primary-bg primary-text min-h-screen">
+    <div className="bg-bg primary-text min-h-screen">
       {/* Navigation */}
       <Header />
       {/* Hero Section */}

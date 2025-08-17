@@ -15,21 +15,63 @@ const WebsiteTypes = () => {
   const sectionRef = useRef(null);
 
   const websiteTypes = [
-    { icon: "🚀", title: "Landing Pages", description: "High-converting single-page websites designed to capture leads and drive specific actions for your marketing campaigns.", videoSrc: demoVideo },
-    { icon: "🏢", title: "Small Business Websites", description: "Professional websites that establish credibility and help local businesses attract and retain customers online.", videoSrc: demoVideo },
-    { icon: "💼", title: "Personal Portfolio Websites", description: "Showcase your work, skills, and achievements with a stunning portfolio that makes you stand out from the competition.", videoSrc: demoVideo },
-    { icon: "✍️", title: "Blogs", description: "Content-focused websites with easy-to-use publishing tools to share your expertise and build your audience.", videoSrc: demoVideo },
-    { icon: "🛒", title: "E-Commerce Websites", description: "Complete online stores with shopping carts, secure payments, inventory management, and everything you need to sell online.", videoSrc: demoVideo },
-    { icon: "🏛️", title: "Large Corporate Websites", description: "Enterprise-level websites with advanced functionality, multi-user management, and scalable architecture for growing companies.", videoSrc: demoVideo },
-    { icon: "⚙️", title: "Custom Full-Stack Applications", description: "Bespoke web applications tailored to your unique business processes, with custom databases and advanced functionality.", videoSrc: demoVideo },
+    {
+      icon: "🚀",
+      title: "Landing Pages",
+      description:
+        "High-converting single-page websites designed to capture leads and drive specific actions for your marketing campaigns.",
+      videoSrc: demoVideo,
+    },
+    {
+      icon: "🏢",
+      title: "Small Business Websites",
+      description:
+        "Professional websites that establish credibility and help local businesses attract and retain customers online.",
+      videoSrc: demoVideo,
+    },
+    {
+      icon: "💼",
+      title: "Personal Portfolio Websites",
+      description:
+        "Showcase your work, skills, and achievements with a stunning portfolio that makes you stand out from the competition.",
+      videoSrc: demoVideo,
+    },
+    {
+      icon: "✍️",
+      title: "Blogs",
+      description:
+        "Content-focused websites with easy-to-use publishing tools to share your expertise and build your audience.",
+      videoSrc: demoVideo,
+    },
+    {
+      icon: "🛒",
+      title: "E-Commerce Websites",
+      description:
+        "Complete online stores with shopping carts, secure payments, inventory management, and everything you need to sell online.",
+      videoSrc: demoVideo,
+    },
+    {
+      icon: "🏛️",
+      title: "Large Corporate Websites",
+      description:
+        "Enterprise-level websites with advanced functionality, multi-user management, and scalable architecture for growing companies.",
+      videoSrc: demoVideo,
+    },
+    {
+      icon: "⚙️",
+      title: "Custom Full-Stack Applications",
+      description:
+        "Bespoke web applications tailored to your unique business processes, with custom databases and advanced functionality.",
+      videoSrc: demoVideo,
+    },
   ];
 
   // Just need IO to know when the section is visible
   const isInView = useVisibility(sectionRef, {
-     threshold: 0.3,
-     onForward: () => {},
-     onBackward: () => {},
-   });
+    threshold: 0.3,
+    onForward: () => {},
+    onBackward: () => {},
+  });
 
   const desktopVideoRef = useRef(null);
   const mobileVideoRef = useRef(null);
@@ -138,7 +180,7 @@ const WebsiteTypes = () => {
   };
 
   return (
-    <section ref={sectionRef} className="outer-section secondary-bg relative">
+    <section ref={sectionRef} className="outer-section bg-bg2 relative">
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">
@@ -156,7 +198,10 @@ const WebsiteTypes = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-12" data-accordion-container>
+        <div
+          className="grid lg:grid-cols-2 gap-6 lg:gap-12"
+          data-accordion-container
+        >
           {/* Left: Accordion list */}
           <div className="flex flex-col space-y-4">
             {websiteTypes.map((websiteType, i) => (
@@ -223,9 +268,13 @@ const WebsiteTypes = () => {
                   {/* Debug */}
                   <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
                     <div>👁️ In View: {isInView ? "✅" : "❌"}</div>
-                    <div>⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
+                    <div>
+                      ⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}
+                    </div>
                     <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
-                    <div>⏲️ Resume Scheduled: {isResumeScheduled ? "✅" : "❌"}</div>
+                    <div>
+                      ⏲️ Resume Scheduled: {isResumeScheduled ? "✅" : "❌"}
+                    </div>
                     <div>🎪 Active Index: {activeIndex}</div>
                     <div>📊 Progress: {Math.round(progress)}%</div>
                   </div>

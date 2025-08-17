@@ -60,7 +60,7 @@ const footerNav = [
 
 export default function Footer() {
   return (
-    <footer className="primary-bg primary-text py-4 w-9/10 mx-auto lg:w-auto">
+    <footer className="bg-bg primary-text py-4 w-9/10 mx-auto lg:w-auto">
       <div className="inner-section text-center">
         <h4 className="text-primary text-xl lg:text-2xl xl:text-3xl font-semibold mb-4">
           Connect:

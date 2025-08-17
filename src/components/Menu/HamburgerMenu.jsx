@@ -50,7 +50,7 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
       onClose={handleClose}
       closeButton={false}
       overlayClass="bg-primary/80"
-      className="w-full h-full primary-bg flex items-center justify-center"
+      className="w-full h-full bg-bg flex items-center justify-center"
       allowScroll={false}
     >
       <div className="relative w-full h-full flex flex-col">
