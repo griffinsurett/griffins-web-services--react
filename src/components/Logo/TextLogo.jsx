@@ -6,7 +6,7 @@ export default function TextLogo({
   title = "",
   className = "",
   firstClass = "text-2xl lg:text-3xl -ml-[0.1rem] font-medium",
-  restClass  = "font-light text-accent uppercase text-sm p-0 m-0 tracking-wider",
+  restClass  = "font-light text-accent uppercase text-xs lg:text-sm p-0 m-0 tracking-wider",
   fadeDuration = 1200,  
 }) {
   const [firstWord, ...others] = title.split(" ");
@@ -36,8 +36,8 @@ export default function TextLogo({
         }
       `}
     >
-      <span className={firstClass}>{firstWord}</span>
-      {restOfTitle && <span className={restClass}> {restOfTitle}</span>}
+      <span className={firstClass} style={{ lineHeight: "normal" }}>{firstWord}</span>
+      {restOfTitle && <span className={restClass} style={{ lineHeight: "normal" }}> {restOfTitle}</span>}
     </div>
   );
 }
