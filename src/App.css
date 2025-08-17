@@ -63,8 +63,8 @@
 }
 
 @utility faded-bg {
-  @apply dark:bg-white/10 dark:hover:bg-white/20;
-  @apply light:bg-black/10 light:hover:bg-black/20;
+  @apply dark:bg-white/10 dark:hover:bg-white/12;
+  @apply light:bg-black/10 light:hover:bg-black/12;
   @apply transition-all hover:transform main-duration;
 }
 
@@ -214,7 +214,7 @@
   }
 
   .outer-card-style {
-    @apply relative overflow-hidden hover:shadow-2xl rounded-3xl p-9;
+    @apply relative overflow-hidden shadow-xl  hover:shadow-2xl rounded-3xl p-9;
   }
 
   .inner-card-transition {

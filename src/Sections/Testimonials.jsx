@@ -55,7 +55,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="outer-section bg-secondary relative">
+    <section className="outer-section primary-bg relative">
       <div className="section-color-border" />
       <div className="inner-section">
         <div className="text-section">

@@ -22,7 +22,7 @@ export default function PortfolioSection() {
   return (
     <section
       ref={sectionRef}
-      className="w-screen overflow-x-hidden outer-section bg-secondary relative"
+      className="w-screen overflow-x-hidden outer-section primary-bg relative"
       data-portfolio-section
     >
       <div className="section-color-border"></div>

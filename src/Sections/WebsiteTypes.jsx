@@ -20,7 +20,6 @@ const WebsiteTypes = () => {
     { icon: "💼", title: "Personal Portfolio Websites", description: "Showcase your work, skills, and achievements with a stunning portfolio that makes you stand out from the competition.", videoSrc: demoVideo },
     { icon: "✍️", title: "Blogs", description: "Content-focused websites with easy-to-use publishing tools to share your expertise and build your audience.", videoSrc: demoVideo },
     { icon: "🛒", title: "E-Commerce Websites", description: "Complete online stores with shopping carts, secure payments, inventory management, and everything you need to sell online.", videoSrc: demoVideo },
-    { icon: "❤️", title: "Non-Profit Websites", description: "Mission-driven websites that inspire action, facilitate donations, and help you make a greater impact in your community.", videoSrc: demoVideo },
     { icon: "🏛️", title: "Large Corporate Websites", description: "Enterprise-level websites with advanced functionality, multi-user management, and scalable architecture for growing companies.", videoSrc: demoVideo },
     { icon: "⚙️", title: "Custom Full-Stack Applications", description: "Bespoke web applications tailored to your unique business processes, with custom databases and advanced functionality.", videoSrc: demoVideo },
   ];
@@ -139,7 +138,7 @@ const WebsiteTypes = () => {
   };
 
   return (
-    <section ref={sectionRef} className="outer-section bg-secondary relative">
+    <section ref={sectionRef} className="outer-section secondary-bg relative">
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">
