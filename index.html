@@ -7,8 +7,9 @@
       content="width=device-width, initial-scale=1.0" />
     <title>Griffin's Web Services | Fast Performing | Mobile Responsive | Best Websites</title>
 
+    <!-- First-paint theme colors (light/dark) -->
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
-<meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#0b0b0d">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#0b0b0d">
 
     <!-- Let the UA know we support both schemes -->
     <meta name="color-scheme" content="dark light" />
@@ -55,26 +56,38 @@
       name="description"
       content="Griffin's Web Services offers fast performing, mobile responsive, and high-quality websites." />
 
-    <!-- Will be kept in sync with CSS var(--color-bg) -->
+    <!-- Fallback; will be kept in sync with CSS var(--color-bg) -->
     <meta name="theme-color" content="#000000" />
 
-    <!-- Keep <meta name="theme-color"> synced with current CSS bg -->
+    <!-- Keep all <meta name="theme-color"> tags synced with current CSS bg -->
     <script>
       (function () {
-        function updateThemeMeta() {
-          var tag = document.querySelector('meta[name="theme-color"]');
-          if (!tag) return;
-          var bg = getComputedStyle(document.documentElement)
+        function currentBg() {
+          return getComputedStyle(document.documentElement)
             .getPropertyValue('--color-bg')
             .trim();
-          if (bg) tag.setAttribute('content', bg);
         }
 
-        // Initial update after styles apply
-        document.addEventListener('DOMContentLoaded', updateThemeMeta);
+        function setAllThemeColors(value) {
+          document.querySelectorAll('meta[name="theme-color"]').forEach(function (tag) {
+            tag.setAttribute('content', value);
+          });
+        }
+
+        function update() {
+          var bg = currentBg();
+          if (bg) setAllThemeColors(bg);
+        }
+
+        // Initial update after styles apply (or immediately if ready)
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', update, { once: true });
+        } else {
+          update();
+        }
 
         // Watch for theme/accent changes (data-theme or inline style)
-        var obs = new MutationObserver(updateThemeMeta);
+        var obs = new MutationObserver(update);
         obs.observe(document.documentElement, {
           attributes: true,
           attributeFilter: ['data-theme', 'style'],
@@ -82,7 +95,7 @@
 
         // If another tab changes localStorage, reflect here too
         window.addEventListener('storage', function (e) {
-          if (e.key === 'theme' || e.key === 'accent') updateThemeMeta();
+          if (e.key === 'theme' || e.key === 'accent') update();
         });
       })();
     </script>
