@@ -36,6 +36,8 @@ export default function PortfolioCarousel({
 
   const inView = useVisibility(containerRef, { threshold: 0.3 });
 
+  const ArrowClasses = "absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 secondary-text backdrop-blur-sm hover:bg-white/20 transition hover:border-white/75"
+
   const {
     isAutoplayPaused,
     isResumeScheduled,
@@ -185,9 +187,7 @@ export default function PortfolioCarousel({
             <button
               onClick={goToPrevious}
               aria-label="Previous"
-              className="absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full
-                          border faded-bg secondary-text backdrop-blur-sm
-                         transition"
+              className={ArrowClasses}
               style={{
                 left: leftCalc,
                 top: "50%",
@@ -199,9 +199,7 @@ export default function PortfolioCarousel({
             <button
               onClick={goToNext}
               aria-label="Next"
-              className="absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full
-                         bg-white/10 border border-white/20 secondary-text backdrop-blur-sm
-                         hover:bg-white/20 transition"
+              className={ArrowClasses}
               style={{
                 left: rightCalc,
                 top: "50%",

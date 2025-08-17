@@ -71,8 +71,12 @@
   @apply bg-white/20 hover:bg-white/50;
 }
 
+@utility faded-accent-border {
+  @apply border border-accent/20;
+}
+
 @utility card-bg {
-  @apply dark:bg-white/5 light:bg-black/5 border border-accent/20;
+  @apply dark:bg-white/5 light:bg-black/5 faded-accent-border;
 }
 
 @utility primary-text {

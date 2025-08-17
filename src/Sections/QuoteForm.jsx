@@ -83,7 +83,7 @@ const QuoteForm = () => {
 
         <form
           onSubmit={handleSubmit}
-          className="group secondary-bg outer-card-style outer-card-transition"
+          className="group secondary-bg faded-accent-border outer-card-style outer-card-transition"
         >
           <div className="inner-card-style"></div>
 

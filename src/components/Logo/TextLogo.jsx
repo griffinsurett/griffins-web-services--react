@@ -5,7 +5,7 @@ import { useVisibility } from "../../hooks/useVisibility";
 export default function TextLogo({
   title = "",
   className = "",
-  firstClass = "text-2xl lg:text-3xl -ml-[0.1rem] font-medium",
+  firstClass = "text-2xl lg:text-3xl -ml-[0.1rem] leading-wide font-bold",
   restClass  = "font-light text-accent uppercase text-xs lg:text-sm p-0 m-0 tracking-wider",
   fadeDuration = 1200,  
 }) {
