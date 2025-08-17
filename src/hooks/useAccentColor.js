@@ -1,65 +1,87 @@
 // src/hooks/useAccentColor.js
 import { useEffect, useState } from "react";
 
-/** Parse a CSS list that may be comma OR space separated */
 function parseCssList(val) {
   return (val || "")
     .split(/[, \n\r\t]+/)
     .map(s => s.trim())
     .filter(Boolean);
 }
-
-/** Return a deduped array preserving first occurrence */
 function dedupe(list) {
   const seen = new Set();
-  return list.filter(c => {
-    if (seen.has(c)) return false;
-    seen.add(c);
-    return true;
-  });
+  return list.filter(c => (seen.has(c) ? false : (seen.add(c), true)));
 }
+
+const FALLBACK_ACCENTS = [
+  "var(--main-accent)",
+  "#10b981", // emerald
+  "#ec4899", // pink
+  "#ff5f1f", // orange
+  "#f59e0b", // amber
+];
 
 export function useAccentColor() {
   const [accents, setAccents] = useState([]);
   const [accent, setAccent] = useState("");
 
-  useEffect(() => {
+  // Read variables from :root (may be empty if CSS not loaded yet)
+  const readFromCss = () => {
     const root = document.documentElement;
     const styles = getComputedStyle(root);
-
-    // 1) Get default + list from CSS
     const cssDefault = styles.getPropertyValue("--color-accent").trim();
-    const optionsRaw = styles.getPropertyValue("--accent-options").trim();
+    const rawOptions = styles.getPropertyValue("--accent-options").trim();
+    const options = parseCssList(rawOptions);
+    return { cssDefault, options };
+  };
 
-    // 2) Build list (CSS-only). If none provided, fall back to just the default.
-    let list = parseCssList(optionsRaw);
-    if (!list.length && cssDefault) list = [cssDefault];
+  useEffect(() => {
+    const root = document.documentElement;
+    const { cssDefault, options } = readFromCss();
+
+    // Use CSS list if present; otherwise fallback (first paint on prod can be too early)
+    let list = options.length ? options : FALLBACK_ACCENTS.slice();
+
+    // Always expose the computed default as a swatch (so “main accent” can’t disappear)
+    if (cssDefault) list = [cssDefault, ...list];
+
     list = dedupe(list);
-
     setAccents(list);
 
-    // 3) Pick initial: localStorage > CSS default > first option
+    // Pick initial value: stored > cssDefault > first option
     const stored = localStorage.getItem("accent");
     const initial =
       (stored && list.includes(stored) && stored) ||
-      (cssDefault && list.includes(cssDefault) && cssDefault) ||
+      cssDefault ||
       list[0] ||
       "";
 
     if (initial) {
       setAccent(initial);
-      // Ensure the DOM reflects the initial (if different from cssDefault)
       if (initial !== cssDefault) {
         root.style.setProperty("--color-accent", initial);
       }
     }
+
+    // If CSS wasn't ready (no options yet), retry once after window 'load'
+    if (!options.length) {
+      const onLoad = () => {
+        const late = readFromCss().options;
+        if (late.length) {
+          const { cssDefault: cssDef2 } = readFromCss();
+          let merged = dedupe([cssDef2, ...late]);
+          setAccents(merged);
+        }
+        window.removeEventListener("load", onLoad);
+      };
+      window.addEventListener("load", onLoad);
+      return () => window.removeEventListener("load", onLoad);
+    }
   }, []);
 
-  // 4) Whenever accent changes, update CSS var + persist
+  // Persist & apply whenever user picks a new accent
   useEffect(() => {
     if (!accent) return;
-    const root = document.documentElement;
-    root.style.setProperty("--color-accent", accent);
+    document.documentElement.style.setProperty("--color-accent", accent);
     localStorage.setItem("accent", accent);
   }, [accent]);
 
