@@ -247,7 +247,7 @@
   }
 
   .card-icon-color {
-    @apply bg-gradient-to-br from-primary to-primary-secondary text-black;
+    @apply bg-gradient-to-br from-primary light:to-bg2 dark:to-primary/25 text-black;
   }
 
   /* Hover modes */

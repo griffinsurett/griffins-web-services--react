@@ -228,11 +228,11 @@ export default function PortfolioCarousel({
       )}
 
       {/* (Optional) Debug */}
-      <div className="mt-4 text-xs opacity-70">
+      {/* <div className="mt-4 text-xs opacity-70">
         <div>⏸️ Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
         <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
         <div>⏲️ Resume in 5s: {isResumeScheduled ? "✅" : "❌"}</div>
-      </div>
+      </div> */}
     </div>
   );
 }
