@@ -81,11 +81,11 @@ function AccordionItem({
           <h3 className="h3 pr-4">{question}</h3>
           <div
             className={`flex-shrink-0 icon-xsmall transition-all main-duration ${
-              isOpen ? "card-icon-color rotate-45" : "bg-accent/20 rotate-0"
+              isOpen ? "card-icon-color rotate-45" : "bg-primary/20 rotate-0"
             }`}
           >
             <svg
-              className={`w-4 h-4 ${isOpen ? "" : "text-accent"}`}
+              className={`w-4 h-4 ${isOpen ? "light:text-accent" : "text-primary"}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

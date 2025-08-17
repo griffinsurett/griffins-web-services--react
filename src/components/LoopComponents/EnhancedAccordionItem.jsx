@@ -65,8 +65,8 @@ const EnhancedAccordionItem = ({
               transition-all duration-[600ms] text-xl font-normal leading-none
               ${
                 isActive
-                  ? "bg-accent text-black"
-                  : "bg-accent/20 group-hover:bg-accent/30 text-accent"
+                  ? "bg-primary text-zinc-900"
+                  : "bg-primary/20 group-hover:bg-accent/30 text-accent "
               }
             `}
           >
@@ -83,7 +83,7 @@ const EnhancedAccordionItem = ({
           `}
         >
           <div className="px-6 pb-6">
-            <div className="w-full h-px bg-accent/20 mb-4" />
+            <div className="w-full h-px bg-primary/20 mb-4" />
             <p className="secondary-text leading-relaxed mb-6">{description}</p>
             {children && <div className="lg:hidden">{children}</div>}
           </div>
