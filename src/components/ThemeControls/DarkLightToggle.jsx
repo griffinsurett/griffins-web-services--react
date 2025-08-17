@@ -3,8 +3,8 @@ import { CircleCheckbox } from "./checkboxes/CircleCheckbox";
 import { UseMode } from "../../hooks/UseMode.js";
 
 export default function ThemeToggle() {
-  const moonSize = 16;
-  const sunSize = 20;
+  const moonSize = 14;
+  const sunSize = 18;
   const [isLight, setIsLight] = UseMode();
   const maskId = useId();
 
