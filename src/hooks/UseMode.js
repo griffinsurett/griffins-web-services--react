@@ -1,6 +1,15 @@
 // src/hooks/UseMode.js
 import { useEffect, useState } from "react";
 
+/**
+ * Theme hook — mirrors how accent color is handled:
+ * - Sets `data-theme` + `color-scheme` on <html>
+ * - Updates a CSS var `--color-bg` (so the <head> script syncs <meta name="theme-color">)
+ * - Persists the user’s choice in localStorage
+ *
+ * NOTE: index.html already has a MutationObserver that watches `data-theme`/style
+ * and updates <meta name="theme-color"> from the computed `--color-bg`.
+ */
 export function UseMode() {
   // Pick the correct initial value synchronously
   const getInitial = () => {
@@ -16,45 +25,23 @@ export function UseMode() {
 
   const [isLight, setIsLight] = useState(getInitial);
 
-  // Keep browser/OS status bars in sync with theme (like useAccentColor updates the CSS var)
-  const setStatusBarMeta = (theme) => {
-    try {
-      // Match your primary-bg: light ~ off-white, dark ~ black
-      const color = theme === "light" ? "var(--color-primary-light)" : "var(--color-primary-dark)";
-
-      // <meta name="theme-color">
-      let t = document.querySelector('meta[name="theme-color"]');
-      if (!t) {
-        t = document.createElement("meta");
-        t.setAttribute("name", "theme-color");
-        document.head.appendChild(t);
-      }
-      t.setAttribute("content", color);
-
-      // iOS PWA status bar style (harmless if not a PWA)
-      let ios = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-      if (!ios) {
-        ios = document.createElement("meta");
-        ios.setAttribute("name", "apple-mobile-web-app-status-bar-style");
-        document.head.appendChild(ios);
-      }
-      ios.setAttribute("content", theme === "light" ? "default" : "black-translucent");
-    } catch {
-      /* no-op: SSR or restricted environments */
-    }
-  };
-
   // Apply to <html> + persist whenever it changes
   useEffect(() => {
     const theme = isLight ? "light" : "dark";
     const root = document.documentElement;
+
+    // Attribute + UA hint
     root.setAttribute("data-theme", theme);
     root.style.colorScheme = theme;
+
+    // Keep a CSS var in sync so the <head> script updates <meta name="theme-color">
+    // (Do NOT set the meta tag here—mirror the accent approach by only touching CSS vars.)
+    const bg = theme === "light" ? "#fafafa" : "#000000";
+    root.style.setProperty("--color-bg", bg);
+
     try {
       localStorage.setItem("theme", theme);
     } catch {}
-    // 🔄 keep the mobile/UA status bar colors in sync with theme
-    setStatusBarMeta(theme);
   }, [isLight]);
 
   // Follow OS changes only if user hasn't explicitly saved a preference
