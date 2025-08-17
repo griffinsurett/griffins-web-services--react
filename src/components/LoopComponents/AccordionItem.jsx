@@ -25,7 +25,9 @@ function AccordionItem({
 
   // Keep local isOpen in sync with the radio group's current checked state
   React.useEffect(() => {
-    const radios = Array.from(document.querySelectorAll(`input[type="radio"][name="${name}"]`));
+    const radios = Array.from(
+      document.querySelectorAll(`input[type="radio"][name="${name}"]`)
+    );
     const handleAnyChange = () => {
       if (inputRef.current) {
         const checked = !!inputRef.current.checked;
@@ -35,7 +37,8 @@ function AccordionItem({
     radios.forEach((r) => r.addEventListener("change", handleAnyChange));
     // initialize
     handleAnyChange();
-    return () => radios.forEach((r) => r.removeEventListener("change", handleAnyChange));
+    return () =>
+      radios.forEach((r) => r.removeEventListener("change", handleAnyChange));
   }, [name]);
 
   const handleChange = (e) => {
@@ -45,7 +48,11 @@ function AccordionItem({
   };
 
   return (
-    <div className={`group relative ${className}`} data-accordion-item data-active={isOpen ? "true" : "false"}>
+    <div
+      className={`group relative ${className}`}
+      data-accordion-item
+      data-active={isOpen ? "true" : "false"}
+    >
       <input
         ref={inputRef}
         type="radio"
@@ -62,7 +69,7 @@ function AccordionItem({
       />
 
       <AnimatedBorder
-        variant="progress-b-f"       // forward on open, reverse on close
+        variant="progress-b-f" // forward on open, reverse on close
         triggers="controlled"
         active={isOpen}
         borderRadius="rounded-2xl"
@@ -85,12 +92,19 @@ function AccordionItem({
             }`}
           >
             <svg
-              className={`w-4 h-4 ${isOpen ? "light:text-accent" : "text-primary"}`}
+              className={`w-4 h-4 ${
+                isOpen ? "light:text-accent" : "text-primary"
+              }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
           </div>
         </label>
@@ -104,7 +118,7 @@ function AccordionItem({
         >
           <div className="px-6 pb-5">
             <div className="w-full h-px bg-accent/20 mb-4" />
-            <p className="secondary-text leading-relaxed">{answer}</p>
+            <p className="text-text leading-relaxed">{answer}</p>
           </div>
         </div>
       </AnimatedBorder>

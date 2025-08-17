@@ -261,7 +261,7 @@ const WebsiteTypes = () => {
                     </div>
                     <h3 className="h3">{websiteTypes[activeIndex].title}</h3>
                   </div>
-                  <p className="secondary-text leading-relaxed">
+                  <p className="text-text leading-relaxed">
                     {websiteTypes[activeIndex].description}
                   </p>
 

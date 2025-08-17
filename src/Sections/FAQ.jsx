@@ -48,7 +48,7 @@ const FAQ = () => {
         </div>
 
         <div className="text-center mt-12">
-          <p className="secondary-text mb-6">
+          <p className="text-text mb-6">
             Still have questions? We're here to help!
           </p>
           <Button variant="primary" href="/#contact" className="text-center">

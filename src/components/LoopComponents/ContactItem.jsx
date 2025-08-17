@@ -7,7 +7,7 @@ export default function ContactItem({ data }) {
     <UnderlineLink
       href={href}
       className="
-       secondary-text text-xl lg:text-2xl
+       text-text text-xl lg:text-2xl
         hover:text-accent
         transition-colors duration-450 space-x-3
       "

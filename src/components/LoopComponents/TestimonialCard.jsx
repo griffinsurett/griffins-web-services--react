@@ -34,7 +34,7 @@ export default function TestimonialCard({
 
       <div className="card-icon-color icon-medium mb-5 z-10 relative">❝</div>
 
-      <p className="secondary-text text-lg leading-relaxed mb-8 italic relative z-10">
+      <p className="text-text text-lg leading-relaxed mb-8 italic relative z-10">
         "{quote}"
       </p>
 
@@ -43,7 +43,7 @@ export default function TestimonialCard({
           <div className="icon-small card-icon-color">{avatar}</div>
           <div>
             <h4 className="h4">{author}</h4>
-            <p className="secondary-text text-sm">{role}</p>
+            <p className="text-text text-sm">{role}</p>
           </div>
         </div>
 

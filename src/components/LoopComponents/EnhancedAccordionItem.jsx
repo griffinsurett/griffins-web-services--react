@@ -84,7 +84,7 @@ const EnhancedAccordionItem = ({
         >
           <div className="px-6 pb-6">
             <div className="w-full h-px bg-primary/20 mb-4" />
-            <p className="secondary-text leading-relaxed mb-6">{description}</p>
+            <p className="text-text leading-relaxed mb-6">{description}</p>
             {children && <div className="lg:hidden">{children}</div>}
           </div>
         </div>

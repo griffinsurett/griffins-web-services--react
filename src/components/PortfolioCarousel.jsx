@@ -20,7 +20,7 @@ export default function PortfolioCarousel({
   autoAdvanceDelay = 4000,
   showArrows = true,
   showDots = true,
-  drag = false,              // ⬅️ NEW: enable horizontal drag/tap on side zones
+  drag = false, // ⬅️ NEW: enable horizontal drag/tap on side zones
   className = "",
 }) {
   const containerRef = useRef(null);
@@ -36,21 +36,19 @@ export default function PortfolioCarousel({
 
   const inView = useVisibility(containerRef, { threshold: 0.3 });
 
-  const ArrowClasses = "absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 secondary-text backdrop-blur-sm hover:bg-white/20 transition hover:border-white/75"
+  const ArrowClasses =
+    "absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 text-text backdrop-blur-sm hover:bg-white/20 transition hover:border-white/75";
 
-  const {
-    isAutoplayPaused,
-    isResumeScheduled,
-    userEngaged,
-  } = useCarouselAutoplay({
-    totalItems: items.length,
-    currentIndex: index,
-    setIndex,
-    autoAdvanceDelay,
-    inView: autoplay && inView,
-    containerSelector: `[data-autoplay-scope="${scopeId}"]`,
-    itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
-  });
+  const { isAutoplayPaused, isResumeScheduled, userEngaged } =
+    useCarouselAutoplay({
+      totalItems: items.length,
+      currentIndex: index,
+      setIndex,
+      autoAdvanceDelay,
+      inView: autoplay && inView,
+      containerSelector: `[data-autoplay-scope="${scopeId}"]`,
+      itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
+    });
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -59,19 +57,18 @@ export default function PortfolioCarousel({
   }, []);
 
   const getSizes = () => {
-    if (vw < 640)  return { centerW: 280, centerH: 190, sideW: 180, sideH: 120 };
-    if (vw < 768)  return { centerW: 340, centerH: 230, sideW: 220, sideH: 150 };
-    if (vw < 1024) return { centerW: 460, centerH: 310, sideW: 290, sideH: 190 };
-    if (vw < 1280) return { centerW: 680, centerH: 450, sideW: 420, sideH: 290 };
-    return            { centerW: 860, centerH: 540, sideW: 520, sideH: 360 };
+    if (vw < 640) return { centerW: 280, centerH: 190, sideW: 180, sideH: 120 };
+    if (vw < 768) return { centerW: 340, centerH: 230, sideW: 220, sideH: 150 };
+    if (vw < 1024)
+      return { centerW: 460, centerH: 310, sideW: 290, sideH: 190 };
+    if (vw < 1280)
+      return { centerW: 680, centerH: 450, sideW: 420, sideH: 290 };
+    return { centerW: 860, centerH: 540, sideW: 520, sideH: 360 };
   };
 
   // Distance from stage center to side-slide centers (used for ≥1280px)
   const getTranslateDistance = (sideW) => {
-    const bleed =
-      vw >= 1536 ? 72 :
-      vw >= 1280 ? 56 :
-      vw >= 1024 ? 40 : 20;
+    const bleed = vw >= 1536 ? 72 : vw >= 1280 ? 56 : vw >= 1024 ? 40 : 20;
     const edgeGutter = -bleed;
     return vw / 2 - sideW / 2 - edgeGutter;
   };
@@ -83,13 +80,12 @@ export default function PortfolioCarousel({
 
   const goToPrevious = () =>
     setIndex(index === 0 ? items.length - 1 : index - 1);
-  const goToNext = () =>
-    setIndex(index === items.length - 1 ? 0 : index + 1);
+  const goToNext = () => setIndex(index === items.length - 1 ? 0 : index + 1);
 
   // Arrow geometry
   const arrowDiameter = vw >= 768 ? 48 : 40; // md: w-12 h-12 vs w-10 h-10
-  const arrowRadius   = arrowDiameter / 2;
-  const gap           = vw >= 1024 ? 20 : 16;
+  const arrowRadius = arrowDiameter / 2;
+  const gap = vw >= 1024 ? 20 : 16;
 
   // Responsive rule:
   // - large (≥1280): align to side-slide centers (±tx)
@@ -98,7 +94,7 @@ export default function PortfolioCarousel({
 
   const sideOffsetFromCenterSlide = centerW / 2 + arrowRadius + gap;
 
-  const leftCalc  = isLarge
+  const leftCalc = isLarge
     ? `calc(50% - ${tx}px)`
     : `calc(50% - ${sideOffsetFromCenterSlide}px)`;
 
@@ -107,7 +103,7 @@ export default function PortfolioCarousel({
     : `calc(50% + ${sideOffsetFromCenterSlide}px)`;
 
   // ── Side drag zones (transparent overlays)
-  const leftZoneRef  = useRef(null);
+  const leftZoneRef = useRef(null);
   const rightZoneRef = useRef(null);
 
   // Bind side-only drag/tap handlers
@@ -130,7 +126,7 @@ export default function PortfolioCarousel({
     height: "100%",
   });
 
-  const leftZoneLeftPx  = isLarge ? tx : sideOffsetFromCenterSlide;
+  const leftZoneLeftPx = isLarge ? tx : sideOffsetFromCenterSlide;
   const rightZoneLeftPx = isLarge ? tx : sideOffsetFromCenterSlide;
 
   return (
@@ -214,7 +210,10 @@ export default function PortfolioCarousel({
 
       {/* Dots */}
       {showDots && items.length > 1 && (
-        <nav className="mt-6 flex justify-center gap-3" aria-label="Carousel Pagination">
+        <nav
+          className="mt-6 flex justify-center gap-3"
+          aria-label="Carousel Pagination"
+        >
           {items.map((_, i) => (
             <button
               key={i}

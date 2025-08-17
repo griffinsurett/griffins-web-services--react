@@ -22,7 +22,7 @@ export default function Header() {
           {/* Hamburger/X Button */}
           <HamburgerIcon
             checkboxId={checkboxId}
-            className="primary-text transition-colors duration-300"
+            className="text-headingtransition-colors duration-300"
           />
         </div>
       </header>

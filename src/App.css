@@ -28,9 +28,9 @@
   );
 
   /* Text colors */
-  --color-heading: var(--color-primary-dark);
-  --color-text: var(--color-secondary-dark);
-  --color-muted: var(--color-tertiary-dark);
+  --color-heading: var(--color-tertiary-dark);
+  --color-text: var(--text-zinc-700);
+  --color-muted: var(--text-zinc-200);
 
   /* Your custom background colors */
   --color-bg: var(--color-primary-dark);
@@ -54,10 +54,10 @@
     /* primary color */
     --color-primary: var(--color-zinc-900);
 
-    /* text colors */
-    --color-heading: var(--color-primary-light);
-    --color-text: var(--color-secondary-light);
-    --color-muted: var(--color-tertiary-light);
+    /* Text colors */
+    --color-heading: var(--color-tertiary-dark);
+    --color-text: var(--text-zinc-700);
+    --color-muted: var(--text-zinc-200);
 
     /* background colors */
     --color-bg: var(--color-primary-light);
@@ -69,9 +69,9 @@
     --color-primary: var(--color-accent);
 
     /* text colors */
-    --color-heading: var(--color-primary-dark);
-    --color-text: var(--color-secondary-dark);
-    --color-muted: var(--color-tertiary-dark);
+    --color-heading: var(--color-primary-light);
+    --color-text: var(--color-secondary-light);
+    --color-muted: var(--text-zinc-200);
 
     /* background colors */
     --color-bg: var(--color-primary-dark);
@@ -80,22 +80,8 @@
   }
 }
 
-
-@utility primary-text {
-  @apply dark:text-zinc-50 light:text-zinc-900;
-}
-
-@utility secondary-text {
-  @apply dark:text-zinc-100 light:text-zinc-700;
-}
-
 @utility muted-text {
   @apply dark:text-zinc-200 light:text-zinc-600;
-}
-
-/* Theme-aware Heading color utilities */
-@utility heading-text {
-  @apply dark:text-zinc-50 light:text-zinc-900;
 }
 
 @utility heading-accent-text {
@@ -183,7 +169,7 @@
 }
 
 @utility form-option {
-  @apply bg-bg primary-text;
+  @apply bg-bg text-heading;
 }
 
 @layer components {
@@ -308,20 +294,20 @@
 
   /* Typography - updated with theme-aware color utilities */
   .h1 {
-    @apply text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight heading-text;
+    @apply text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight text-heading;
   }
   .h2 {
-    @apply text-3xl md:text-4xl lg:text-5xl font-bold heading-text;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold text-heading;
   }
   .h3 {
-    @apply text-xl font-semibold heading-text;
+    @apply text-xl font-semibold text-heading;
   }
   .h4 {
-    @apply font-semibold text-lg heading-text;
+    @apply font-semibold text-lg text-heading;
   }
 
   p {
-    @apply secondary-text;
+    @apply text-text;
   }
 
   .hero-text {

@@ -4,7 +4,7 @@ export default function StatisticListing({ data }) {
   return (
     <div>
       <h3 className="h2 text-accent mb-3">{number}</h3>
-      <p className="secondary-text text-lg">{label}</p>
+      <p className="text-text text-lg">{label}</p>
     </div>
   );
 }

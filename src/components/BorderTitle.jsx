@@ -30,7 +30,7 @@ export default function BorderTitle({
         >
           <Heading
             tagName="span"
-            className={`uppercase tracking-wider font-semibold primary-text ${className}`}
+            className={`uppercase tracking-wider font-semibold text-heading${className}`}
           >
             {children}
           </Heading>

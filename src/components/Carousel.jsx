@@ -57,7 +57,8 @@ export default function Carousel({
 
   const pages = useMemo(() => {
     const out = [];
-    for (let i = 0; i < items.length; i += spv) out.push(items.slice(i, i + spv));
+    for (let i = 0; i < items.length; i += spv)
+      out.push(items.slice(i, i + spv));
     return out.length ? out : [[]];
   }, [items, spv]);
 
@@ -77,20 +78,19 @@ export default function Carousel({
 
   const inView = useVisibility(containerRef, { threshold: 0.3 });
 
-  const { isAutoplayPaused, isResumeScheduled, userEngaged } = useCarouselAutoplay({
-    totalItems: pageCount,
-    currentIndex: pageIndex,
-    setIndex: setPageIndex,
-    autoAdvanceDelay,
-    inView: autoplay && inView,
-    containerSelector: `[data-autoplay-scope="${scopeId}"]`,
-    itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
-  });
+  const { isAutoplayPaused, isResumeScheduled, userEngaged } =
+    useCarouselAutoplay({
+      totalItems: pageCount,
+      currentIndex: pageIndex,
+      setIndex: setPageIndex,
+      autoAdvanceDelay,
+      inView: autoplay && inView,
+      containerSelector: `[data-autoplay-scope="${scopeId}"]`,
+      itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
+    });
 
-  const goPrev = () =>
-    setPageIndex((p) => (p === 0 ? pageCount - 1 : p - 1));
-  const goNext = () =>
-    setPageIndex((p) => (p === pageCount - 1 ? 0 : p + 1));
+  const goPrev = () => setPageIndex((p) => (p === 0 ? pageCount - 1 : p - 1));
+  const goNext = () => setPageIndex((p) => (p === pageCount - 1 ? 0 : p + 1));
 
   // HoverGuard while animating
   const TRANSITION_MS = 500;
@@ -133,7 +133,7 @@ export default function Carousel({
               onClick={goPrev}
               aria-label="Previous"
               className="w-10 h-10 md:w-12 md:h-12 rounded-full
-                         muted-control-bg muted-control-border secondary-text backdrop-blur-sm
+                         muted-control-bg muted-control-border text-text backdrop-blur-sm
                          muted-control-hover transition"
             >
               <ChevronLeft className="mx-auto my-auto w-5 h-5 md:w-6 md:h-6" />
@@ -178,7 +178,10 @@ export default function Carousel({
 
           {/* HoverGuard (blocks card hover during slide) */}
           {transitioning && (
-            <div className="absolute inset-0 z-30 pointer-events-auto" aria-hidden="true" />
+            <div
+              className="absolute inset-0 z-30 pointer-events-auto"
+              aria-hidden="true"
+            />
           )}
 
           {/* Full-viewport DRAG ZONES (left 50% + right 50%) */}
@@ -207,7 +210,7 @@ export default function Carousel({
               onClick={goNext}
               aria-label="Next"
               className="w-10 h-10 md:w-12 md:h-12 rounded-full
-                         faded-bg secondary-text backdrop-blur-sm
+                         faded-bg text-text backdrop-blur-sm
                          transition"
             >
               <ChevronRight className="mx-auto my-auto w-5 h-5 md:w-6 md:h-6" />
@@ -218,15 +221,16 @@ export default function Carousel({
 
       {/* Dots */}
       {showDots && pageCount > 1 && (
-        <nav className="mt-6 flex justify-center gap-3" aria-label="Carousel Pagination">
+        <nav
+          className="mt-6 flex justify-center gap-3"
+          aria-label="Carousel Pagination"
+        >
           {Array.from({ length: pageCount }).map((_, i) => (
             <button
               key={i}
               onClick={() => setPageIndex(i)}
               className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                i === pageIndex 
-                  ? "bg-primary scale-[1.30]" 
-                  : "faded-bg"
+                i === pageIndex ? "bg-primary scale-[1.30]" : "faded-bg"
               }`}
               aria-label={`Go to page ${i + 1}`}
             />

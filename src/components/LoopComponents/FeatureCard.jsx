@@ -22,12 +22,10 @@ export default function FeatureCard({
     >
       {/* Inner gradient overlay - shows accent hint on hover */}
       <div className="inner-card-style inner-card-transition inner-card-color" />
-      
+
       <div className="icon-large z-10 mb-5 card-icon-color">{icon}</div>
       <h3 className="h3 mb-3 relative z-10">{title}</h3>
-      <p className="secondary-text leading-relaxed relative z-10">
-        {description}
-      </p>
+      <p className="text-text leading-relaxed relative z-10">{description}</p>
     </AnimatedBorder>
   );
 }
