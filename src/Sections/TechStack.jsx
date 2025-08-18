@@ -3,6 +3,8 @@ import React, { useRef, useEffect, useState } from "react";
 import Heading from "../components/Heading";
 import { useVisibility } from "../hooks/useVisibility";
 import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
+import BorderTitle from "../components/BorderTitle";
+import LabelIcon from "../components/LoopComponents/LabelIcon";
 import {
   Code2,
   Palette,
@@ -21,15 +23,20 @@ import {
   GitBranch,
   Workflow,
 } from "lucide-react";
-import BorderTitle from "../components/BorderTitle";
 
 const TechStack = () => {
   const containerRef = useRef(null);
   const trackRef = useRef(null);
   const [currentOffset, setCurrentOffset] = useState(0);
+  
+  // Mobile touch state
+  const [activeMobileItem, setActiveMobileItem] = useState(null);
+  const mobileTimeoutRef = useRef(null);
 
   // Check if section is in view
   const inView = useVisibility(containerRef, { threshold: 0.3 });
+
+  const description = "From modern frameworks, CMS platforms, to a wide range of hosting platforms we build with the right tools for your project."
 
   // Technology stack with lucide-react icons
   const technologies = [
@@ -104,6 +111,29 @@ const TechStack = () => {
   const itemWidth = 120; // Approximate width of each item including gap
   const totalWidth = technologies.length * itemWidth;
 
+  // Mobile touch handlers
+  const handleMobileTouch = (techName, index) => {
+    // Clear any existing timeout
+    if (mobileTimeoutRef.current) {
+      clearTimeout(mobileTimeoutRef.current);
+    }
+    
+    // Set active item
+    setActiveMobileItem(`${techName}-${index}`);
+    
+    // Auto-hide after 2.5 seconds
+    mobileTimeoutRef.current = setTimeout(() => {
+      setActiveMobileItem(null);
+    }, 2500);
+  };
+
+  const clearMobileActive = () => {
+    if (mobileTimeoutRef.current) {
+      clearTimeout(mobileTimeoutRef.current);
+    }
+    setActiveMobileItem(null);
+  };
+
   // Use engagement autoplay hook
   const { isAutoplayPaused, userEngaged, engageUser, pause, resume } =
     useEngagementAutoplay({
@@ -153,6 +183,15 @@ const TechStack = () => {
     };
   }, [inView, isAutoplayPaused, totalWidth]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (mobileTimeoutRef.current) {
+        clearTimeout(mobileTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <section
       ref={containerRef}
@@ -162,7 +201,7 @@ const TechStack = () => {
       {/* <div className="section-dim-border"></div> */}
       <div className="inner-section text-center lg:text-left">
         <BorderTitle>Our Tech Stack</BorderTitle>
-        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_2fr] gap-8 lg:gap-12 items-center">
+        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_2fr] gap-4 lg:gap-12 items-center">
           {/* Left side - Text (full width on mobile) */}
           <div className="w-sm">
             <Heading
@@ -173,9 +212,8 @@ const TechStack = () => {
               text="the tools that matter."
               textClass="text-heading block lg:inline"
             />
-            <p className="text-text text-lg mt-4 hidden lg:block">
-              From modern frameworks, CMS platforms, to a wide range of hosting platforms we build with
-              the right tools for your project.
+            <p className="text-text text-lg hidden lg:block">
+                        {description}
             </p>
           </div>
 
@@ -196,6 +234,12 @@ const TechStack = () => {
               onMouseLeave={() => {
                 resume();
               }}
+              // Clear mobile active state when touching outside
+              onTouchStart={(e) => {
+                if (e.target === e.currentTarget) {
+                  clearMobileActive();
+                }
+              }}
             >
               <div
                 ref={trackRef}
@@ -205,66 +249,29 @@ const TechStack = () => {
                   width: "max-content",
                 }}
               >
-                {duplicatedTechnologies.map((tech, index) => (
-                  <div
-                    key={`${tech.name}-${index}`}
-                    data-tech-item
-                    className="group flex flex-col items-center flex-shrink-0"
-                  >
-                    {/* Logo container */}
-                    <div
-                      className="
-                      relative
-                      p-3 md:p-4
-                      transition-all duration-300
-                      group-hover:scale-110
-                      cursor-pointer
-                    "
-                    >
-                      {/* Glow effect on hover */}
-                      <div
-                        className="
-                        absolute inset-0
-                        bg-accent/30
-                        blur-2xl
-                        opacity-0
-                        group-hover:opacity-100
-                        transition-opacity duration-300
-                        rounded-full
-                      "
-                      />
-
-                      {/* White icon */}
-                      <div className="relative text-heading opacity-70 group-hover:opacity-100 transition-opacity duration-300">
-                        {tech.icon}
-                      </div>
-                    </div>
-
-                    {/* Tech name - visible on hover */}
-                    <div
-                      className="
-                      mt-2
-                      text-xs md:text-sm
-                      text-muted
-                      opacity-0 group-hover:opacity-100
-                      transition-all duration-300
-                      transform translate-y-2 group-hover:translate-y-0
-                      whitespace-nowrap
-                    "
-                    >
-                      {tech.name}
-                    </div>
-                  </div>
-                ))}
+                {duplicatedTechnologies.map((tech, index) => {
+                  const itemKey = `${tech.name}-${index}`;
+                  const isMobileActive = activeMobileItem === itemKey;
+                  
+                  return (
+                    <LabelIcon
+                      key={itemKey}
+                      tech={tech}
+                      index={index}
+                      isActive={isMobileActive}
+                      onTouch={handleMobileTouch}
+                      onMouseEnter={engageUser}
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>
         </div>
 
         {/* Mobile subtitle */}
-        <p className="text-center text-text text-base mt-8 lg:hidden">
-          From modern frameworks to traditional CMS platforms, we build with the
-          right tools for your project.
+        <p className="text-center text-text text-base lg:hidden">
+          {description}
         </p>
       </div>
     </section>
