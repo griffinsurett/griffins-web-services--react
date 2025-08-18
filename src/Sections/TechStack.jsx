@@ -235,7 +235,7 @@ const TechStack = () => {
                       />
 
                       {/* White icon */}
-                      <div className="relative text-white opacity-70 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="relative text-heading opacity-70 group-hover:opacity-100 transition-opacity duration-300">
                         {tech.icon}
                       </div>
                     </div>

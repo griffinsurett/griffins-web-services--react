@@ -29,7 +29,7 @@ export default function IconListItem({
 
   // Layout configurations
   const layouts = {
-    vertical: "flex flex-col items-center",
+    vertical: "flex flex-col",
     horizontal: "flex items-center",
     "horizontal-reverse": "flex items-start flex-row-reverse"
   };

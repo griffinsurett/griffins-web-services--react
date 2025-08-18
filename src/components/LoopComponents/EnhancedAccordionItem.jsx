@@ -1,6 +1,7 @@
 // EnhancedAccordionItem.jsx
 import React from "react";
 import AnimatedBorder from "../AnimatedBorder";
+import IconListItem from "./IconListItem";
 
 const EnhancedAccordionItem = ({
   data,
@@ -53,13 +54,19 @@ const EnhancedAccordionItem = ({
           className="w-full text-left flex items-center justify-between p-5 hover:bg-card/50 transition-colors duration-300 cursor-pointer relative z-20"
           onMouseDown={(e) => e.preventDefault()} // prevent scroll-to-focus jump
         >
-          <div className="flex items-center gap-2">
-            <div className="icon-medium card-icon-color">{icon}</div>
-            <div>
-              <h3 className="h3">{title}</h3>
-            </div>
-          </div>
+          {/* Icon and title using IconListItem */}
+          <IconListItem
+            data={{ icon, title }}
+            layout="horizontal"
+            alignment="left"
+            className="gap-2"
+            iconClassName="icon-medium card-icon-color"
+            titleClassName="h3"
+            titleTag="h3"
+            showDescription={false}
+          />
 
+          {/* Expand/collapse indicator */}
           <div
             className={`
               w-8 h-8 rounded-full flex items-center justify-center
@@ -77,6 +84,7 @@ const EnhancedAccordionItem = ({
           </div>
         </label>
 
+        {/* Collapsible content */}
         <div
           className={`
             overflow-hidden transition-all duration-500 ease-in-out relative z-20

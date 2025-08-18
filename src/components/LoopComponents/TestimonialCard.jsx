@@ -1,6 +1,7 @@
 // src/components/LoopComponents/TestimonialCard.jsx
 import React from "react";
 import AnimatedBorder from "../AnimatedBorder";
+import IconListItem from "./IconListItem";
 
 export default function TestimonialCard({
   data,
@@ -32,21 +33,32 @@ export default function TestimonialCard({
       {/* Inner gradient overlay - shows accent hint on hover */}
       <div className="inner-card-style inner-card-transition inner-card-color" />
 
-      <div className="card-icon-color icon-medium mb-5 z-10 relative">❝</div>
-
-      <p className="text-text text-lg leading-relaxed mb-8 italic relative z-10">
-        "{quote}"
-      </p>
+      {/* Quote icon and text combined */}
+      <IconListItem
+        data={{ icon: "❝", description: `"${quote}"` }}
+        layout="vertical"
+        alignment="left"
+        iconClassName="card-icon-color icon-medium mb-5 z-10 relative"
+        descriptionClassName="text-text text-lg leading-relaxed mb-8 italic relative z-10"
+        descriptionTag="p"
+        showTitle={false}
+      />
 
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 relative z-10">
-        <div className="flex items-center gap-4">
-          <div className="icon-small card-icon-color">{avatar}</div>
-          <div>
-            <h4 className="h4">{author}</h4>
-            <p className="text-text text-sm">{role}</p>
-          </div>
-        </div>
+        {/* Author info */}
+        <IconListItem
+          data={{ icon: avatar, title: author, description: role }}
+          layout="horizontal"
+          alignment="left"
+          className="gap-4"
+          iconClassName="icon-small card-icon-color"
+          titleClassName="h4"
+          titleTag="h4"
+          descriptionClassName="text-text text-sm"
+          descriptionTag="p"
+        />
 
+        {/* Rating stars */}
         <div className="flex gap-1 text-center justify-center items-center">
           {[...Array(rating)].map((_, i) => (
             <RatingStar key={i} i={i} />

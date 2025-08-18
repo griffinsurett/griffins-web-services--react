@@ -1,6 +1,7 @@
 // src/components/LoopComponents/FeatureCard.jsx
 import React from "react";
 import AnimatedBorder from "../AnimatedBorder";
+import IconListItem from "./IconListItem";
 
 export default function FeatureCard({
   data,
@@ -23,10 +24,17 @@ export default function FeatureCard({
       {/* Inner gradient overlay - shows accent hint on hover */}
       <div className="inner-card-style inner-card-transition inner-card-color" />
 
+   <IconListItem
+        data={data}
+        layout="vertical"
+        alignment="center"
+        iconClassName="icon-large z-10 mb-5 card-icon-color"
+        titleClassName="h3 mb-3 relative z-10"
+        titleTag="h3"
+        descriptionClassName="text-text leading-relaxed relative z-10"
+        descriptionTag="p"
+      />
       
-      <div className="icon-large z-10 mb-5 card-icon-color">{icon}</div>
-      <h3 className="h3 mb-3 relative z-10">{title}</h3>
-      <p className="text-text leading-relaxed relative z-10">{description}</p>
     </AnimatedBorder>
   );
 }
