@@ -21,7 +21,7 @@ const Hero = () => {
         <p className="hero-text text-text mb-8 max-w-4xl mx-auto">
           {siteData.description}
         </p>
-        <div className="flex flex-col gap-5 justify-center items-center">
+        <div className="flex flex-col">
         <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
           <Button variant="primary" href="#contact">
             Get Started Today ✨

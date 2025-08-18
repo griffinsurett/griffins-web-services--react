@@ -160,11 +160,11 @@ const TechStack = () => {
       id="tech-stack"
     >
       {/* <div className="section-dim-border"></div> */}
-      <div className="inner-section">
+      <div className="inner-section text-center lg:text-left">
         <BorderTitle>Our Tech Stack</BorderTitle>
         <div className="flex flex-col lg:grid lg:grid-cols-[1fr_2fr] gap-8 lg:gap-12 items-center">
           {/* Left side - Text (full width on mobile) */}
-          <div className="text-center lg:text-left w-sm">
+          <div className="w-sm">
             <Heading
               tagName="h2"
               className="mb-6"
