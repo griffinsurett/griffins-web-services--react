@@ -199,7 +199,7 @@ const WebsiteTypes = () => {
         </div>
 
         <div
-          className="grid lg:grid-cols-2 gap-6 lg:gap-12"
+          className="max-2-primary"
           data-accordion-container
         >
           {/* Left: Accordion list */}

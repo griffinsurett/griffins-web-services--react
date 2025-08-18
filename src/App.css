@@ -253,6 +253,10 @@
     @apply bg-gradient-to-br from-primary light:to-bg2 dark:to-primary/25 text-black;
   }
 
+  .max-2-primary {
+    @apply grid lg:grid-cols-2 gap-6 lg:gap-12;
+  }
+
   .max-3-primary {
     @apply grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:mb-16;
   }
