@@ -49,7 +49,7 @@ const About = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="max-3">
           {Services.map((item, idx) => (
             <FeatureCard key={idx} data={item} />
           ))}
