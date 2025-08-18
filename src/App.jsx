@@ -12,6 +12,7 @@ import Testimonials from "./Sections/Testimonials";
 import CTASection from "./Sections/CTASection";
 import QuoteForm from "./Sections/QuoteForm";
 import PortfolioSection from "./Sections/PortfolioSection";
+import HostingMaintenance from "./Sections/HostingMaintenance";
 
 const GriffinsLanding = () => {
   useEffect(() => {
@@ -23,7 +24,7 @@ const GriffinsLanding = () => {
   }, []);
 
   return (
-    <div className="bg-bg text-headingmin-h-screen">
+    <div className="bg-bg text-headingmin-h-screen transition-all">
       {/* Navigation */}
       <Header />
       {/* Hero Section */}
@@ -52,6 +53,9 @@ const GriffinsLanding = () => {
 
       {/* Testimonials Section */}
       <Testimonials />
+
+      {/* Hosting Maintenance Section */}
+      <HostingMaintenance />
 
       {/* Quote Form Section */}
       <QuoteForm />

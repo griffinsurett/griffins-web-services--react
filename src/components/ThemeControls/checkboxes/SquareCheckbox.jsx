@@ -17,7 +17,7 @@ export function SquareCheckbox({ color, checked, onChange }) {
           block 
           rounded-sm 
           border-2 border-transparent 
-          peer-checked:border-white peer-checked:shadow-lg
+          peer-checked:border-primary-light peer-checked:shadow-lg
           "
         style={{ backgroundColor: color }}
       />

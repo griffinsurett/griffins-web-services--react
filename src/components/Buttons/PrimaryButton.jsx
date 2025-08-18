@@ -13,7 +13,7 @@ const PrimaryButton = ({ Base, className = "", ...props }) => {
       "hover:bg-transparent",
 
       // Dark-mode hover (override only in dark)
-      "dark:hover:text-white",
+      "dark:hover:text-primary-light",
     ].join(" ");
 
   return <Base className={`${classes} ${className}`} {...props} />;

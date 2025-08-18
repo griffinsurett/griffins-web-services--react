@@ -254,7 +254,7 @@ const WebsiteTypes = () => {
                   className="shadow-2xl shadow-accent/20"
                 />
 
-                <div className="mt-6 p-6 card-bg rounded-xl">
+                {/* <div className="mt-6 p-6 card-bg rounded-xl">
                   <div className="flex items-center gap-4 mb-3">
                     <div className="icon-small card-icon-color">
                       {websiteTypes[activeIndex].icon}
@@ -263,7 +263,7 @@ const WebsiteTypes = () => {
                   </div>
                   <p className="text-text leading-relaxed">
                     {websiteTypes[activeIndex].description}
-                  </p>
+                  </p> */}
 
                   {/* Debug */}
                   {/* <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
@@ -278,7 +278,7 @@ const WebsiteTypes = () => {
                     <div>🎪 Active Index: {activeIndex}</div>
                     <div>📊 Progress: {Math.round(progress)}%</div>
                   </div> */}
-                </div>
+                {/* </div> */}
               </div>
             </div>
           </div>

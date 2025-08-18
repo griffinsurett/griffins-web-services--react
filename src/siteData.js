@@ -19,21 +19,15 @@ export const siteData = {
 export const contactItems = [
   {
     type: "email",
-    label: "hello@griffinsweb.com",
-    href: "mailto:hello@griffinsweb.com",
+    label: "griffin@griffinswebservices.com",
+    href: "mailto:griffin@griffinswebservices.com",
     icon: Mail,
   },
   {
     type: "phone",
-    label: "(123) 456-7890",
-    href: "tel:+1234567890",
+    label: "(732) 939-1309",
+    href: "tel:+17329391309",
     icon: Phone,
-  },
-  {
-    type: "address",
-    label: "123 Main St, Anytown, USA",
-    href: "https://www.google.com/maps",
-    icon: MapPin,
   },
 ];
 
@@ -44,22 +38,17 @@ export const contactItems = [
 export const socialMediaLinks = [
   {
     name: "LinkedIn",
-    href: "#linkedin",
+    href: "https://www.linkedin.com/in/griffin-surett/",
     icon: Linkedin,
   },
   {
-    name: "Twitter",
-    href: "#twitter",
-    icon: Twitter,
-  },
-  {
     name: "GitHub",
-    href: "#github",
+    href: "https://github.com/griffinsurett",
     icon: Github,
   },
   {
     name: "Instagram",
-    href: "#instagram",
+    href: "https://www.instagram.com/griffinswebservices/",
     icon: Instagram,
   },
 ];

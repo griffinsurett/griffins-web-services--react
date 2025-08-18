@@ -24,7 +24,7 @@
   --color-primary-secondary: color-mix(
     in srgb,
     var(--color-primary) 85%,
-    black
+    var(--primary-dark)
   );
 
   /* Text colors */
@@ -57,7 +57,7 @@
     /* Text colors */
     --color-heading: var(--color-tertiary-dark);
     --color-text: var(--text-zinc-700);
-    --color-muted: var(--text-zinc-200);
+    --color-muted: var(--text-zinc-600);
 
     /* background colors */
     --color-bg: var(--color-primary-light);
@@ -88,27 +88,14 @@
   color: var(--color-primary);
 }
 
-/* Theme-aware Background utilities */
-/* @utility primary-bg {
-  @apply dark:bg-black light:bg-zinc-50;
-}
-
-@utility bg-bg2 {
-  @apply dark:bg-zinc-950 light:bg-zinc-100;
-}
-
-@utility bg-bg3 {
-  @apply dark:bg-zinc-900 light:bg-zinc-200;
-} */
-
 @utility faded-bg {
-  @apply dark:bg-white/10 dark:hover:bg-white/12;
-  @apply light:bg-black/10 light:hover:bg-black/12;
+  @apply dark:bg-primary-light/10 dark:hover:bg-primary-light/12;
+  @apply light:bg-primary-dark/10 light:hover:bg-primary-dark/12;
   @apply transition-all hover:transform main-duration;
 }
 
 @utility faded-bg2 {
-  @apply bg-white/20 hover:bg-white/50;
+  @apply bg-primary-light/20 hover:bg-primary-dark/50;
 }
 
 @utility faded-accent-border {
@@ -116,7 +103,7 @@
 }
 
 @utility card-bg {
-  @apply dark:bg-white/5 light:bg-black/5 faded-accent-border;
+  @apply dark:bg-primary-light/5 light:bg-primary-dark/5 faded-accent-border;
 }
 
 @utility logo-class {
@@ -150,11 +137,11 @@
 /* The main form field styling - updated with theme-aware colors */
 @utility form-field {
   @apply w-full bg-transparent border border-accent/20 rounded-xl px-4 py-3 focus:outline-none main-duration transition-all;
-  @apply dark:focus:bg-black/70 light:focus:bg-white/70;
-  @apply muted-text;
+  @apply dark:focus:bg-primary-dark/70 light:focus:bg-primary-light/70;
+  @apply text-muted;
 
   &::placeholder {
-    @apply muted-text;
+    @apply text-muted;
   }
 
   /* Fix for select dropdown arrow spacing */
@@ -193,6 +180,10 @@
 
   .inner-section {
     @apply w-9/10 lg:max-w-6xl mx-auto;
+  }
+
+  .section-box {
+    @apply rounded-3xl p-8 lg:p-12 relative overflow-hidden;
   }
 
   .section-dim-border {

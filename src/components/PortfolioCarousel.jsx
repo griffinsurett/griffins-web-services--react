@@ -37,7 +37,7 @@ export default function PortfolioCarousel({
   const inView = useVisibility(containerRef, { threshold: 0.3 });
 
   const ArrowClasses =
-    "absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/10 border border-white/20 text-text backdrop-blur-sm hover:bg-white/20 transition hover:border-white/75";
+    "absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary-light/10 border border-primary-light/20 text-text backdrop-blur-sm hover:bg-primary-light/20 transition hover:border-primary-light/75";
 
   const { isAutoplayPaused, isResumeScheduled, userEngaged } =
     useCarouselAutoplay({

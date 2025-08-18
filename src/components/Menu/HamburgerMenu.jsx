@@ -72,7 +72,7 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
         </nav>
 
         {/* Optional footer content in modal */}
-        <div className="text-center pb-8 muted-text">
+        <div className="text-center pb-8 text-muted">
           <p className="text-sm">Ready to transform your online presence?</p>
         </div>
       </div>

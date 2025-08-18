@@ -27,7 +27,7 @@ const SecondaryButton = ({
 
   const innerButtonClasses =
     `bg-transparent text-heading${borderRadius} ` +
-    `hover:bg-accent hover:text-black`;
+    `hover:bg-accent hover:text-primary-dark`;
 
   return (
     <AnimatedBorder
