@@ -158,7 +158,7 @@ const HostingMaintenance = () => {
             </p>
           </div>
 
-          <div className="max-3 gap-8 align-middle">
+          <div className="max-3-primary gap-8 align-middle">
             {hostingFeatures.map((feature, idx) => (
               <FeatureCard key={idx} data={feature} />
             ))}

@@ -61,7 +61,7 @@ const Benefits = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="max-3-primary">
           {benefits.map((item, idx) => (
             <FeatureCard key={idx} data={item} />
           ))}

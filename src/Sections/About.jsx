@@ -49,7 +49,7 @@ const About = () => {
           </p>
         </div>
 
-        <div className="max-3">
+        <div className="max-3-secondary">
           {Services.map((item, idx) => (
             <FeatureCard key={idx} data={item} />
           ))}

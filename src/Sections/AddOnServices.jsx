@@ -350,7 +350,7 @@ const AddOnServices = () => {
         </div>
 
         {/* Tab Navigation - Radio Inputs */}
-        <div className="flex flex-wrap mb-6 gap-2 lg:gap-auto justify-center lg:justify-between">
+        <div className="flex flex-wrap gap-2 lg:gap-auto justify-center lg:justify-between">
           {Object.entries(categories).map(([key, category]) => (
             <RadioTab
               key={key}
@@ -368,7 +368,7 @@ const AddOnServices = () => {
         {/* Active Category Content */}
         <div className="transition-all duration-500 ease-in-out">
           {/* Services Grid - Only Active Category */}
-          <div className="max-3">
+          <div className="max-3-primary my-6">
             {categories[activeTab].services.map((service, index) => (
               <div key={index} className="relative">
                 <FeatureCard
