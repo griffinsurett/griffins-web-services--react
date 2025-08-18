@@ -17,7 +17,7 @@ const Hero = () => {
           textClass="emphasized-text"
           after={` with ${siteData.title}`}
         />
-        <p className="hero-text text-text mb-10 max-w-4xl mx-auto">
+        <p className="hero-text text-text mb-8 max-w-4xl mx-auto">
           {siteData.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
