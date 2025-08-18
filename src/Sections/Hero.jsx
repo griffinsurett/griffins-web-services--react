@@ -3,6 +3,7 @@ import React from "react";
 import Button from "../components/Buttons/Button";
 import Heading from "../components/Heading";
 import { siteData } from "../siteData";
+import TestimonialsCirclesSection from "./TestimonialsCirclesSection";
 
 const Hero = () => {
   return (
@@ -20,6 +21,7 @@ const Hero = () => {
         <p className="hero-text text-text mb-8 max-w-4xl mx-auto">
           {siteData.description}
         </p>
+        <div className="flex flex-col gap-5 justify-center items-center">
         <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
           <Button variant="primary" href="#contact">
             Get Started Today ✨
@@ -27,6 +29,8 @@ const Hero = () => {
           <Button variant="secondary" href="#projects">
             View Our Work 👀
           </Button>
+        </div>
+                  {/* <TestimonialsCirclesSection /> */}
         </div>
       </div>
     </section>

@@ -46,7 +46,7 @@ const GriffinsLanding = () => {
       {/* Add-On Services Section */}
       <AddOnServices />
 
-            {/* Testimonials Section */}
+      {/* Testimonials Section */}
       <Testimonials />
 
       {/* FAQ Section */}
