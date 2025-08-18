@@ -5,6 +5,7 @@ import SocialLink from "../components/LoopComponents/SocialLink";
 import UnderlineLink from "../components/LoopComponents/UnderlineLink";
 import Heading from "../components/Heading";
 import { siteData, contactItems, socialMediaLinks } from "../siteData";
+import Logo from "../components/Logo/Logo";
 
 const footerNav = [
   { label: "Privacy Policy", href: "#privacy-policy" },
@@ -19,11 +20,6 @@ export default function Footer() {
       <div className="section-color-border"></div>
       <div className="inner-section py-16 text-center">
         
-        {/* Company Heading */}
-        {/* <Heading tagName="h3" className="h3 mb-8 text-accent">
-          {siteData.title}
-        </Heading> */}
-
         {/* Contact Information */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-6 lg:gap-12 mb-8">
           {contactItems.map((item) => (

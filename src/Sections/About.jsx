@@ -33,7 +33,7 @@ const About = () => {
   ];
 
   return (
-    <section className="outer-section bg-secondary relative">
+    <section className="outer-section bg-secondary relative" id="about">
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">

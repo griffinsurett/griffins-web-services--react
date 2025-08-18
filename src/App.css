@@ -42,6 +42,10 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-bg overflow-x-hidden;
   }
@@ -103,7 +107,15 @@
 }
 
 @utility card-bg {
-  @apply dark:bg-primary-light/5 light:bg-primary-dark/5 faded-accent-border;
+  @apply dark:bg-primary-light/5 light:bg-primary-dark/5 faded-accent-border transition-all main-duration;
+}
+
+/* @utility hover-card-bg {
+  @apply hover:bg-transparent hover:border-primary/50;
+} */
+
+@utility border-off-hover {
+    @apply hover:border-transparent;
 }
 
 @utility logo-class {

@@ -44,6 +44,7 @@ const EnhancedAccordionItem = ({
         borderRadius="rounded-3xl"
         borderWidth={2}
         className="transition-all duration-100"
+        innerClassName="card-bg"
         loop={false}
       >
         {/* Label toggles the radio */}

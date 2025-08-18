@@ -1,17 +1,14 @@
-import React from 'react';
+import React from "react";
 import TextLogo from "./TextLogo";
 import VideoLogo from "./VideoLogo";
 
 /**
- * LogoLink component renders a linked logo section combining the animated video logo
+ * Logo component renders a linked logo section combining the animated video logo
  * and the text logo side by side.
  */
-const LogoLink = ({ loading = "lazy" }) => {
+const Logo = ({ loading = "lazy" }) => {
   return (
-    <a
-      href="/"
-      className="flex justify-center items-center gap-1.5"
-    >
+    <a href="/" className="flex justify-center items-center gap-1.5">
       <VideoLogo alt="Griffin's Web Services Animated Logo" loading={loading} />
       <div>
         <TextLogo
@@ -24,4 +21,4 @@ const LogoLink = ({ loading = "lazy" }) => {
   );
 };
 
-export default LogoLink;
+export default Logo;

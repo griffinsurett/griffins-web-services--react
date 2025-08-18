@@ -4,11 +4,13 @@ import Modal from "../Modal";
 import UnderlineLink from "../LoopComponents/UnderlineLink";
 
 const navItems = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/#home" },
+  { label: "About", href: "/#about" },
+  { label: "Website Solutions", href: "/#website-types" },
+  { label: "Web Hosting", href: "/#hosting" },
+  { label: "Add-On Services", href: "/#add-ons" },
+  { label: "Projects", href: "/#projects" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
@@ -56,7 +58,7 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
       <div className="relative w-full h-full flex flex-col">
         {/* Navigation Menu */}
         <nav className="flex-1 flex items-center justify-center">
-          <ul className="flex flex-col items-center space-y-8 text-center">
+          <ul className="flex flex-col items-center space-y-6 text-center">
             {navItems.map((item) => (
               <li key={item.label}>
                 <UnderlineLink

@@ -180,7 +180,7 @@ const WebsiteTypes = () => {
   };
 
   return (
-    <section ref={sectionRef} className="outer-section bg-bg2 relative">
+    <section ref={sectionRef} className="outer-section bg-bg2 relative" id="website-types">
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">

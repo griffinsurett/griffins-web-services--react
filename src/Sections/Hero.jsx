@@ -21,10 +21,12 @@ const Hero = () => {
           {siteData.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
-          <Button variant="primary" link="/">
+          <Button variant="primary" href="#contact">
             Get Started Today ✨
           </Button>
-          <Button variant="secondary">View Our Work 👀</Button>
+          <Button variant="secondary" href="#projects">
+            View Our Work 👀
+          </Button>
         </div>
       </div>
     </section>

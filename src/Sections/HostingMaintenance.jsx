@@ -125,8 +125,8 @@ const HostingMaintenance = () => {
   ];
 
   return (
-    <section className="outer-section bg-bg relative">
-      <div className="section-dim-border"></div>
+    <section className="outer-section bg-bg relative" id="hosting">
+      <div className="section-color-border"></div>
       <div className="inner-section">
         {/* Header */}
         <div className="text-section">

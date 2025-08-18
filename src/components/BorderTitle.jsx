@@ -13,7 +13,7 @@ export default function BorderTitle({
   className = "",
   duration = 1200,
   hoverSweep = true,
-  pillClassName = "text-sm px-5 py-2 tracking-wider",
+  pillClassName = "text-sm px-5 py-2.5 tracking-wider",
 }) {
   return (
     <div className="inline-block mb-3">

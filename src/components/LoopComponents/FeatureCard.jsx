@@ -18,7 +18,7 @@ export default function FeatureCard({
       borderWidth={2}
       // Slow down the hover lift/transform without touching the ring speed
       className={`group text-center outer-card-transition outer-card-hover-transition !duration-[900ms] ease-out ${className}`}
-      innerClassName="h-85 mx-auto px-10 flex flex-col justify-center items-center relative"
+      innerClassName="h-85 mx-auto px-10 flex flex-col justify-center items-center relative card-bg"
     >
       {/* Inner gradient overlay - shows accent hint on hover */}
       <div className="inner-card-style inner-card-transition inner-card-color" />

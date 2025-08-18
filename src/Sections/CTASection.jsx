@@ -19,7 +19,7 @@ const CTASection = () => {
             Services...
           </p>
         </div>
-        <Button variant="primary" className="text-center">
+        <Button variant="primary" className="text-center" href="#contact">
           Start Your Project - 50% Off! 🎉
         </Button>
       </div>

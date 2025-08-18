@@ -63,7 +63,7 @@ const QuoteForm = () => {
   ];
 
   return (
-    <section className="outer-section bg-bg relative">
+    <section className="outer-section bg-bg relative" id="contact">
       <div className="section-color-border"></div>
       <div className="inner-section">
         <div className="text-section">

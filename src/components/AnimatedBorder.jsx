@@ -270,7 +270,7 @@ const AnimatedBorder = ({
         />
       )}
 
-      <div className={`relative z-10 overflow-hidden ${borderRadius} ${innerClassName} card-bg`}>
+      <div className={`relative z-10 overflow-hidden ${borderRadius} ${innerClassName}`}>
         {children}
       </div>
     </div>

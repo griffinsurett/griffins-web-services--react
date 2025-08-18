@@ -76,6 +76,7 @@ function AccordionItem({
         borderWidth={2}
         duration={800}
         className="cursor-pointer transition-all main-duration overflow-hidden"
+        innerClassName="card-bg"
       >
         {/* Header / toggle */}
         <label
@@ -88,7 +89,7 @@ function AccordionItem({
           <h3 className="h3 pr-4">{question}</h3>
           <div
             className={`flex-shrink-0 icon-xsmall transition-all main-duration ${
-              isOpen ? "card-icon-color rotate-45" : "bg-primary/20 rotate-0"
+              isOpen ? "bg-bg rotate-45" : "bg-primary/20 rotate-0"
             }`}
           >
             <svg
