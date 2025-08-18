@@ -55,8 +55,7 @@ const RadioTab = ({
         borderRadius="rounded-full"
         borderWidth={2}
         color="var(--color-accent)"
-        className={`button-transition`}
-        innerClassName="px-2 py-1 card-bg border-off-hover"
+        innerClassName="px-2 py-1  card-bg border-off-hover"
       >
         <label
           htmlFor={id}
