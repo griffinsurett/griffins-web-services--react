@@ -44,8 +44,8 @@ const About = () => {
             text="Are"
             textClass="emphasized-text"
           />
-          <p className="large-text">
-            {siteData.title} is your trusted partner in digital transformation...
+          <p className="large-text mb-8">
+Websites is what we do, we’re here to make you a lightning fast, secure, and scalable website that handles your marketing campaigns, integrates with ai, and stands the test of time. 
           </p>
         </div>
 

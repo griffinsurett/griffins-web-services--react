@@ -14,6 +14,7 @@ import QuoteForm from "./Sections/QuoteForm";
 import PortfolioSection from "./Sections/PortfolioSection";
 import HostingMaintenance from "./Sections/HostingMaintenance";
 import AddOnServices from "./Sections/AddOnServices";
+import TechStack from "./Sections/TechStack";
 
 const GriffinsLanding = () => {
   useEffect(() => {
@@ -40,14 +41,15 @@ const GriffinsLanding = () => {
       {/* CTA Section */}
       <CTASection />
 
+        {/* Testimonials Section */}
+      <Testimonials />
+
       {/* Portfolio Section */}
       <PortfolioSection />
+      <TechStack />
 
       {/* Add-On Services Section */}
       <AddOnServices />
-
-      {/* Testimonials Section */}
-      <Testimonials />
 
       {/* FAQ Section */}
       <FAQSection />
@@ -56,7 +58,7 @@ const GriffinsLanding = () => {
       <Benefits />
 
       {/* Stats Section */}
-      <Stats />
+      {/* <Stats /> */}
 
       {/* Hosting Maintenance Section */}
       <HostingMaintenance />

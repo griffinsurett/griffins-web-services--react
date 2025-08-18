@@ -63,7 +63,7 @@ const AddOnServices = () => {
           icon: "🤖",
           title: "AI Optimization (SEO for ChatGPT, etc.)",
           description:
-            "Optimize your content for AI search engines and chatbot discovery.",
+            "Optimize your website for AI search engines and chatbot discovery.",
           featured: true,
         },
         {
@@ -99,6 +99,20 @@ const AddOnServices = () => {
           title: "Conversion Rate Optimization",
           description:
             "Analyze and improve your website's conversion performance.",
+          featured: false,
+        },
+          {
+          icon: "📱",
+          title: "Social Media Design Templates",
+          description:
+            "Professional templates for all your social media platforms and campaigns.",
+          featured: true,
+        },
+        {
+          icon: "✍️",
+          title: "Content & Copywriting",
+          description:
+            "Engaging content and copy that speaks to your audience and drives conversions.",
           featured: false,
         },
       ],

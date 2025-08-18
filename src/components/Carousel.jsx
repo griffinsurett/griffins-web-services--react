@@ -239,7 +239,7 @@ export default function Carousel({
       )}
 
       {/* Debug */}
-      {debug && (
+      {/* {debug && (
         <div className="mt-4 text-xs opacity-70">
           <div>⏸️ Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
           <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
@@ -247,7 +247,7 @@ export default function Carousel({
           <div>📱 spv: {spv}</div>
           <div>📄 pages: {pageCount}</div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

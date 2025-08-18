@@ -334,7 +334,7 @@
   }
 
   .large-text {
-    @apply text-xl leading-relaxed paragraph-spacing;
+    @apply text-xl lg:text-2xl leading-relaxed paragraph-spacing;
   }
 
   .button-transition {
