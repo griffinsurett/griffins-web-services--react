@@ -1,15 +1,20 @@
 // src/hooks/useAutoScroll.js
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
-import { 
-  useTouchInteraction, 
-  useScrollInteraction, 
-  usePointerInteraction 
+import {
+  useTouchInteraction,
+  useScrollInteraction,
+  usePointerInteraction,
 } from "./useInteractions";
 
 /**
  * Auto-scroll a scrollable element while it is active & visible.
- * 🎯 FULLY CENTRALIZED: Now uses all our interaction hooks instead of manual event handlers.
+ *
+ * Mobile-specific fixes:
+ *  - Do NOT pause on mere touchstart (only on meaningful move/long-press).
+ *  - Use scrollBy/scrollTo on mobile UAs for more reliable programmatic scroll.
+ *  - Watch content size with ResizeObserver; if image height loads late,
+ *    we retry starting the animation automatically.
  *
  * Options:
  *  - ref:              React ref to a scrollable element (required)
@@ -19,7 +24,7 @@ import {
  *  - loop:             when reaching bottom, reset to top and continue (while active)
  *  - startDelay:       ms before FIRST start each time the item becomes active+visible
  *  - resumeDelay:      ms after disengage (wheel/scroll/touch/click) to resume
- *  - resumeOnUserInput:boolean — if false, do NOT resume after user input (default false)
+ *  - resumeOnUserInput:boolean — if false, do NOT resume after user input
  *  - threshold:        threshold to consider "visible"
  *  - visibleRootMargin:number|string|object — IO rootMargin for early/late inView
  *  - resetOnInactive:  when active=false OR inView=false, snap back to top
@@ -27,14 +32,14 @@ import {
 export function useAutoScroll({
   ref,
   active = false,
-  speed = 40,           // px/sec or (host)=>px/sec
-  cycleDuration = 0,    // seconds; overrides speed when > 0
+  speed = 40, // px/sec or (host)=>px/sec
+  cycleDuration = 0, // seconds; overrides speed when > 0
   loop = false,
   startDelay = 1500,
   resumeDelay = 1200,
-  resumeOnUserInput = false,
+  resumeOnUserInput = true, // ✅ allow resume on touch after a short delay
   threshold = 0.3,
-  visibleRootMargin = 0,   // control the visible band using IO rootMargin
+  visibleRootMargin = 0,
   resetOnInactive = true,
 } = {}) {
   const rafRef = useRef(null);
@@ -42,11 +47,17 @@ export function useAutoScroll({
   const startTimerRef = useRef(null);
   const resumeTimerRef = useRef(null);
 
-  const internalScrollRef = useRef(false);   // marks programmatic scrolls
+  const internalScrollRef = useRef(false); // marks programmatic scrolls
   const startedThisCycleRef = useRef(false); // first start per active+visible cycle?
 
   const [paused, setPaused] = useState(false); // pause due to user input
   const [resumeScheduled, setResumeScheduled] = useState(false);
+  const [contentVersion, setContentVersion] = useState(0); // bump when scrollHeight grows
+
+  // ── UA heuristic for mobile
+  const isMobileUA =
+    typeof navigator !== "undefined" &&
+    /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent || "");
 
   // ── normalize IO rootMargin
   const toPx = (v) => (typeof v === "number" ? `${v}px` : `${v}`);
@@ -97,16 +108,15 @@ export function useAutoScroll({
   }, []);
 
   const scheduleResume = useCallback(() => {
-    if (!resumeOnUserInput) return; // respect no-resume mode
+    if (!resumeOnUserInput) return;
     clearResume();
     setResumeScheduled(true);
     resumeTimerRef.current = setTimeout(() => {
       setResumeScheduled(false);
       setPaused(false);
-    }, resumeDelay);
+    }, Math.max(0, resumeDelay));
   }, [resumeDelay, resumeOnUserInput, clearResume]);
 
-  // ── Centralized pause/resume handlers
   const pauseNow = useCallback(() => {
     setPaused(true);
     clearResume();
@@ -128,29 +138,49 @@ export function useAutoScroll({
       lastTsRef.current = ts;
 
       const max = Math.max(0, host.scrollHeight - host.clientHeight);
-      if (max <= 0) return; // nothing to scroll
+      if (max <= 0) {
+        // nothing to scroll — keep checking until content grows
+        rafRef.current = requestAnimationFrame(step);
+        return;
+      }
 
       const pps = resolvePxPerSecond(host); // px/sec
-      const next = host.scrollTop + pps * dt;
+      const delta = pps * dt;
+      const next = host.scrollTop + delta;
 
       internalScrollRef.current = true; // mark as programmatic
-      if (next >= max) {
+
+      // ✅ Mobile-friendly programmatic scroll
+      try {
+        if (isMobileUA && typeof host.scrollBy === "function") {
+          const remaining = max - host.scrollTop;
+          const stepDelta = Math.min(delta, Math.max(0, remaining));
+          host.scrollBy({ top: stepDelta, left: 0, behavior: "auto" });
+        } else if (isMobileUA && typeof host.scrollTo === "function") {
+          host.scrollTo({ top: Math.min(next, max), left: 0, behavior: "auto" });
+        } else {
+          host.scrollTop = Math.min(next, max);
+        }
+      } catch {
+        // Fallback
+        host.scrollTop = Math.min(next, max);
+      }
+
+      // End/loop handling
+      if (host.scrollTop >= max - 0.5) {
         if (loop) {
           host.scrollTop = 0;
         } else {
-          host.scrollTop = max;
           requestAnimationFrame(() => (internalScrollRef.current = false));
           clearRAF();
           return;
         }
-      } else {
-        host.scrollTop = next;
       }
-      requestAnimationFrame(() => (internalScrollRef.current = false));
 
+      requestAnimationFrame(() => (internalScrollRef.current = false));
       rafRef.current = requestAnimationFrame(step);
     },
-    [ref, resolvePxPerSecond, loop, clearRAF]
+    [ref, resolvePxPerSecond, loop, clearRAF, isMobileUA]
   );
 
   const startNow = useCallback(() => {
@@ -180,7 +210,17 @@ export function useAutoScroll({
       clearRAF();
       clearStartTimer();
     };
-  }, [active, inView, paused, startDelay, startNow, clearRAF, clearStartTimer]);
+    // NOTE: include contentVersion so we retry after image/height growth
+  }, [
+    active,
+    inView,
+    paused,
+    startDelay,
+    startNow,
+    clearRAF,
+    clearStartTimer,
+    contentVersion,
+  ]);
 
   // ── Reset to top when item becomes inactive or out of view
   useEffect(() => {
@@ -200,106 +240,112 @@ export function useAutoScroll({
     }
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // ✅ CENTRALIZED TOUCH INTERACTION
+  // ✅ CENTRALIZED TOUCH INTERACTION (mobile-safe)
   useTouchInteraction({
     elementRef: ref,
-    tapThreshold: 8, // smaller threshold for scroll elements
-    longPressDelay: 600, // slightly longer for scroll containers
-    
-    onTouchStart: (e, data) => {
-      pauseNow();
-    },
-    
-    onTouchEnd: (e, data) => {
+    tapThreshold: 8,
+    longPressDelay: 600,
+
+    // IMPORTANT: do NOT pause on mere touchstart (prevents accidental cancel on page scroll)
+    onTouchStart: () => {},
+
+    onTouchEnd: () => {
       maybeScheduleResume();
     },
-    
+
     onTouchMove: (e, data) => {
-      // Only pause if they're actually moving significantly
+      // Only pause if they're actually moving significantly *on the element*
       if (data.moved) {
         pauseNow();
       }
     },
-    
-    onLongPress: (e, data) => {
-      // Long press also pauses (might be selecting text, etc.)
+
+    onLongPress: () => {
       pauseNow();
     },
-    
-    // Don't prevent default - we want native scroll to work
+
     preventDefaultOnTouch: false,
   });
 
   // ✅ CENTRALIZED SCROLL INTERACTION
   useScrollInteraction({
     elementRef: ref,
-    scrollThreshold: 5, // sensitive to small scroll movements
-    debounceDelay: 100, // quick response
+    scrollThreshold: 5,
+    debounceDelay: 100,
     trustedOnly: true,
-    internalFlagRef: internalScrollRef, // ignore our own programmatic scrolls
+    internalFlagRef: internalScrollRef,
     wheelSensitivity: 1,
-    
-    onScrollActivity: (data) => {
-      // Any real user scroll should pause
+
+    onScrollActivity: () => {
+      // Real user scroll on this element should pause, but we can resume shortly.
       pauseNow();
       maybeScheduleResume();
     },
-    
-    onScrollStart: (data) => {
-      // User started scrolling
+
+    onScrollStart: () => {
       pauseNow();
     },
-    
-    onScrollEnd: (data) => {
-      // User finished scrolling - maybe resume
+
+    onScrollEnd: () => {
       maybeScheduleResume();
     },
-    
-    onWheelActivity: (data) => {
-      // Immediate wheel response (more responsive than waiting for scroll)
+
+    onWheelActivity: () => {
       pauseNow();
       maybeScheduleResume();
     },
   });
 
-  // ✅ CENTRALIZED POINTER INTERACTION (replaces manual pointer events)
+  // ✅ CENTRALIZED POINTER INTERACTION
   usePointerInteraction({
     elementRef: ref,
-    pointerTypes: ['mouse', 'pen'], // handle mouse and pen, but not touch (handled above)
+    pointerTypes: ["mouse", "pen"],
     clickThreshold: 10,
     longPressDelay: 500,
-    
-    onPointerDown: (e, data) => {
-      // Mouse/pen down
+
+    onPointerDown: () => {
       pauseNow();
     },
-    
-    onPointerUp: (e, data) => {
-      // Mouse/pen up
+
+    onPointerUp: () => {
       maybeScheduleResume();
     },
-    
+
     onPointerMove: (e, data) => {
-      // Mouse/pen move while pressed
       if (data.moved) {
         pauseNow();
       }
     },
-    
-    onPointerClick: (e, data) => {
-      // Click (short press without much movement)
+
+    onPointerClick: () => {
       pauseNow();
       maybeScheduleResume();
     },
-    
-    onPointerLongPress: (e, data) => {
-      // Long press with mouse/pen
+
+    onPointerLongPress: () => {
       pauseNow();
     },
-    
-    // Don't prevent default for pointer events on scroll containers
+
     preventDefaultOnPointer: false,
   });
+
+  // Watch content height changes (e.g., images finishing load)
+  useEffect(() => {
+    const el = ref?.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    let lastMax = Math.max(0, el.scrollHeight - el.clientHeight);
+
+    const ro = new ResizeObserver(() => {
+      const max = Math.max(0, el.scrollHeight - el.clientHeight);
+      if (max > lastMax + 1) {
+        lastMax = max;
+        setContentVersion((v) => v + 1); // trigger restart attempt
+      }
+    });
+
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
 
   // ── Cleanup
   useEffect(
@@ -311,12 +357,10 @@ export function useAutoScroll({
     [clearRAF, clearStartTimer, clearResume]
   );
 
-  return { 
-    inView, 
-    paused, 
+  return {
+    inView,
+    paused,
     resumeScheduled,
-    
-    // Additional state for debugging/monitoring
     isAnimating: () => !!rafRef.current,
     hasStartedThisCycle: () => startedThisCycleRef.current,
   };
