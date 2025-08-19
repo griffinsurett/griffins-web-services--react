@@ -1,4 +1,4 @@
-// src/hooks/useAutoScroll.js - FIXED FOR MOBILE
+// src/hooks/useAutoScroll.js - FIXED for mobile
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
 import { 
@@ -9,7 +9,7 @@ import {
 
 /**
  * Auto-scroll a scrollable element while it is active & visible.
- * 🎯 MOBILE FIXED: Now properly handles touch without breaking autoplay
+ * 🎯 MOBILE FIXED: Now properly handles touch interactions without breaking autoplay
  */
 export function useAutoScroll({
   ref,
@@ -19,11 +19,11 @@ export function useAutoScroll({
   loop = false,
   startDelay = 1500,
   resumeDelay = 1200,
-  resumeOnUserInput = false,
+  resumeOnUserInput = true, // ✅ CHANGED: default to true for mobile compatibility
   threshold = 0.3,
   visibleRootMargin = 0,   // control the visible band using IO rootMargin
   resetOnInactive = true,
-} = {}) => {
+} = {}) {
   const rafRef = useRef(null);
   const lastTsRef = useRef(0);
   const startTimerRef = useRef(null);
@@ -35,9 +35,8 @@ export function useAutoScroll({
   const [paused, setPaused] = useState(false); // pause due to user input
   const [resumeScheduled, setResumeScheduled] = useState(false);
 
-  // ✅ NEW: Track if user is actively scrolling vs just touching
-  const userScrollingRef = useRef(false);
-  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
+  // ✅ NEW: Track if user is actively interacting with THIS specific element
+  const activelyInteractingRef = useRef(false);
 
   // ── normalize IO rootMargin
   const toPx = (v) => (typeof v === "number" ? `${v}px` : `${v}`);
@@ -188,63 +187,55 @@ export function useAutoScroll({
       host.scrollTop = 0;
       requestAnimationFrame(() => (internalScrollRef.current = false));
       setPaused(false); // clear paused for next cycle
-      userScrollingRef.current = false; // ✅ Reset user scrolling state
     }
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // ✅ FIXED: SMARTER TOUCH INTERACTION
+  // ✅ FIXED: More selective touch interaction handling
   useTouchInteraction({
     elementRef: ref,
-    tapThreshold: 15, // ✅ Increased - only pause if they really moved
-    longPressDelay: 800, // ✅ Longer delay
+    tapThreshold: 8,
+    longPressDelay: 600,
     
     onTouchStart: (e, data) => {
-      // ✅ Record touch start position and time
-      touchStartRef.current = {
-        x: data.x,
-        y: data.y,
-        time: Date.now()
-      };
-      userScrollingRef.current = false; // Reset scroll state
-      // ✅ DON'T pause immediately - wait to see if they actually scroll
-    },
-    
-    onTouchMove: (e, data) => {
-      // ✅ Only pause if they're actually scrolling (moved significantly in Y direction)
-      if (data.moved && Math.abs(data.deltaY) > 10) {
-        if (!userScrollingRef.current) {
-          userScrollingRef.current = true;
-          pauseNow();
-        }
+      // ✅ Only pause if the touch is specifically targeting this scrollable element
+      const target = e.target;
+      const scrollableEl = ref?.current;
+      if (scrollableEl && scrollableEl.contains(target)) {
+        activelyInteractingRef.current = true;
+        pauseNow();
       }
     },
     
     onTouchEnd: (e, data) => {
-      const touchDuration = Date.now() - touchStartRef.current.time;
-      
-      // ✅ Only try to resume if user was actually scrolling
-      if (userScrollingRef.current) {
-        maybeScheduleResume();
+      // ✅ Only schedule resume if we were actually interacting with this element
+      if (activelyInteractingRef.current) {
+        activelyInteractingRef.current = false;
+        // ✅ Shorter delay for mobile to feel more responsive
+        setTimeout(() => {
+          maybeScheduleResume();
+        }, 300);
       }
-      // ✅ For quick taps (under 200ms, no movement), don't pause at all
-      else if (touchDuration < 200 && !data.moved) {
-        // This was just a quick tap, don't interfere with auto-scroll
-        return;
+    },
+    
+    onTouchMove: (e, data) => {
+      // ✅ Only pause if actively interacting AND moving significantly
+      if (activelyInteractingRef.current && data.moved) {
+        pauseNow();
       }
-      
-      userScrollingRef.current = false;
     },
     
     onLongPress: (e, data) => {
-      // ✅ Long press definitely pauses (user is likely selecting text)
-      pauseNow();
+      // ✅ Only pause for long press if targeting this element
+      if (activelyInteractingRef.current) {
+        pauseNow();
+      }
     },
     
     // Don't prevent default - we want native scroll to work
     preventDefaultOnTouch: false,
   });
 
-  // ✅ CENTRALIZED SCROLL INTERACTION (unchanged - this works fine)
+  // ✅ IMPROVED: More selective scroll interaction
   useScrollInteraction({
     elementRef: ref,
     scrollThreshold: 5,
@@ -254,25 +245,27 @@ export function useAutoScroll({
     wheelSensitivity: 1,
     
     onScrollActivity: (data) => {
-      pauseNow();
-      maybeScheduleResume();
-    },
-    
-    onScrollStart: (data) => {
-      pauseNow();
-    },
-    
-    onScrollEnd: (data) => {
-      maybeScheduleResume();
+      // ✅ Only pause if this is a direct scroll on our element, not page scroll
+      if (data.source === 'scroll') {
+        // Check if the scroll target is our element or a child
+        const scrollableEl = ref?.current;
+        if (scrollableEl && document.activeElement && 
+            (scrollableEl.contains(document.activeElement) || 
+             scrollableEl === document.activeElement)) {
+          pauseNow();
+          maybeScheduleResume();
+        }
+      }
     },
     
     onWheelActivity: (data) => {
+      // ✅ Wheel events are more intentional, so handle them normally
       pauseNow();
       maybeScheduleResume();
     },
   });
 
-  // ✅ CENTRALIZED POINTER INTERACTION (unchanged - this works fine)
+  // ✅ IMPROVED: More selective pointer interaction
   usePointerInteraction({
     elementRef: ref,
     pointerTypes: ['mouse', 'pen'], // handle mouse and pen, but not touch (handled above)
@@ -280,7 +273,12 @@ export function useAutoScroll({
     longPressDelay: 500,
     
     onPointerDown: (e, data) => {
-      pauseNow();
+      // ✅ Only pause for mouse/pen if targeting this element
+      const target = e.target;
+      const scrollableEl = ref?.current;
+      if (scrollableEl && scrollableEl.contains(target)) {
+        pauseNow();
+      }
     },
     
     onPointerUp: (e, data) => {
@@ -288,17 +286,20 @@ export function useAutoScroll({
     },
     
     onPointerMove: (e, data) => {
+      // Mouse/pen move while pressed
       if (data.moved) {
         pauseNow();
       }
     },
     
     onPointerClick: (e, data) => {
+      // Click (short press without much movement)
       pauseNow();
       maybeScheduleResume();
     },
     
     onPointerLongPress: (e, data) => {
+      // Long press with mouse/pen
       pauseNow();
     },
     
@@ -311,6 +312,7 @@ export function useAutoScroll({
       clearRAF();
       clearStartTimer();
       clearResume();
+      activelyInteractingRef.current = false;
     },
     [clearRAF, clearStartTimer, clearResume]
   );
