@@ -3,9 +3,13 @@ import React, { useRef } from "react";
 import { useAutoScroll } from "../../hooks/useAutoScroll";
 
 /**
- * Single slide for the 3D carousel, now with a scrollable inner viewport
- * ONLY when the slide is ACTIVE. Inactive side slides do not intercept
- * wheel/touch scroll, allowing the page to scroll normally.
+ * Single slide for the 3D carousel, with a scrollable inner viewport
+ * ONLY when the slide is ACTIVE.
+ *
+ * Tweaks:
+ *  - Use overscroll-auto so normal page scroll isn't trapped too early.
+ *  - Enable iOS momentum (WebkitOverflowScrolling).
+ *  - Allow resume after user input in the hook config.
  */
 export default function PortfolioItemComponent({
   item,
@@ -25,7 +29,6 @@ export default function PortfolioItemComponent({
     "absolute left-1/2 overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] " +
     "transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-transform";
 
-  // Position logic (wrap-around)
   const diff = i - activeIndex;
   let pos = "hidden";
   if (diff === 0) pos = "center";
@@ -40,11 +43,11 @@ export default function PortfolioItemComponent({
   useAutoScroll({
     ref: viewportRef,
     active: isActive,
-    cycleDuration: 30,        // slow scroll (seconds top → bottom)
-    loop: false,              // stop at bottom
+    cycleDuration: 30,
+    loop: false,
     startDelay: 1500,
-    resumeDelay: 0,
-    resumeOnUserInput: false, // never resume during current active cycle
+    resumeDelay: 1000,
+    resumeOnUserInput: true, // important for mobile
     threshold: 0.1,
     resetOnInactive: true,
   });
@@ -87,10 +90,9 @@ export default function PortfolioItemComponent({
     };
   }
 
-  // Only the ACTIVE slide should allow inner scrolling and capture touch/wheel.
   const viewportClassesActive = `
     w-full h-full bg-primary-light
-    overflow-y-auto
+    overflow-y-auto overscroll-auto   /* was overscroll-contain */
     touch-pan-y m-0 p-0
   `;
   const viewportClassesInactive = `
@@ -99,6 +101,10 @@ export default function PortfolioItemComponent({
     m-0 p-0
   `;
 
+  const viewportInlineStyle = isActive
+    ? { WebkitOverflowScrolling: "touch", overscrollBehaviorY: "auto" }
+    : undefined;
+
   return (
     <div
       className={`${slideBase} ${topClass}`}
@@ -106,13 +112,13 @@ export default function PortfolioItemComponent({
       data-carousel-item
       data-index={i}
       data-active={isActive ? "true" : "false"}
-      // Clicking a side slide selects it; pointer events remain enabled on container
       onClick={() => i !== activeIndex && onSelect(i)}
     >
-      {/* Scrollable viewport only when ACTIVE. Inactive viewports do not intercept scroll. */}
+      {/* Scrollable viewport only when ACTIVE */}
       <figure
         ref={viewportRef}
         className={isActive ? viewportClassesActive : viewportClassesInactive}
+        style={viewportInlineStyle}
         aria-hidden={isActive ? "false" : "true"}
         tabIndex={isActive ? 0 : -1}
       >
