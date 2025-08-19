@@ -3,13 +3,8 @@ import React, { useRef } from "react";
 import { useAutoScroll } from "../../hooks/useAutoScroll";
 
 /**
- * Single slide for the 3D carousel, with a scrollable inner viewport
- * ONLY when the slide is ACTIVE.
- *
- * Tweaks:
- *  - Use overscroll-auto so normal page scroll isn't trapped too early.
- *  - Enable iOS momentum (WebkitOverflowScrolling).
- *  - Allow resume after user input in the hook config.
+ * Single slide with a scrollable inner viewport ONLY when ACTIVE.
+ * Keeps page scroll friendly, but pauses autoplay immediately on engagement.
  */
 export default function PortfolioItemComponent({
   item,
@@ -39,15 +34,14 @@ export default function PortfolioItemComponent({
   const topClass = isActive ? "top-0" : "top-1/2";
   const baseTranslate = isActive ? "translate(-50%, 0)" : "translate(-50%, -50%)";
 
-  // Auto-scroll ONLY while active & visible. When inactive, it resets to top.
   useAutoScroll({
     ref: viewportRef,
     active: isActive,
     cycleDuration: 30,
     loop: false,
     startDelay: 1500,
-    resumeDelay: 1000,
-    resumeOnUserInput: true, // important for mobile
+    resumeDelay: 900,
+    resumeOnUserInput: true,
     threshold: 0.1,
     resetOnInactive: true,
   });
@@ -92,7 +86,7 @@ export default function PortfolioItemComponent({
 
   const viewportClassesActive = `
     w-full h-full bg-primary-light
-    overflow-y-auto overscroll-auto   /* was overscroll-contain */
+    overflow-y-auto overscroll-auto
     touch-pan-y m-0 p-0
   `;
   const viewportClassesInactive = `
@@ -114,7 +108,6 @@ export default function PortfolioItemComponent({
       data-active={isActive ? "true" : "false"}
       onClick={() => i !== activeIndex && onSelect(i)}
     >
-      {/* Scrollable viewport only when ACTIVE */}
       <figure
         ref={viewportRef}
         className={isActive ? viewportClassesActive : viewportClassesInactive}

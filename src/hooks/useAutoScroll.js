@@ -10,12 +10,12 @@ import {
 /**
  * Auto-scroll a scrollable element while it is active & visible.
  *
- * Mobile fixes:
- *  - Do NOT pause on mere touchstart (only on real move/long-press).
- *  - Keep a "programmatic" guard TRUE slightly longer so our own scroll
- *    events don't look like user input (prevents the "tiny nudge then stop").
- *  - Use a floating accumulator for sub-pixel deltas (smoother on iOS).
- *  - Retry start when content height grows (image loading).
+ * Key behaviors:
+ *  - Pause immediately on user engagement (touch/pointer/scroll start).
+ *  - Do NOT resume while the user is still interacting.
+ *  - Resume only after interaction ends + resumeDelay.
+ *  - Long “programmatic” guard so our own scrolls don’t look like user input.
+ *  - Sub-pixel accumulator for smoothness (iOS), dt clamp, ResizeObserver retry.
  */
 export function useAutoScroll({
   ref,
@@ -24,8 +24,8 @@ export function useAutoScroll({
   cycleDuration = 0,    // seconds; overrides speed when > 0
   loop = false,
   startDelay = 1500,
-  resumeDelay = 1000,
-  resumeOnUserInput = true,  // allow resume after incidental touches
+  resumeDelay = 900,
+  resumeOnUserInput = true,
   threshold = 0.3,
   visibleRootMargin = 0,
   resetOnInactive = true,
@@ -35,9 +35,12 @@ export function useAutoScroll({
   const startTimerRef = useRef(null);
   const resumeTimerRef = useRef(null);
 
-  // Guard to mark our own programmatic scrolls so interaction hooks ignore them
+  // Marks our own programmatic scrolls
   const internalScrollRef = useRef(false);
   const programmaticUnsetTimerRef = useRef(null);
+
+  // Tracks whether the user is actively interacting now
+  const userInteractingRef = useRef(false);
 
   const startedThisCycleRef = useRef(false);
   const floatTopRef = useRef(0); // sub-pixel accumulator
@@ -98,8 +101,8 @@ export function useAutoScroll({
     setResumeScheduled(false);
   }, []);
 
+  // Keep the “programmatic” guard up long enough for mobile’s deferred scroll events
   const setProgrammaticGuard = useCallback((ms = 220) => {
-    // Keep the guard true long enough to cover async scroll events on mobile
     internalScrollRef.current = true;
     if (programmaticUnsetTimerRef.current) {
       clearTimeout(programmaticUnsetTimerRef.current);
@@ -112,54 +115,52 @@ export function useAutoScroll({
 
   const scheduleResume = useCallback(() => {
     if (!resumeOnUserInput) return;
+    // Never resume while the user is still interacting
+    if (userInteractingRef.current) return;
+
     clearResume();
     setResumeScheduled(true);
     resumeTimerRef.current = setTimeout(() => {
-      setResumeScheduled(false);
-      setPaused(false);
+      // Only resume if the user is STILL not interacting
+      if (!userInteractingRef.current) {
+        setResumeScheduled(false);
+        setPaused(false);
+      }
     }, Math.max(0, resumeDelay));
   }, [resumeDelay, resumeOnUserInput, clearResume]);
 
-  // ── Centralized pause/resume handlers
+  // ── Centralized pause/resume helpers
   const pauseNow = useCallback(() => {
     setPaused(true);
     clearResume();
   }, [clearResume]);
-
-  const maybeScheduleResume = useCallback(() => {
-    if (resumeOnUserInput) {
-      scheduleResume();
-    }
-  }, [resumeOnUserInput, scheduleResume]);
 
   const step = useCallback(
     (ts) => {
       const host = ref?.current;
       if (!host) return;
 
-      // dt with clamp to avoid big jumps after tab-throttle
+      // dt with clamp to avoid big jumps after throttling
       const last = lastTsRef.current || ts;
       const dt = (ts - last) / 1000;
       lastTsRef.current = ts;
-      const dtClamped = Math.min(0.05, Math.max(0, dt)); // up to 50ms/frame
+      const dtClamped = Math.min(0.05, Math.max(0, dt)); // <= 50ms
 
       const max = Math.max(0, host.scrollHeight - host.clientHeight);
       if (max <= 0) {
-        // Nothing to scroll yet; keep checking (image might still load)
         rafRef.current = requestAnimationFrame(step);
         return;
       }
 
-      // Initialize accumulator to current position if first frame
       if (floatTopRef.current === 0 && host.scrollTop > 0) {
         floatTopRef.current = host.scrollTop;
       }
 
-      const pps = resolvePxPerSecond(host); // px/sec
+      const pps = resolvePxPerSecond(host);
       const delta = pps * dtClamped;
       floatTopRef.current = Math.min(max, floatTopRef.current + delta);
 
-      setProgrammaticGuard(); // mark outbound scroll as ours
+      setProgrammaticGuard(); // mark this scroll as ours
 
       try {
         if (isMobileUA && typeof host.scrollTo === "function") {
@@ -194,7 +195,6 @@ export function useAutoScroll({
     clearRAF();
     const host = ref?.current;
     if (host) {
-      // reset accumulator to actual top
       floatTopRef.current = host.scrollTop || 0;
       startedThisCycleRef.current = true;
       rafRef.current = requestAnimationFrame(step);
@@ -220,7 +220,6 @@ export function useAutoScroll({
       clearRAF();
       clearStartTimer();
     };
-    // include contentVersion so we retry after images grow height
   }, [
     active,
     inView,
@@ -232,7 +231,7 @@ export function useAutoScroll({
     contentVersion,
   ]);
 
-  // ── Reset to top when item becomes inactive or out of view
+  // ── Reset when inactive/out-of-view
   useEffect(() => {
     if (!resetOnInactive) return;
     const host = ref?.current;
@@ -244,6 +243,7 @@ export function useAutoScroll({
       clearResume();
       clearStartTimer();
       internalScrollRef.current = true;
+      userInteractingRef.current = false;
       floatTopRef.current = 0;
       try {
         host.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -255,25 +255,40 @@ export function useAutoScroll({
     }
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // ✅ TOUCH: don't pause on *start*, only on real move/long-press
+  // ======= INPUT HANDLERS (pause immediately on engagement) =======
+
+  // TOUCH
   useTouchInteraction({
     elementRef: ref,
     tapThreshold: 8,
     longPressDelay: 600,
-    onTouchStart: () => {}, // IMPORTANT: no pause here
-    onTouchEnd: () => {
-      maybeScheduleResume();
-    },
-    onTouchMove: (e, data) => {
-      if (data.moved) pauseNow();
-    },
-    onLongPress: () => {
+
+    onTouchStart: () => {
+      userInteractingRef.current = true;
       pauseNow();
     },
+
+    onTouchMove: (e, data) => {
+      if (data.moved) {
+        userInteractingRef.current = true;
+        pauseNow();
+      }
+    },
+
+    onTouchEnd: () => {
+      userInteractingRef.current = false;
+      scheduleResume();
+    },
+
+    onLongPress: () => {
+      userInteractingRef.current = true;
+      pauseNow();
+    },
+
     preventDefaultOnTouch: false,
   });
 
-  // ✅ SCROLL: respect internal programmatic guard
+  // SCROLL (including momentum end)
   useScrollInteraction({
     elementRef: ref,
     scrollThreshold: 5,
@@ -281,42 +296,66 @@ export function useAutoScroll({
     trustedOnly: true,
     internalFlagRef: internalScrollRef,
     wheelSensitivity: 1,
-    onScrollActivity: () => {
-      pauseNow();
-      maybeScheduleResume();
-    },
+
     onScrollStart: () => {
+      userInteractingRef.current = true;
       pauseNow();
     },
-    onScrollEnd: () => {
-      maybeScheduleResume();
+
+    onScrollActivity: () => {
+      userInteractingRef.current = true;
+      pauseNow();
     },
+
     onWheelActivity: () => {
+      userInteractingRef.current = true;
       pauseNow();
-      maybeScheduleResume();
+    },
+
+    onScrollEnd: () => {
+      userInteractingRef.current = false;
+      scheduleResume(); // only resumes if still not interacting
     },
   });
 
-  // ✅ POINTER
+  // POINTER (mouse/pen)
   usePointerInteraction({
     elementRef: ref,
     pointerTypes: ["mouse", "pen"],
     clickThreshold: 10,
     longPressDelay: 500,
-    onPointerDown: () => pauseNow(),
-    onPointerUp: () => maybeScheduleResume(),
-    onPointerMove: (e, data) => {
-      if (data.moved) pauseNow();
-    },
-    onPointerClick: () => {
+
+    onPointerDown: () => {
+      userInteractingRef.current = true;
       pauseNow();
-      maybeScheduleResume();
     },
-    onPointerLongPress: () => pauseNow(),
+
+    onPointerMove: (e, data) => {
+      if (data.moved) {
+        userInteractingRef.current = true;
+        pauseNow();
+      }
+    },
+
+    onPointerUp: () => {
+      userInteractingRef.current = false;
+      scheduleResume();
+    },
+
+    onPointerClick: () => {
+      userInteractingRef.current = false;
+      scheduleResume();
+    },
+
+    onPointerLongPress: () => {
+      userInteractingRef.current = true;
+      pauseNow();
+    },
+
     preventDefaultOnPointer: false,
   });
 
-  // Watch content height changes (e.g., images loading in)
+  // Watch content height changes (e.g., images loading)
   useEffect(() => {
     const el = ref?.current;
     if (!el || typeof ResizeObserver === "undefined") return;
@@ -326,7 +365,7 @@ export function useAutoScroll({
       const max = Math.max(0, el.scrollHeight - el.clientHeight);
       if (max > lastMax + 1) {
         lastMax = max;
-        setContentVersion((v) => v + 1); // trigger restart attempt
+        setContentVersion((v) => v + 1);
       }
     });
 
@@ -344,6 +383,7 @@ export function useAutoScroll({
         clearTimeout(programmaticUnsetTimerRef.current);
         programmaticUnsetTimerRef.current = null;
       }
+      userInteractingRef.current = false;
     },
     [clearRAF, clearStartTimer, clearResume]
   );

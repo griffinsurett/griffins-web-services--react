@@ -17,7 +17,7 @@ export default function PortfolioCarousel({
   items = [],
   defaultIndex = 0,
   autoplay = true,
-  autoAdvanceDelay = 4000,
+  autoAdvanceDelay = 5000,
   showArrows = true,
   showDots = true,
   drag = false, // ⬅️ NEW: enable horizontal drag/tap on side zones
