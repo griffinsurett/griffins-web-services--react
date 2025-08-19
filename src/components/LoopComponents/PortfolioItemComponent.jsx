@@ -2,6 +2,11 @@
 import React, { useRef } from "react";
 import { useAutoScroll } from "../../hooks/useAutoScroll";
 
+/**
+ * Single slide for the 3D carousel, now with a scrollable inner viewport
+ * ONLY when the slide is ACTIVE. Inactive side slides do not intercept
+ * wheel/touch scroll, allowing the page to scroll normally.
+ */
 export default function PortfolioItemComponent({
   item,
   i,
@@ -31,9 +36,6 @@ export default function PortfolioItemComponent({
   const topClass = isActive ? "top-0" : "top-1/2";
   const baseTranslate = isActive ? "translate(-50%, 0)" : "translate(-50%, -50%)";
 
-  // ✅ SOLUTION 1: Detect mobile and disable touch interactions
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
   // Auto-scroll ONLY while active & visible. When inactive, it resets to top.
   useAutoScroll({
     ref: viewportRef,
@@ -43,25 +45,9 @@ export default function PortfolioItemComponent({
     startDelay: 1500,
     resumeDelay: 0,
     resumeOnUserInput: false, // never resume during current active cycle
-    threshold: 0.35,
+    threshold: 0.1,
     resetOnInactive: true,
-    // ✅ NEW: Disable touch interactions on mobile for auto-scroll
-    disableTouchInteraction: isMobile,
   });
-
-  // ✅ Add debugging to verify it's working
-  React.useEffect(() => {
-    if (isActive && isMobile) {
-      console.log('📱 Mobile Auto-scroll (Touch Disabled):', {
-        isActive,
-        isMobile,
-        touchDisabled: true,
-        elementExists: !!viewportRef.current,
-        scrollHeight: viewportRef.current?.scrollHeight,
-        clientHeight: viewportRef.current?.clientHeight,
-      });
-    }
-  }, [isActive, isMobile]);
 
   let style;
   if (isActive) {

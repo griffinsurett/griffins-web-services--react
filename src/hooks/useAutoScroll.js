@@ -23,7 +23,6 @@ import {
  *  - threshold:        threshold to consider "visible"
  *  - visibleRootMargin:number|string|object — IO rootMargin for early/late inView
  *  - resetOnInactive:  when active=false OR inView=false, snap back to top
- *  - disableTouchInteraction: boolean — if true, don't listen to touch events (for mobile)
  */
 export function useAutoScroll({
   ref,
@@ -34,10 +33,9 @@ export function useAutoScroll({
   startDelay = 1500,
   resumeDelay = 1200,
   resumeOnUserInput = false,
-  threshold = 0.1,
+  threshold = 0.3,
   visibleRootMargin = 0,   // control the visible band using IO rootMargin
   resetOnInactive = true,
-  disableTouchInteraction = false, // ✅ NEW: Disable touch interactions
 } = {}) {
   const rafRef = useRef(null);
   const lastTsRef = useRef(0);
@@ -49,6 +47,9 @@ export function useAutoScroll({
 
   const [paused, setPaused] = useState(false); // pause due to user input
   const [resumeScheduled, setResumeScheduled] = useState(false);
+
+  // ✅ Mobile detection
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   // ── normalize IO rootMargin
   const toPx = (v) => (typeof v === "number" ? `${v}px` : `${v}`);
@@ -120,6 +121,7 @@ export function useAutoScroll({
     }
   }, [resumeOnUserInput, scheduleResume]);
 
+  // ✅ FIXED: Mobile-compatible step function
   const step = useCallback(
     (ts) => {
       const host = ref?.current;
@@ -133,35 +135,86 @@ export function useAutoScroll({
       if (max <= 0) return; // nothing to scroll
 
       const pps = resolvePxPerSecond(host); // px/sec
-      const next = host.scrollTop + pps * dt;
+      const delta = pps * dt; // pixels to scroll this frame
 
       internalScrollRef.current = true; // mark as programmatic
-      if (next >= max) {
-        if (loop) {
-          host.scrollTop = 0;
-        } else {
-          host.scrollTop = max;
-          requestAnimationFrame(() => (internalScrollRef.current = false));
-          clearRAF();
-          return;
+
+      if (isMobile) {
+        // ✅ MOBILE: Use scrollBy method which works more reliably
+        try {
+          const currentScroll = host.scrollTop;
+          const nextScroll = currentScroll + delta;
+          
+          if (nextScroll >= max) {
+            if (loop) {
+              host.scrollTo({ top: 0, behavior: 'auto' });
+            } else {
+              host.scrollTo({ top: max, behavior: 'auto' });
+              requestAnimationFrame(() => (internalScrollRef.current = false));
+              clearRAF();
+              return;
+            }
+          } else {
+            host.scrollBy({ top: delta, behavior: 'auto' });
+          }
+        } catch (error) {
+          // Fallback to direct manipulation if scrollBy fails
+          console.log('📱 Mobile scrollBy failed, using fallback:', error);
+          const next = host.scrollTop + delta;
+          if (next >= max) {
+            if (loop) {
+              host.scrollTop = 0;
+            } else {
+              host.scrollTop = max;
+              requestAnimationFrame(() => (internalScrollRef.current = false));
+              clearRAF();
+              return;
+            }
+          } else {
+            host.scrollTop = next;
+          }
         }
       } else {
-        host.scrollTop = next;
+        // ✅ DESKTOP: Use direct scrollTop manipulation (existing method)
+        const next = host.scrollTop + delta;
+        if (next >= max) {
+          if (loop) {
+            host.scrollTop = 0;
+          } else {
+            host.scrollTop = max;
+            requestAnimationFrame(() => (internalScrollRef.current = false));
+            clearRAF();
+            return;
+          }
+        } else {
+          host.scrollTop = next;
+        }
       }
-      requestAnimationFrame(() => (internalScrollRef.current = false));
 
+      requestAnimationFrame(() => (internalScrollRef.current = false));
       rafRef.current = requestAnimationFrame(step);
     },
-    [ref, resolvePxPerSecond, loop, clearRAF]
+    [ref, resolvePxPerSecond, loop, clearRAF, isMobile]
   );
 
   const startNow = useCallback(() => {
     clearRAF();
     if (ref?.current) {
       startedThisCycleRef.current = true;
+      
+      // ✅ MOBILE: Force initial scroll unlock
+      if (isMobile && ref.current) {
+        try {
+          // Tiny scroll to "unlock" programmatic scrolling on mobile
+          ref.current.scrollBy({ top: 0.1, behavior: 'auto' });
+        } catch (error) {
+          console.log('📱 Mobile scroll unlock failed:', error);
+        }
+      }
+      
       rafRef.current = requestAnimationFrame(step);
     }
-  }, [step, ref, clearRAF]);
+  }, [step, ref, clearRAF, isMobile]);
 
   // ── Start/stop with a delayed *first* start per active+visible cycle
   useEffect(() => {
@@ -196,43 +249,52 @@ export function useAutoScroll({
       clearResume();
       clearStartTimer();
       internalScrollRef.current = true;
-      host.scrollTop = 0;
+      
+      // ✅ MOBILE: Use scrollTo for reset
+      if (isMobile) {
+        try {
+          host.scrollTo({ top: 0, behavior: 'auto' });
+        } catch (error) {
+          host.scrollTop = 0; // fallback
+        }
+      } else {
+        host.scrollTop = 0;
+      }
+      
       requestAnimationFrame(() => (internalScrollRef.current = false));
       setPaused(false); // clear paused for next cycle
     }
-  }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
+  }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer, isMobile]);
 
-  // ✅ CONDITIONALLY ENABLE TOUCH INTERACTION
-  if (!disableTouchInteraction) {
-    useTouchInteraction({
-      elementRef: ref,
-      tapThreshold: 8, // smaller threshold for scroll elements
-      longPressDelay: 600, // slightly longer for scroll containers
-      
-      onTouchStart: (e, data) => {
+  // ✅ CENTRALIZED TOUCH INTERACTION
+  useTouchInteraction({
+    elementRef: ref,
+    tapThreshold: 8, // smaller threshold for scroll elements
+    longPressDelay: 600, // slightly longer for scroll containers
+    
+    onTouchStart: (e, data) => {
+      pauseNow();
+    },
+    
+    onTouchEnd: (e, data) => {
+      maybeScheduleResume();
+    },
+    
+    onTouchMove: (e, data) => {
+      // Only pause if they're actually moving significantly
+      if (data.moved) {
         pauseNow();
-      },
-      
-      onTouchEnd: (e, data) => {
-        maybeScheduleResume();
-      },
-      
-      onTouchMove: (e, data) => {
-        // Only pause if they're actually moving significantly
-        if (data.moved) {
-          pauseNow();
-        }
-      },
-      
-      onLongPress: (e, data) => {
-        // Long press also pauses (might be selecting text, etc.)
-        pauseNow();
-      },
-      
-      // Don't prevent default - we want native scroll to work
-      preventDefaultOnTouch: false,
-    });
-  }
+      }
+    },
+    
+    onLongPress: (e, data) => {
+      // Long press also pauses (might be selecting text, etc.)
+      pauseNow();
+    },
+    
+    // Don't prevent default - we want native scroll to work
+    preventDefaultOnTouch: false,
+  });
 
   // ✅ CENTRALIZED SCROLL INTERACTION
   useScrollInteraction({
