@@ -1,11 +1,6 @@
-// src/components/LoopComponents/PortfolioItemComponent.jsx
 import React, { useRef } from "react";
 import { useAutoScroll } from "../../hooks/useAutoScroll";
 
-/**
- * Single slide with a scrollable inner viewport ONLY when ACTIVE.
- * Keeps page scroll friendly, but pauses autoplay immediately on engagement.
- */
 export default function PortfolioItemComponent({
   item,
   i,
