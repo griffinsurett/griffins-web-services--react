@@ -33,7 +33,7 @@ export function useAutoScroll({
   startDelay = 1500,
   resumeDelay = 1200,
   resumeOnUserInput = false,
-  threshold = 0.3,
+  threshold = 0.1,
   visibleRootMargin = 0,   // control the visible band using IO rootMargin
   resetOnInactive = true,
 } = {}) {
