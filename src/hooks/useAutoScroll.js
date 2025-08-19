@@ -48,9 +48,6 @@ export function useAutoScroll({
   const [paused, setPaused] = useState(false); // pause due to user input
   const [resumeScheduled, setResumeScheduled] = useState(false);
 
-  // ✅ Mobile detection
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
   // ── normalize IO rootMargin
   const toPx = (v) => (typeof v === "number" ? `${v}px` : `${v}`);
   const rootMargin = useMemo(() => {
@@ -121,7 +118,6 @@ export function useAutoScroll({
     }
   }, [resumeOnUserInput, scheduleResume]);
 
-  // ✅ FIXED: Mobile-compatible step function
   const step = useCallback(
     (ts) => {
       const host = ref?.current;
@@ -135,86 +131,35 @@ export function useAutoScroll({
       if (max <= 0) return; // nothing to scroll
 
       const pps = resolvePxPerSecond(host); // px/sec
-      const delta = pps * dt; // pixels to scroll this frame
+      const next = host.scrollTop + pps * dt;
 
       internalScrollRef.current = true; // mark as programmatic
-
-      if (isMobile) {
-        // ✅ MOBILE: Use scrollBy method which works more reliably
-        try {
-          const currentScroll = host.scrollTop;
-          const nextScroll = currentScroll + delta;
-          
-          if (nextScroll >= max) {
-            if (loop) {
-              host.scrollTo({ top: 0, behavior: 'auto' });
-            } else {
-              host.scrollTo({ top: max, behavior: 'auto' });
-              requestAnimationFrame(() => (internalScrollRef.current = false));
-              clearRAF();
-              return;
-            }
-          } else {
-            host.scrollBy({ top: delta, behavior: 'auto' });
-          }
-        } catch (error) {
-          // Fallback to direct manipulation if scrollBy fails
-          console.log('📱 Mobile scrollBy failed, using fallback:', error);
-          const next = host.scrollTop + delta;
-          if (next >= max) {
-            if (loop) {
-              host.scrollTop = 0;
-            } else {
-              host.scrollTop = max;
-              requestAnimationFrame(() => (internalScrollRef.current = false));
-              clearRAF();
-              return;
-            }
-          } else {
-            host.scrollTop = next;
-          }
+      if (next >= max) {
+        if (loop) {
+          host.scrollTop = 0;
+        } else {
+          host.scrollTop = max;
+          requestAnimationFrame(() => (internalScrollRef.current = false));
+          clearRAF();
+          return;
         }
       } else {
-        // ✅ DESKTOP: Use direct scrollTop manipulation (existing method)
-        const next = host.scrollTop + delta;
-        if (next >= max) {
-          if (loop) {
-            host.scrollTop = 0;
-          } else {
-            host.scrollTop = max;
-            requestAnimationFrame(() => (internalScrollRef.current = false));
-            clearRAF();
-            return;
-          }
-        } else {
-          host.scrollTop = next;
-        }
+        host.scrollTop = next;
       }
-
       requestAnimationFrame(() => (internalScrollRef.current = false));
+
       rafRef.current = requestAnimationFrame(step);
     },
-    [ref, resolvePxPerSecond, loop, clearRAF, isMobile]
+    [ref, resolvePxPerSecond, loop, clearRAF]
   );
 
   const startNow = useCallback(() => {
     clearRAF();
     if (ref?.current) {
       startedThisCycleRef.current = true;
-      
-      // ✅ MOBILE: Force initial scroll unlock
-      if (isMobile && ref.current) {
-        try {
-          // Tiny scroll to "unlock" programmatic scrolling on mobile
-          ref.current.scrollBy({ top: 0.1, behavior: 'auto' });
-        } catch (error) {
-          console.log('📱 Mobile scroll unlock failed:', error);
-        }
-      }
-      
       rafRef.current = requestAnimationFrame(step);
     }
-  }, [step, ref, clearRAF, isMobile]);
+  }, [step, ref, clearRAF]);
 
   // ── Start/stop with a delayed *first* start per active+visible cycle
   useEffect(() => {
@@ -249,22 +194,11 @@ export function useAutoScroll({
       clearResume();
       clearStartTimer();
       internalScrollRef.current = true;
-      
-      // ✅ MOBILE: Use scrollTo for reset
-      if (isMobile) {
-        try {
-          host.scrollTo({ top: 0, behavior: 'auto' });
-        } catch (error) {
-          host.scrollTop = 0; // fallback
-        }
-      } else {
-        host.scrollTop = 0;
-      }
-      
+      host.scrollTop = 0;
       requestAnimationFrame(() => (internalScrollRef.current = false));
       setPaused(false); // clear paused for next cycle
     }
-  }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer, isMobile]);
+  }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
   // ✅ CENTRALIZED TOUCH INTERACTION
   useTouchInteraction({
