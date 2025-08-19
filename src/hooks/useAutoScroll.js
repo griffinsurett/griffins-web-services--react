@@ -1,11 +1,15 @@
 // src/hooks/useAutoScroll.js
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
-import { useTouchInteraction, useScrollInteraction } from "./useInteractions";
+import { 
+  useTouchInteraction, 
+  useScrollInteraction, 
+  usePointerInteraction 
+} from "./useInteractions";
 
 /**
  * Auto-scroll a scrollable element while it is active & visible.
- * Now uses centralized interaction hooks for better maintainability.
+ * 🎯 FULLY CENTRALIZED: Now uses all our interaction hooks instead of manual event handlers.
  *
  * Options:
  *  - ref:              React ref to a scrollable element (required)
@@ -99,7 +103,6 @@ export function useAutoScroll({
     resumeTimerRef.current = setTimeout(() => {
       setResumeScheduled(false);
       setPaused(false);
-      // After resume, start immediately (no extra startDelay).
     }, resumeDelay);
   }, [resumeDelay, resumeOnUserInput, clearResume]);
 
@@ -201,18 +204,28 @@ export function useAutoScroll({
   useTouchInteraction({
     elementRef: ref,
     tapThreshold: 8, // smaller threshold for scroll elements
+    longPressDelay: 600, // slightly longer for scroll containers
+    
     onTouchStart: (e, data) => {
       pauseNow();
     },
+    
     onTouchEnd: (e, data) => {
       maybeScheduleResume();
     },
+    
     onTouchMove: (e, data) => {
       // Only pause if they're actually moving significantly
       if (data.moved) {
         pauseNow();
       }
     },
+    
+    onLongPress: (e, data) => {
+      // Long press also pauses (might be selecting text, etc.)
+      pauseNow();
+    },
+    
     // Don't prevent default - we want native scroll to work
     preventDefaultOnTouch: false,
   });
@@ -224,6 +237,7 @@ export function useAutoScroll({
     debounceDelay: 100, // quick response
     trustedOnly: true,
     internalFlagRef: internalScrollRef, // ignore our own programmatic scrolls
+    wheelSensitivity: 1,
     
     onScrollActivity: (data) => {
       // Any real user scroll should pause
@@ -240,44 +254,52 @@ export function useAutoScroll({
       // User finished scrolling - maybe resume
       maybeScheduleResume();
     },
-  });
-
-  // ── Additional pointer events for mouse interactions
-  useEffect(() => {
-    const host = ref?.current;
-    if (!host) return;
-
-    // These handle mouse-specific interactions that aren't covered by touch/scroll
-    const onPointerDown = (e) => {
-      // Only handle mouse events (not touch, which is handled above)
-      if (e.pointerType === 'mouse') {
-        pauseNow();
-      }
-    };
-
-    const onPointerUp = (e) => {
-      if (e.pointerType === 'mouse') {
-        maybeScheduleResume();
-      }
-    };
-
-    // Handle mouse wheel separately from scroll (for immediate response)
-    const onWheel = (e) => {
-      if (!e.isTrusted) return;
+    
+    onWheelActivity: (data) => {
+      // Immediate wheel response (more responsive than waiting for scroll)
       pauseNow();
       maybeScheduleResume();
-    };
+    },
+  });
 
-    host.addEventListener("pointerdown", onPointerDown, { passive: true });
-    host.addEventListener("pointerup", onPointerUp, { passive: true });
-    host.addEventListener("wheel", onWheel, { passive: true });
-
-    return () => {
-      host.removeEventListener("pointerdown", onPointerDown);
-      host.removeEventListener("pointerup", onPointerUp);
-      host.removeEventListener("wheel", onWheel);
-    };
-  }, [ref, pauseNow, maybeScheduleResume]);
+  // ✅ CENTRALIZED POINTER INTERACTION (replaces manual pointer events)
+  usePointerInteraction({
+    elementRef: ref,
+    pointerTypes: ['mouse', 'pen'], // handle mouse and pen, but not touch (handled above)
+    clickThreshold: 10,
+    longPressDelay: 500,
+    
+    onPointerDown: (e, data) => {
+      // Mouse/pen down
+      pauseNow();
+    },
+    
+    onPointerUp: (e, data) => {
+      // Mouse/pen up
+      maybeScheduleResume();
+    },
+    
+    onPointerMove: (e, data) => {
+      // Mouse/pen move while pressed
+      if (data.moved) {
+        pauseNow();
+      }
+    },
+    
+    onPointerClick: (e, data) => {
+      // Click (short press without much movement)
+      pauseNow();
+      maybeScheduleResume();
+    },
+    
+    onPointerLongPress: (e, data) => {
+      // Long press with mouse/pen
+      pauseNow();
+    },
+    
+    // Don't prevent default for pointer events on scroll containers
+    preventDefaultOnPointer: false,
+  });
 
   // ── Cleanup
   useEffect(
@@ -289,5 +311,13 @@ export function useAutoScroll({
     [clearRAF, clearStartTimer, clearResume]
   );
 
-  return { inView, paused, resumeScheduled };
+  return { 
+    inView, 
+    paused, 
+    resumeScheduled,
+    
+    // Additional state for debugging/monitoring
+    isAnimating: () => !!rafRef.current,
+    hasStartedThisCycle: () => startedThisCycleRef.current,
+  };
 }
