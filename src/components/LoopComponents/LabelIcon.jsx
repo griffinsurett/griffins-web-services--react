@@ -28,7 +28,7 @@ export default function LabelIcon({
         "
         // Mobile touch handlers
         onTouchStart={(e) => {
-          e.preventDefault();
+          // e.preventDefault();
           onTouch?.(tech.name, index);
         }}
         // Desktop mouse handlers

@@ -1,5 +1,6 @@
 // src/hooks/useVisibility.js
 import { useEffect, useRef, useState } from "react";
+import { useScrollInteraction } from "./useInteractions";
 
 /**
  * useVisibility(ref, options)
@@ -59,47 +60,43 @@ export function useVisibility(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, root, rootMargin, threshold, once, onEnter, onExit]);
 
+  // ✅ REFACTORED: Use centralized scroll interaction instead of hardcoded listeners
   // Direction-aware scroll handlers (only if callbacks provided)
-  const pauseTimeout = useRef(null);
-  const lastY = useRef(typeof window !== "undefined" ? window.pageYOffset : 0);
-
-  useEffect(() => {
-    const wantsDirection = typeof onForward === "function" || typeof onBackward === "function";
-    if (!wantsDirection) return;
-
-    function handleMovement(deltaY) {
-      clearTimeout(pauseTimeout.current);
-
+  const wantsDirection = typeof onForward === "function" || typeof onBackward === "function";
+  
+  useScrollInteraction({
+    elementRef: null, // Use window (default)
+    scrollThreshold: 5, // Small threshold for direction detection
+    debounceDelay: pauseDelay,
+    trustedOnly: true,
+    
+    // Only register callbacks if direction tracking is wanted
+    onScrollActivity: wantsDirection ? ({ dir }) => {
+      if (dir === "down") {
+        onForward?.();
+      } else if (dir === "up") {
+        // Only call onBackward when near the top
+        if (window.pageYOffset <= restoreAtTopOffset) {
+          onBackward?.();
+        }
+      }
+    } : undefined,
+    
+    onWheelActivity: wantsDirection ? ({ deltaY }) => {
       if (deltaY > 0) {
         onForward?.();
       } else if (deltaY < 0) {
-        if (window.pageYOffset <= restoreAtTopOffset) onBackward?.();
+        // Only call onBackward when near the top
+        if (window.pageYOffset <= restoreAtTopOffset) {
+          onBackward?.();
+        }
       }
-
-      pauseTimeout.current = setTimeout(() => {}, pauseDelay);
-    }
-
-    function onWheel(e) {
-      handleMovement(e.deltaY || 0);
-    }
-    function onScroll() {
-      const y = window.pageYOffset;
-      handleMovement(y - lastY.current);
-      lastY.current = y;
-    }
-
-    window.addEventListener("wheel", onWheel, { passive: true });
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("scroll", onScroll);
-      clearTimeout(pauseTimeout.current);
-    };
-  }, [onForward, onBackward, pauseDelay, restoreAtTopOffset]);
+    } : undefined,
+  });
 
   // Optional: react to a menu checkbox toggling (force show/hide behavior)
   useEffect(() => {
-    if (!menuCheckboxId) return;
+    if (!menuCheckboxId || !wantsDirection) return;
     const box = document.getElementById(menuCheckboxId);
     if (!box) return;
 
@@ -107,8 +104,11 @@ export function useVisibility(
       if (box.checked) {
         onBackward?.();
       } else {
-        if (window.pageYOffset > restoreAtTopOffset) onForward?.();
-        else onBackward?.();
+        if (window.pageYOffset > restoreAtTopOffset) {
+          onForward?.();
+        } else {
+          onBackward?.();
+        }
       }
     };
 
@@ -117,7 +117,7 @@ export function useVisibility(
     syncMenu();
 
     return () => box.removeEventListener("change", syncMenu);
-  }, [menuCheckboxId, onForward, onBackward, restoreAtTopOffset]);
+  }, [menuCheckboxId, onForward, onBackward, restoreAtTopOffset, wantsDirection]);
 
   // For `once: true`, return "have we ever been visible?"
   return once ? seen : visible;

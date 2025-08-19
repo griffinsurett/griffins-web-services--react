@@ -266,7 +266,8 @@ const WebsiteTypes = () => {
                   </p> */}
 
                   {/* Debug */}
-                  {/* <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
+                  {process.env.NODE_ENV === 'development' && (
+                  <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
                     <div>👁️ In View: {isInView ? "✅" : "❌"}</div>
                     <div>
                       ⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}
@@ -277,8 +278,8 @@ const WebsiteTypes = () => {
                     </div>
                     <div>🎪 Active Index: {activeIndex}</div>
                     <div>📊 Progress: {Math.round(progress)}%</div>
-                  </div> */}
-                {/* </div> */}
+                  </div>
+                )}
               </div>
             </div>
           </div>

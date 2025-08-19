@@ -349,7 +349,7 @@ const AddOnServices = () => {
       <div className="inner-section">
         {/* Section Header */}
         <div className="text-section">
-          <BorderTitle>Premium Add-Ons</BorderTitle>
+          <BorderTitle>Website Enhancements</BorderTitle>
           <Heading
             tagName="h2"
             className="mb-4"

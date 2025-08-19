@@ -1,6 +1,7 @@
 // src/hooks/useScrollTriggeredVideo.js
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
+import { useScrollInteraction } from "./useInteractions";
 
 /**
  * useScrollTriggeredVideo(containerRef, videoRef, menuCheckboxIdOrOptions?, options?)
@@ -46,71 +47,68 @@ export function useScrollTriggeredVideo(
     return visibleRootMargin || "0px";
   }, [visibleRootMargin]);
 
-  // ✅ rely on our hook; “once” mimics the old “disconnect on first view”
+  // ✅ rely on our hook; "once" mimics the old "disconnect on first view"
   const seenOnce = useVisibility(containerRef, { threshold, rootMargin, once: true });
 
   const [activated, setActivated] = useState(false);
   const pauseTimeout = useRef(null);
-  const lastScrollY = useRef(
-    typeof window !== "undefined" ? window.pageYOffset : 0
-  );
 
-  // Scroll & wheel → drive playback (attach once the section has been seen)
-  useEffect(() => {
-    if (!seenOnce) return;
+  // ✅ REFACTORED: Use centralized scroll interaction instead of hardcoded listeners
+  const handleMovement = useMemo(() => (deltaY) => {
+    const vid = videoRef.current;
 
-    function handleMovement(deltaY) {
-      const vid = videoRef.current;
+    // first scroll down ever → activate
+    if (!activated && deltaY > 0) {
+      setActivated(true);
+      return;
+    }
+    if (!vid) return;
 
-      // first scroll down ever → activate
-      if (!activated && deltaY > 0) {
-        setActivated(true);
-        return;
-      }
-      if (!vid) return;
+    clearTimeout(pauseTimeout.current);
 
-      clearTimeout(pauseTimeout.current);
+    if (deltaY > 0) {
+      vid.playbackRate = 0.5;
+      vid.play().catch(() => {});
+    } else if (deltaY < 0) {
+      vid.pause();
+      const reverseStep = 0.02;
+      vid.currentTime =
+        vid.currentTime > reverseStep
+          ? vid.currentTime - reverseStep
+          : vid.duration;
 
-      if (deltaY > 0) {
-        vid.playbackRate = 0.5;
+      if (window.pageYOffset <= 0) {
+        vid.currentTime = 0;
         vid.play().catch(() => {});
-      } else if (deltaY < 0) {
-        vid.pause();
-        const reverseStep = 0.02;
-        vid.currentTime =
-          vid.currentTime > reverseStep
-            ? vid.currentTime - reverseStep
-            : vid.duration;
-
-        if (window.pageYOffset <= 0) {
-          vid.currentTime = 0;
-          vid.play().catch(() => {});
-        }
       }
-
-      pauseTimeout.current = setTimeout(() => {
-        vid.pause();
-      }, 100);
     }
 
-    const onWheel = (e) => handleMovement(e.deltaY || 0);
-    const onScroll = () => {
-      const y = window.pageYOffset;
-      const deltaY = y - lastScrollY.current;
-      lastScrollY.current = y;
+    pauseTimeout.current = setTimeout(() => {
+      vid.pause();
+    }, 100);
+  }, [activated, videoRef]);
+
+  // ✅ REFACTORED: Use useScrollInteraction instead of manual event listeners
+  useScrollInteraction({
+    elementRef: null, // Use window (default)
+    scrollThreshold: 1, // Very sensitive to any scroll
+    debounceDelay: 16, // ~60fps for smooth video control
+    trustedOnly: true,
+    wheelSensitivity: 1,
+    
+    // Only attach when the section has been seen once
+    onScrollActivity: seenOnce ? ({ dir, delta }) => {
+      // Convert direction to deltaY for compatibility
+      const deltaY = dir === "down" ? delta : -delta;
       handleMovement(deltaY);
-    };
+    } : undefined,
+    
+    onWheelActivity: seenOnce ? ({ deltaY }) => {
+      handleMovement(deltaY);
+    } : undefined,
+  });
 
-    window.addEventListener("wheel", onWheel, { passive: true });
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("scroll", onScroll);
-      clearTimeout(pauseTimeout.current);
-    };
-  }, [seenOnce, activated, videoRef]);
-
-  // Autoplay as soon as “activated”
+  // Autoplay as soon as "activated"
   useEffect(() => {
     if (!activated || !videoRef.current) return;
     videoRef.current.playbackRate = 0.5;
@@ -130,13 +128,18 @@ export function useScrollTriggeredVideo(
     };
 
     box.addEventListener("change", resetOnOpen);
-    // in case it’s already open on mount
+    // in case it's already open on mount
     resetOnOpen();
 
     return () => {
       box.removeEventListener("change", resetOnOpen);
     };
   }, [menuCheckboxId, videoRef]);
+
+  // Cleanup pause timeout on unmount
+  useEffect(() => () => {
+    clearTimeout(pauseTimeout.current);
+  }, []);
 
   return { activated };
 }

@@ -1,7 +1,7 @@
 // src/components/Carousel.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import useCarouselAutoplay from "../hooks/useCarouselAutoplay";
+import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
 import { useVisibility } from "../hooks/useVisibility";
 import { useSideDragNavigation } from "../hooks/useInteractions";
 
@@ -78,16 +78,21 @@ export default function Carousel({
 
   const inView = useVisibility(containerRef, { threshold: 0.3 });
 
-  const { isAutoplayPaused, isResumeScheduled, userEngaged } =
-    useCarouselAutoplay({
-      totalItems: pageCount,
-      currentIndex: pageIndex,
-      setIndex: setPageIndex,
-      autoAdvanceDelay,
-      inView: autoplay && inView,
-      containerSelector: `[data-autoplay-scope="${scopeId}"]`,
-      itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
-    });
+  // ✅ REFACTORED: Direct useEngagementAutoplay call with carousel-specific config
+  const { isAutoplayPaused, isResumeScheduled, userEngaged } = useEngagementAutoplay({
+    totalItems: pageCount,
+    currentIndex: pageIndex,
+    setIndex: setPageIndex,
+    autoplayTime: autoAdvanceDelay,
+    resumeDelay: 5000,
+    resumeTriggers: ["scroll", "click-outside", "hover-away"],
+    containerSelector: `[data-autoplay-scope="${scopeId}"]`,
+    itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
+    inView: autoplay && inView,
+    pauseOnEngage: true,
+    engageOnlyOnActiveItem: true,
+    activeItemAttr: "data-active",
+  });
 
   const goPrev = () => setPageIndex((p) => (p === 0 ? pageCount - 1 : p - 1));
   const goNext = () => setPageIndex((p) => (p === pageCount - 1 ? 0 : p + 1));
@@ -239,7 +244,7 @@ export default function Carousel({
       )}
 
       {/* Debug */}
-      {/* {debug && (
+      {debug && (
         <div className="mt-4 text-xs opacity-70">
           <div>⏸️ Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
           <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
@@ -247,7 +252,7 @@ export default function Carousel({
           <div>📱 spv: {spv}</div>
           <div>📄 pages: {pageCount}</div>
         </div>
-      )} */}
+      )}
     </div>
   );
 }
