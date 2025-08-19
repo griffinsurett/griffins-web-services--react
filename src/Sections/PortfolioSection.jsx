@@ -7,6 +7,7 @@ import Heading from "../components/Heading";
 import ProntoDesktop from "../assets/ProntoJunkRemoval/pronto-desktop.jpg";
 import FariasDesktop from "../assets/FariasDemolition/Farias-Desktop.jpg";
 import JSVDesktop from "../assets/JSV-Quick-Solar/JSV-Desktop.jpg";
+import PablosDesktop from "../assets/PablosPeakRoofing/Pablos-Desktop.jpg"
 
 export default function PortfolioSection() {
   const sectionRef = useRef(null);
@@ -14,7 +15,8 @@ export default function PortfolioSection() {
   const items = [
     { id: 1, title: "Pronto Junk Removal", image: ProntoDesktop },
     { id: 2, title: "Faria's Demolition", image: FariasDesktop },
-    { id: 3, title: "JSV Quick Solar", image: JSVDesktop },
+    { id: 3, title: "Pablo's Peak Roofing", image: PablosDesktop },
+    { id: 4, title: "JSV Quick Solar", image: JSVDesktop },
   ];
 
   useVisibility(sectionRef, {
