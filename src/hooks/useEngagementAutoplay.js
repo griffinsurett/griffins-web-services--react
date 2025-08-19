@@ -8,9 +8,9 @@ import { useScrollInteraction, useClickInteraction } from "./useInteractions";
  * Engagement-aware autoplay controller.
  *
  * - `autoplayTime`: number | () => number (ms). If a function, it’s called each (re)schedule.
- *   Great for “video remaining + delay” logic.
  * - Engagement marks user as “engaged”; you decide whether to pause immediately via `pauseOnEngage`.
  * - Resume after inactivity is handled by `usePauseableState` with `resumeDelay` and triggers.
+ * - Listens to "autoscroll-user" events from inner viewports (useAutoScroll) to pause/resume.
  */
 export default function useEngagementAutoplay({
   totalItems,
@@ -22,11 +22,12 @@ export default function useEngagementAutoplay({
   containerSelector = "[data-autoplay-container]",
   itemSelector = "[data-autoplay-item]",
   inView = true,
-  pauseOnEngage = false,       // do not pause immediately by default
+  pauseOnEngage = false,
   engageOnlyOnActiveItem = false,
   activeItemAttr = "data-active",
 }) {
-    const graceRef = useRef(false);
+  const graceRef = useRef(false);
+
   const {
     isPaused,
     userEngaged,
@@ -50,10 +51,9 @@ export default function useEngagementAutoplay({
     enabled: !isPaused && inView,
   });
 
-    // ✅ Public hook method: enter “grace window” (e.g., right at video `ended`)
+  // ✅ Public hook method: enter “grace window” (e.g., right at video `ended`)
   const beginGraceWindow = useCallback(() => {
     graceRef.current = true;
-    // If the user is already engaged, pause now (cancels the scheduled advance).
     if (userEngaged && !isPaused) pause();
   }, [userEngaged, isPaused, pause]);
 
@@ -67,14 +67,14 @@ export default function useEngagementAutoplay({
     if (graceRef.current && userEngaged && !isPaused) pause();
   }, [userEngaged, isPaused, pause]);
 
-  // Scroll → schedule resume
+  // Global scroll → schedule resume (more sensitive for trackpads)
   useScrollInteraction({
-    scrollThreshold: 150,
-    debounceDelay: 150,
+    scrollThreshold: 10,
+    debounceDelay: 120,
     onScrollActivity: () => handleResumeActivity("scroll"),
   });
 
-  // Click interactions
+  // Click interactions (inside/outside)
   useClickInteraction({
     containerSelector,
     itemSelector,
@@ -90,7 +90,7 @@ export default function useEngagementAutoplay({
     },
   });
 
-  // Hover: engage on eligible enter; treat leaving all eligible hosts as hover-away
+  // Hover: engage on eligible enter; schedule resume when leaving all eligible
   useEffect(() => {
     const items = Array.from(document.querySelectorAll(itemSelector));
     if (!items.length) return;
@@ -140,8 +140,46 @@ export default function useEngagementAutoplay({
     engageUser,
     handleResumeActivity,
     pause,
-    currentIndex,   // rebind when active item changes
-    userEngaged,    // keep fallback accurate
+    currentIndex,
+    userEngaged,
+  ]);
+
+  // 🔗 Listen for inner-viewport user activity from useAutoScroll
+  useEffect(() => {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    const onAutoScrollUser = (e) => {
+      const { phase } = e.detail || {};
+      const item = e.target?.closest?.(itemSelector);
+
+      if (engageOnlyOnActiveItem) {
+        const isActive = item?.getAttribute?.(activeItemAttr) === "true";
+        if (!isActive) return;
+      }
+
+      if (phase === "start") {
+        // user started interacting with inner scrollable viewport
+        engageUser();
+        if (pauseOnEngage && !isPaused) pause();
+      } else if (phase === "end") {
+        // user became idle inside the active viewport → schedule resume
+        handleResumeActivity("scroll");
+      }
+    };
+
+    container.addEventListener("autoscroll-user", onAutoScrollUser);
+    return () => container.removeEventListener("autoscroll-user", onAutoScrollUser);
+  }, [
+    containerSelector,
+    itemSelector,
+    activeItemAttr,
+    engageOnlyOnActiveItem,
+    pauseOnEngage,
+    engageUser,
+    pause,
+    isPaused,
+    handleResumeActivity,
   ]);
 
   return {
