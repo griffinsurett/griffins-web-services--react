@@ -1,4 +1,4 @@
-// src/hooks/useAutoScroll.js - MOBILE DEBUG & FIX
+// src/hooks/useAutoScroll.js
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
 import { 
@@ -7,17 +7,34 @@ import {
   usePointerInteraction 
 } from "./useInteractions";
 
+/**
+ * Auto-scroll a scrollable element while it is active & visible.
+ * 🎯 FULLY CENTRALIZED: Now uses all our interaction hooks instead of manual event handlers.
+ *
+ * Options:
+ *  - ref:              React ref to a scrollable element (required)
+ *  - active:           boolean — only run when true
+ *  - speed:            px per second OR (host) => px/sec
+ *  - cycleDuration:    seconds to go from top → bottom (overrides `speed` when > 0)
+ *  - loop:             when reaching bottom, reset to top and continue (while active)
+ *  - startDelay:       ms before FIRST start each time the item becomes active+visible
+ *  - resumeDelay:      ms after disengage (wheel/scroll/touch/click) to resume
+ *  - resumeOnUserInput:boolean — if false, do NOT resume after user input (default false)
+ *  - threshold:        threshold to consider "visible"
+ *  - visibleRootMargin:number|string|object — IO rootMargin for early/late inView
+ *  - resetOnInactive:  when active=false OR inView=false, snap back to top
+ */
 export function useAutoScroll({
   ref,
   active = false,
-  speed = 40,
-  cycleDuration = 0,
+  speed = 40,           // px/sec or (host)=>px/sec
+  cycleDuration = 0,    // seconds; overrides speed when > 0
   loop = false,
   startDelay = 1500,
   resumeDelay = 1200,
-  resumeOnUserInput = false, // ✅ Keep as false for portfolio
+  resumeOnUserInput = false,
   threshold = 0.3,
-  visibleRootMargin = 0,
+  visibleRootMargin = 0,   // control the visible band using IO rootMargin
   resetOnInactive = true,
 } = {}) {
   const rafRef = useRef(null);
@@ -25,42 +42,18 @@ export function useAutoScroll({
   const startTimerRef = useRef(null);
   const resumeTimerRef = useRef(null);
 
-  const internalScrollRef = useRef(false);
-  const startedThisCycleRef = useRef(false);
+  const internalScrollRef = useRef(false);   // marks programmatic scrolls
+  const startedThisCycleRef = useRef(false); // first start per active+visible cycle?
 
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused] = useState(false); // pause due to user input
   const [resumeScheduled, setResumeScheduled] = useState(false);
-
-  // ✅ DEBUG: Add mobile detection
-  const isMobile = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
-  }, []);
-
-  // ✅ DEBUG: Add state logging for mobile
-  const [debugInfo, setDebugInfo] = useState({});
-  
-  useEffect(() => {
-    if (isMobile) {
-      setDebugInfo({
-        active,
-        paused,
-        hasRAF: !!rafRef.current,
-        hasStartTimer: !!startTimerRef.current,
-        startedThisCycle: startedThisCycleRef.current,
-        elementExists: !!ref?.current,
-        scrollable: ref?.current ? ref.current.scrollHeight > ref.current.clientHeight : false,
-      });
-    }
-  }, [active, paused, isMobile, ref]);
 
   // ── normalize IO rootMargin
   const toPx = (v) => (typeof v === "number" ? `${v}px` : `${v}`);
   const rootMargin = useMemo(() => {
     if (typeof visibleRootMargin === "number") {
       const n = Math.max(0, visibleRootMargin | 0);
-      return `-${n}px 0px -${n}px 0px`;
+      return `-${n}px 0px -${n}px 0px`; // shrink top & bottom by N
     }
     if (visibleRootMargin && typeof visibleRootMargin === "object") {
       const { top = 0, right = 0, bottom = 0, left = 0 } = visibleRootMargin;
@@ -69,15 +62,8 @@ export function useAutoScroll({
     return visibleRootMargin || "0px";
   }, [visibleRootMargin]);
 
-  // ✅ FIXED: Force visibility to true if element exists and active (bypass IO issues on mobile)
-  const rawInView = useVisibility(ref, { threshold, rootMargin });
-  const inView = useMemo(() => {
-    // On mobile, if we have an element and it's active, assume it's visible
-    if (isMobile && ref?.current && active) {
-      return true;
-    }
-    return rawInView;
-  }, [isMobile, ref, active, rawInView]);
+  // ── visibility via our hook
+  const inView = useVisibility(ref, { threshold, rootMargin });
 
   const resolvePxPerSecond = useCallback(
     (host) => {
@@ -94,30 +80,24 @@ export function useAutoScroll({
   );
 
   const clearRAF = useCallback(() => {
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
     lastTsRef.current = 0;
   }, []);
 
   const clearStartTimer = useCallback(() => {
-    if (startTimerRef.current) {
-      clearTimeout(startTimerRef.current);
-      startTimerRef.current = null;
-    }
+    if (startTimerRef.current) clearTimeout(startTimerRef.current);
+    startTimerRef.current = null;
   }, []);
 
   const clearResume = useCallback(() => {
-    if (resumeTimerRef.current) {
-      clearTimeout(resumeTimerRef.current);
-      resumeTimerRef.current = null;
-    }
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = null;
     setResumeScheduled(false);
   }, []);
 
   const scheduleResume = useCallback(() => {
-    if (!resumeOnUserInput) return;
+    if (!resumeOnUserInput) return; // respect no-resume mode
     clearResume();
     setResumeScheduled(true);
     resumeTimerRef.current = setTimeout(() => {
@@ -126,6 +106,7 @@ export function useAutoScroll({
     }, resumeDelay);
   }, [resumeDelay, resumeOnUserInput, clearResume]);
 
+  // ── Centralized pause/resume handlers
   const pauseNow = useCallback(() => {
     setPaused(true);
     clearResume();
@@ -137,58 +118,36 @@ export function useAutoScroll({
     }
   }, [resumeOnUserInput, scheduleResume]);
 
-  // ✅ FIXED: More robust animation step for mobile
   const step = useCallback(
     (ts) => {
       const host = ref?.current;
-      if (!host) {
-        clearRAF();
-        return;
-      }
+      if (!host) return;
 
       const last = lastTsRef.current || ts;
-      const dt = (ts - last) / 1000;
+      const dt = (ts - last) / 1000; // seconds
       lastTsRef.current = ts;
 
       const max = Math.max(0, host.scrollHeight - host.clientHeight);
-      if (max <= 0) {
-        clearRAF();
-        return;
-      }
+      if (max <= 0) return; // nothing to scroll
 
-      const pps = resolvePxPerSecond(host);
-      if (pps <= 0) {
-        clearRAF();
-        return;
-      }
-
+      const pps = resolvePxPerSecond(host); // px/sec
       const next = host.scrollTop + pps * dt;
 
-      // ✅ MOBILE FIX: More robust programmatic scroll detection
-      internalScrollRef.current = true;
-      
+      internalScrollRef.current = true; // mark as programmatic
       if (next >= max) {
         if (loop) {
           host.scrollTop = 0;
         } else {
           host.scrollTop = max;
-          // ✅ Use setTimeout instead of rAF for cleanup on mobile
-          setTimeout(() => {
-            internalScrollRef.current = false;
-          }, 16);
+          requestAnimationFrame(() => (internalScrollRef.current = false));
           clearRAF();
           return;
         }
       } else {
         host.scrollTop = next;
       }
-      
-      // ✅ Clean up internal flag
-      setTimeout(() => {
-        internalScrollRef.current = false;
-      }, 16);
+      requestAnimationFrame(() => (internalScrollRef.current = false));
 
-      // ✅ Continue animation
       rafRef.current = requestAnimationFrame(step);
     },
     [ref, resolvePxPerSecond, loop, clearRAF]
@@ -196,71 +155,24 @@ export function useAutoScroll({
 
   const startNow = useCallback(() => {
     clearRAF();
-    const host = ref?.current;
-    
-    if (!host) {
-      console.warn('[useAutoScroll] No element to scroll');
-      return;
+    if (ref?.current) {
+      startedThisCycleRef.current = true;
+      rafRef.current = requestAnimationFrame(step);
     }
+  }, [step, ref, clearRAF]);
 
-    const max = host.scrollHeight - host.clientHeight;
-    if (max <= 0) {
-      console.warn('[useAutoScroll] Element not scrollable', { 
-        scrollHeight: host.scrollHeight, 
-        clientHeight: host.clientHeight 
-      });
-      return;
-    }
-
-    // ✅ DEBUG logging for mobile
-    if (isMobile) {
-      console.log('[useAutoScroll] Starting on mobile', {
-        scrollHeight: host.scrollHeight,
-        clientHeight: host.clientHeight,
-        maxScroll: max,
-        cycleDuration,
-        speed: resolvePxPerSecond(host)
-      });
-    }
-
-    startedThisCycleRef.current = true;
-    
-    // ✅ MOBILE FIX: Force first frame immediately
-    lastTsRef.current = performance.now();
-    rafRef.current = requestAnimationFrame(step);
-  }, [step, ref, clearRAF, cycleDuration, resolvePxPerSecond, isMobile]);
-
-  // ✅ FIXED: More aggressive start logic for mobile
+  // ── Start/stop with a delayed *first* start per active+visible cycle
   useEffect(() => {
     clearRAF();
     clearStartTimer();
 
-    const shouldStart = active && inView && !paused;
-    
-    // ✅ DEBUG: Log conditions on mobile
-    if (isMobile) {
-      console.log('[useAutoScroll] Effect conditions:', {
-        active,
-        inView,
-        paused,
-        shouldStart,
-        startedThisCycle: startedThisCycleRef.current
-      });
-    }
-
-    if (shouldStart) {
+    if (active && inView && !paused) {
       if (!startedThisCycleRef.current) {
-        // ✅ MOBILE FIX: Shorter delay on mobile for better responsiveness
-        const delay = isMobile ? Math.max(500, startDelay) : startDelay;
-        
         startTimerRef.current = setTimeout(() => {
-          if (active && inView && !paused) {
-            startNow();
-          }
-        }, delay);
+          if (active && inView && !paused) startNow();
+        }, Math.max(0, startDelay));
       } else {
-        // ✅ MOBILE FIX: Immediate restart if already started this cycle
-        startNow();
+        startNow(); // already started once this cycle — no extra delay
       }
     }
 
@@ -268,88 +180,128 @@ export function useAutoScroll({
       clearRAF();
       clearStartTimer();
     };
-  }, [active, inView, paused, startDelay, startNow, clearRAF, clearStartTimer, isMobile]);
+  }, [active, inView, paused, startDelay, startNow, clearRAF, clearStartTimer]);
 
-  // ✅ Reset logic (unchanged but with mobile logging)
+  // ── Reset to top when item becomes inactive or out of view
   useEffect(() => {
     if (!resetOnInactive) return;
     const host = ref?.current;
     if (!host) return;
 
     if (!active || !inView) {
-      if (isMobile) {
-        console.log('[useAutoScroll] Resetting on mobile:', { active, inView });
-      }
-      
       startedThisCycleRef.current = false;
       clearRAF();
       clearResume();
       clearStartTimer();
       internalScrollRef.current = true;
       host.scrollTop = 0;
-      setTimeout(() => {
-        internalScrollRef.current = false;
-      }, 16);
-      setPaused(false);
+      requestAnimationFrame(() => (internalScrollRef.current = false));
+      setPaused(false); // clear paused for next cycle
     }
-  }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer, isMobile]);
+  }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // ✅ MOBILE FIX: Only register interaction handlers if resumeOnUserInput is true
-  const shouldRegisterInteractions = resumeOnUserInput;
-
-  // Touch interaction (only if needed)
+  // ✅ CENTRALIZED TOUCH INTERACTION
   useTouchInteraction({
-    elementRef: shouldRegisterInteractions ? ref : { current: null },
-    tapThreshold: 8,
-    longPressDelay: 600,
-    onTouchStart: shouldRegisterInteractions ? pauseNow : () => {},
-    onTouchEnd: shouldRegisterInteractions ? maybeScheduleResume : () => {},
-    onTouchMove: shouldRegisterInteractions ? (e, data) => {
-      if (data.moved) pauseNow();
-    } : () => {},
-    onLongPress: shouldRegisterInteractions ? pauseNow : () => {},
+    elementRef: ref,
+    tapThreshold: 8, // smaller threshold for scroll elements
+    longPressDelay: 600, // slightly longer for scroll containers
+    
+    onTouchStart: (e, data) => {
+      pauseNow();
+    },
+    
+    onTouchEnd: (e, data) => {
+      maybeScheduleResume();
+    },
+    
+    onTouchMove: (e, data) => {
+      // Only pause if they're actually moving significantly
+      if (data.moved) {
+        pauseNow();
+      }
+    },
+    
+    onLongPress: (e, data) => {
+      // Long press also pauses (might be selecting text, etc.)
+      pauseNow();
+    },
+    
+    // Don't prevent default - we want native scroll to work
     preventDefaultOnTouch: false,
   });
 
-  // Scroll interaction (only if needed)
+  // ✅ CENTRALIZED SCROLL INTERACTION
   useScrollInteraction({
-    elementRef: shouldRegisterInteractions ? ref : { current: null },
-    scrollThreshold: 5,
-    debounceDelay: 100,
+    elementRef: ref,
+    scrollThreshold: 5, // sensitive to small scroll movements
+    debounceDelay: 100, // quick response
     trustedOnly: true,
-    internalFlagRef: internalScrollRef,
+    internalFlagRef: internalScrollRef, // ignore our own programmatic scrolls
     wheelSensitivity: 1,
-    onScrollActivity: shouldRegisterInteractions ? (data) => {
+    
+    onScrollActivity: (data) => {
+      // Any real user scroll should pause
       pauseNow();
       maybeScheduleResume();
-    } : () => {},
-    onScrollStart: shouldRegisterInteractions ? pauseNow : () => {},
-    onScrollEnd: shouldRegisterInteractions ? maybeScheduleResume : () => {},
-    onWheelActivity: shouldRegisterInteractions ? (data) => {
+    },
+    
+    onScrollStart: (data) => {
+      // User started scrolling
+      pauseNow();
+    },
+    
+    onScrollEnd: (data) => {
+      // User finished scrolling - maybe resume
+      maybeScheduleResume();
+    },
+    
+    onWheelActivity: (data) => {
+      // Immediate wheel response (more responsive than waiting for scroll)
       pauseNow();
       maybeScheduleResume();
-    } : () => {},
+    },
   });
 
-  // Pointer interaction (only if needed)
+  // ✅ CENTRALIZED POINTER INTERACTION (replaces manual pointer events)
   usePointerInteraction({
-    elementRef: shouldRegisterInteractions ? ref : { current: null },
-    pointerTypes: ['mouse', 'pen'],
+    elementRef: ref,
+    pointerTypes: ['mouse', 'pen'], // handle mouse and pen, but not touch (handled above)
     clickThreshold: 10,
     longPressDelay: 500,
-    onPointerDown: shouldRegisterInteractions ? pauseNow : () => {},
-    onPointerUp: shouldRegisterInteractions ? maybeScheduleResume : () => {},
-    onPointerMove: shouldRegisterInteractions ? (e, data) => {
-      if (data.moved) pauseNow();
-    } : () => {},
-    onPointerClick: shouldRegisterInteractions ? (e, data) => {
+    
+    onPointerDown: (e, data) => {
+      // Mouse/pen down
+      pauseNow();
+    },
+    
+    onPointerUp: (e, data) => {
+      // Mouse/pen up
+      maybeScheduleResume();
+    },
+    
+    onPointerMove: (e, data) => {
+      // Mouse/pen move while pressed
+      if (data.moved) {
+        pauseNow();
+      }
+    },
+    
+    onPointerClick: (e, data) => {
+      // Click (short press without much movement)
       pauseNow();
       maybeScheduleResume();
-    } : () => {},
-    onPointerLongPress: shouldRegisterInteractions ? pauseNow : () => {},
+    },
+    
+    onPointerLongPress: (e, data) => {
+      // Long press with mouse/pen
+      pauseNow();
+    },
+    
+    // Don't prevent default for pointer events on scroll containers
     preventDefaultOnPointer: false,
   });
 
+  // ── Cleanup
   useEffect(
     () => () => {
       clearRAF();
@@ -359,24 +311,13 @@ export function useAutoScroll({
     [clearRAF, clearStartTimer, clearResume]
   );
 
-  // ✅ DEBUG: Console log for mobile debugging
-  useEffect(() => {
-    if (isMobile && process.env.NODE_ENV === 'development') {
-      const interval = setInterval(() => {
-        console.log('[useAutoScroll] Mobile Debug:', debugInfo);
-      }, 2000);
-      
-      return () => clearInterval(interval);
-    }
-  }, [isMobile, debugInfo]);
-
   return { 
     inView, 
     paused, 
     resumeScheduled,
+    
+    // Additional state for debugging/monitoring
     isAnimating: () => !!rafRef.current,
     hasStartedThisCycle: () => startedThisCycleRef.current,
-    // ✅ DEBUG: Expose debug info
-    debugInfo: isMobile ? debugInfo : null,
   };
 }
