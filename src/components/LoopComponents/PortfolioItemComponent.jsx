@@ -90,7 +90,7 @@ export default function PortfolioItemComponent({
   // Only the ACTIVE slide should allow inner scrolling and capture touch/wheel.
   const viewportClassesActive = `
     w-full h-full bg-primary-light
-    overflow-y-auto overscroll-contain
+    overflow-y-auto
     touch-pan-y m-0 p-0
   `;
   const viewportClassesInactive = `
