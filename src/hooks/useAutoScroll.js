@@ -1,3 +1,4 @@
+// src/hooks/useAutoScroll.js
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
 import {
@@ -6,19 +7,11 @@ import {
   usePointerInteraction,
 } from "./useInteractions";
 
-/**
- * Auto-scroll a scrollable element while it is active & visible.
- * Fixes:
- *  - Mobile: pause immediately on finger move (raw touch listeners).
- *  - Desktop: pause on wheel, trackpad, and scrollbar drag.
- *  - Resume: after resumeDelay AND a quiet period (idleQuietMs) after momentum.
- *  - Single-frame guard so user scrolls aren't masked by our own scrollTo().
- */
 export function useAutoScroll({
   ref,
   active = false,
-  speed = 40,           // px/sec or (host)=>px/sec
-  cycleDuration = 0,    // seconds; overrides speed when > 0
+  speed = 40,
+  cycleDuration = 0,
   loop = false,
   startDelay = 1500,
   resumeDelay = 900,
@@ -26,21 +19,18 @@ export function useAutoScroll({
   threshold = 0.3,
   visibleRootMargin = 0,
   resetOnInactive = true,
-  idleQuietMs = 160,    // extra quiet time after last user input before resume
 } = {}) {
-  // ---- internals
+  // Internals
   const rafRef = useRef(null);
   const lastTsRef = useRef(0);
   const startTimerRef = useRef(null);
   const resumeTimerRef = useRef(null);
 
-  // programmatic scroll guard (single frame)
+  // 🔐 Programmatic guard (ONE FRAME ONLY)
   const internalScrollRef = useRef(false);
   const internalUnsetRafRef = useRef(null);
 
-  // interaction & state
   const userInteractingRef = useRef(false);
-  const lastUserInputAtRef = useRef(0);
   const startedThisCycleRef = useRef(false);
   const floatTopRef = useRef(0);
 
@@ -52,7 +42,7 @@ export function useAutoScroll({
   const [userEngaged, setUserEngaged] = useState(false);
   const [contentVersion, setContentVersion] = useState(0);
 
-  // ---- IO rootMargin
+  // IO rootMargin
   const toPx = (v) => (typeof v === "number" ? `${v}px` : `${v}`);
   const rootMargin = useMemo(() => {
     if (typeof visibleRootMargin === "number") {
@@ -68,7 +58,7 @@ export function useAutoScroll({
 
   const inView = useVisibility(ref, { threshold, rootMargin });
 
-  // ---- speed
+  // Speed resolver
   const resolvePxPerSecond = useCallback(
     (host) => {
       if (!host) return 0;
@@ -83,7 +73,7 @@ export function useAutoScroll({
     [speed, cycleDuration]
   );
 
-  // ---- helpers
+  // Helpers
   const clearRAF = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = null;
@@ -101,7 +91,7 @@ export function useAutoScroll({
     setResumeScheduled(false);
   }, []);
 
-  // single-frame programmatic guard
+  // 🏷️ mark exactly ONE frame as programmatic
   const markProgrammaticScroll = useCallback(() => {
     internalScrollRef.current = true;
     if (internalUnsetRafRef.current) {
@@ -114,14 +104,11 @@ export function useAutoScroll({
     });
   }, []);
 
-  const now = () => (typeof performance !== "undefined" ? performance.now() : Date.now());
-
-  // hard pause: flip state + cancel RAF
   const pauseNow = useCallback(() => {
     setPaused(true);
     pausedRef.current = true;
     clearResume();
-    clearRAF();
+    clearRAF(); // stop immediately
   }, [clearRAF, clearResume]);
 
   const step = useCallback(
@@ -133,7 +120,7 @@ export function useAutoScroll({
       const last = lastTsRef.current || ts;
       const dt = (ts - last) / 1000;
       lastTsRef.current = ts;
-      const dtClamped = Math.min(0.05, Math.max(0, dt)); // <= 50ms
+      const dtClamped = Math.min(0.05, Math.max(0, dt));
 
       const max = Math.max(0, host.scrollHeight - host.clientHeight);
       if (max <= 0) {
@@ -183,24 +170,18 @@ export function useAutoScroll({
 
   const scheduleResume = useCallback(() => {
     if (!resumeOnUserInput) return;
-    // ensure both resumeDelay AND idleQuietMs after last user input
+    if (userInteractingRef.current) return; // still moving (drag or momentum)
     clearResume();
     setResumeScheduled(true);
-    const scheduledAt = now();
-
     resumeTimerRef.current = setTimeout(() => {
-      const sinceInput = now() - lastUserInputAtRef.current;
-      if (!userInteractingRef.current && sinceInput >= idleQuietMs) {
+      if (!userInteractingRef.current) {
         setResumeScheduled(false);
-        startNow(); // restart inner autoscroll (carousel autoplay logic stays separate)
-      } else {
-        // not quiet yet; retry until quiet
-        scheduleResume();
+        startNow(); // restart auto-scroll
       }
     }, Math.max(0, resumeDelay));
-  }, [resumeOnUserInput, resumeDelay, idleQuietMs, startNow, clearResume]);
+  }, [resumeOnUserInput, resumeDelay, startNow, clearResume]);
 
-  // ---- lifecycle
+  // Start/stop lifecycle
   useEffect(() => {
     clearRAF();
     clearStartTimer();
@@ -220,6 +201,7 @@ export function useAutoScroll({
     };
   }, [active, inView, paused, startDelay, startNow, clearRAF, clearStartTimer, contentVersion]);
 
+  // Reset when inactive/out-of-view
   useEffect(() => {
     if (!resetOnInactive) return;
     const host = ref?.current;
@@ -241,49 +223,21 @@ export function useAutoScroll({
     }
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // ======= INPUT HANDLERS =======
+  // ====== INPUT HANDLERS (hook-owned) ======
 
-  // 1) Raw touch listeners (mobile belt & suspenders)
-  useEffect(() => {
-    const el = ref?.current;
-    if (!el) return;
+  // Touch: pause on start/move; resume after idle
+  useTouchInteraction({
+    elementRef: ref,
+    tapThreshold: 8,
+    longPressDelay: 600,
+    onTouchStart: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
+    onTouchMove: (_, data) => { if (data.moved) { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); } },
+    onTouchEnd: () => { userInteractingRef.current = false; setUserEngaged(false); scheduleResume(); },
+    onLongPress: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
+    preventDefaultOnTouch: false,
+  });
 
-    const markInput = () => { lastUserInputAtRef.current = now(); };
-
-    const onTouchStart = () => {
-      markInput();
-      userInteractingRef.current = true;
-      setUserEngaged(true);
-      pauseNow();
-    };
-    const onTouchMove = () => {
-      markInput();
-      userInteractingRef.current = true;
-      setUserEngaged(true);
-      if (!pausedRef.current) pauseNow();
-    };
-    const onTouchEnd = () => {
-      markInput();
-      userInteractingRef.current = false;
-      setUserEngaged(false);
-      scheduleResume();
-    };
-    const onTouchCancel = onTouchEnd;
-
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: true });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-    el.addEventListener("touchcancel", onTouchCancel, { passive: true });
-
-    return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchCancel);
-    };
-  }, [ref, pauseNow, scheduleResume]);
-
-  // 2) Your abstraction (kept) – lower thresholds for trackpads
+  // Scroll abstraction (kept, but made more sensitive)
   useScrollInteraction({
     elementRef: ref,
     scrollThreshold: 1,
@@ -291,61 +245,57 @@ export function useAutoScroll({
     trustedOnly: true,
     internalFlagRef: internalScrollRef,
     wheelSensitivity: 1,
-    onScrollStart: () => {
-      lastUserInputAtRef.current = now();
-      userInteractingRef.current = true; setUserEngaged(true); pauseNow();
-    },
-    onScrollActivity: () => {
-      lastUserInputAtRef.current = now();
-      userInteractingRef.current = true; setUserEngaged(true);
-    },
-    onWheelActivity: () => {
-      lastUserInputAtRef.current = now();
-      userInteractingRef.current = true; setUserEngaged(true); pauseNow();
-    },
-    onScrollEnd: () => {
-      lastUserInputAtRef.current = now();
-      userInteractingRef.current = false; setUserEngaged(false); scheduleResume();
-    },
+    onScrollStart: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
+    onScrollActivity: () => { userInteractingRef.current = true; setUserEngaged(true); },
+    onWheelActivity: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
+    onScrollEnd: () => { userInteractingRef.current = false; setUserEngaged(false); scheduleResume(); },
   });
 
-  // 3) Raw wheel/scroll listeners (covers scrollbar + any missed paths)
+  // 🔒 Raw listeners so mobile momentum / trackpad / scrollbar are always caught
   useEffect(() => {
     const el = ref?.current;
     if (!el) return;
 
-    let scrollEndT = null;
+    const SCROLL_IDLE = 160;  // ms without events = idle (handles iOS momentum)
+    const WHEEL_IDLE  = 160;
 
-    const markInput = () => { lastUserInputAtRef.current = now(); };
-
-    const onWheel = () => {
-      markInput();
-      userInteractingRef.current = true; setUserEngaged(true); pauseNow();
-      // wheel end -> handled by scrollEnd too
-    };
+    let scrollIdleT = null;
+    let wheelIdleT = null;
 
     const onScroll = () => {
-      if (internalScrollRef.current) return; // ignore our own scroll this frame
-      markInput();
-      userInteractingRef.current = true; setUserEngaged(true); if (!pausedRef.current) pauseNow();
-      if (scrollEndT) clearTimeout(scrollEndT);
-      scrollEndT = setTimeout(() => {
-        markInput();
-        userInteractingRef.current = false; setUserEngaged(false); scheduleResume();
-      }, idleQuietMs);
+      // ignore if it's OUR programmatic scroll from this frame
+      if (internalScrollRef.current) return;
+      userInteractingRef.current = true; setUserEngaged(true);
+      pauseNow();
+      if (scrollIdleT) clearTimeout(scrollIdleT);
+      scrollIdleT = setTimeout(() => {
+        userInteractingRef.current = false; setUserEngaged(false);
+        scheduleResume();
+      }, SCROLL_IDLE);
     };
 
-    el.addEventListener("wheel", onWheel, { passive: true });
+    const onWheel = () => {
+      userInteractingRef.current = true; setUserEngaged(true);
+      pauseNow();
+      if (wheelIdleT) clearTimeout(wheelIdleT);
+      wheelIdleT = setTimeout(() => {
+        userInteractingRef.current = false; setUserEngaged(false);
+        scheduleResume();
+      }, WHEEL_IDLE);
+    };
+
     el.addEventListener("scroll", onScroll, { passive: true });
+    el.addEventListener("wheel", onWheel, { passive: true });
 
     return () => {
-      el.removeEventListener("wheel", onWheel);
       el.removeEventListener("scroll", onScroll);
-      if (scrollEndT) clearTimeout(scrollEndT);
+      el.removeEventListener("wheel", onWheel);
+      if (scrollIdleT) clearTimeout(scrollIdleT);
+      if (wheelIdleT) clearTimeout(wheelIdleT);
     };
-  }, [ref, pauseNow, scheduleResume, idleQuietMs]);
+  }, [ref, pauseNow, scheduleResume]);
 
-  // height growth (images)
+  // Height growth (late images)
   useEffect(() => {
     const el = ref?.current;
     if (!el || typeof ResizeObserver === "undefined") return;
@@ -361,7 +311,7 @@ export function useAutoScroll({
     return () => ro.disconnect();
   }, [ref]);
 
-  // cleanup
+  // Cleanup
   useEffect(
     () => () => {
       clearRAF();
@@ -378,21 +328,18 @@ export function useAutoScroll({
     [clearRAF, clearStartTimer, clearResume]
   );
 
-  // debug metrics
+  // Debug metrics
   const metrics = useCallback(() => {
     const host = ref?.current;
     const max = host ? Math.max(0, host.scrollHeight - host.clientHeight) : 0;
     const top = host ? host.scrollTop : 0;
     const progress = max > 0 ? top / max : 0;
     return {
-      top,
-      max,
-      progress,
+      top, max, progress,
       animating: !!rafRef.current,
       engaged: userInteractingRef.current,
       started: startedThisCycleRef.current,
       internalGuard: internalScrollRef.current,
-      lastUserInputAt: lastUserInputAtRef.current,
     };
   }, [ref]);
 
