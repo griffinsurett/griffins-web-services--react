@@ -1,3 +1,4 @@
+// src/hooks/useAutoScroll.js
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
 import {
@@ -8,10 +9,10 @@ import {
 
 /**
  * Auto-scroll a scrollable element while it is active & visible.
- * Fixes:
- *  - Pause immediately on ANY user-driven scroll (mobile drag, trackpad, scrollbar).
- *  - Single-frame programmatic guard so real scrolls are never masked.
- *  - Resume only after interaction ends + resumeDelay.
+ * Mobile/desktop fixes:
+ *  - Pause immediately on ANY user scroll (touch drag, trackpad, scrollbar).
+ *  - Single-frame programmatic guard (never masks real user scrolls).
+ *  - Resume only after interaction ends + resumeDelay (debounced).
  *  - Sub-pixel accumulator, dt clamp, ResizeObserver retry.
  */
 export function useAutoScroll({
@@ -33,14 +34,13 @@ export function useAutoScroll({
   const startTimerRef = useRef(null);
   const resumeTimerRef = useRef(null);
 
-  // guard to ignore our own scroll events (cleared next frame)
+  // guard to ignore OUR programmatic scrolls (cleared next frame)
   const internalScrollRef = useRef(false);
   const internalUnsetRafRef = useRef(null);
 
-  // user interaction & state
   const userInteractingRef = useRef(false);
   const startedThisCycleRef = useRef(false);
-  const floatTopRef = useRef(0);
+  const floatTopRef = useRef(0); // sub-pixel accumulator
 
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(paused);
@@ -50,7 +50,7 @@ export function useAutoScroll({
   const [userEngaged, setUserEngaged] = useState(false);
   const [contentVersion, setContentVersion] = useState(0);
 
-  // ---- Intersection visibility
+  // ---- IO visibility
   const toPx = (v) => (typeof v === "number" ? `${v}px` : `${v}`);
   const rootMargin = useMemo(() => {
     if (typeof visibleRootMargin === "number") {
@@ -66,7 +66,7 @@ export function useAutoScroll({
 
   const inView = useVisibility(ref, { threshold, rootMargin });
 
-  // ---- speed resolver
+  // ---- px/sec resolver
   const resolvePxPerSecond = useCallback(
     (host) => {
       if (!host) return 0;
@@ -99,7 +99,7 @@ export function useAutoScroll({
     setResumeScheduled(false);
   }, []);
 
-  // Mark next scroll as programmatic for only one animation frame.
+  // Mark next scroll as programmatic for ONE rAF only
   const markProgrammaticScroll = useCallback(() => {
     internalScrollRef.current = true;
     if (internalUnsetRafRef.current) {
@@ -107,7 +107,7 @@ export function useAutoScroll({
       internalUnsetRafRef.current = null;
     }
     internalUnsetRafRef.current = requestAnimationFrame(() => {
-      internalScrollRef.current = false; // clear guard next frame
+      internalScrollRef.current = false;
       internalUnsetRafRef.current = null;
     });
   }, []);
@@ -116,12 +116,39 @@ export function useAutoScroll({
     setPaused(true);
     pausedRef.current = true;
     clearResume();
-    clearRAF(); // stop immediately
+    clearRAF(); // hard stop
   }, [clearRAF, clearResume]);
+
+  const startNow = useCallback(() => {
+    clearRAF();
+    const host = ref?.current;
+    if (host) {
+      floatTopRef.current = host.scrollTop || 0;
+      startedThisCycleRef.current = true;
+      pausedRef.current = false;
+      setPaused(false);
+      rafRef.current = requestAnimationFrame(step);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const scheduleResume = useCallback(() => {
+    if (!resumeOnUserInput) return;
+    if (userInteractingRef.current) return;
+    clearResume();
+    setResumeScheduled(true);
+    resumeTimerRef.current = setTimeout(() => {
+      if (!userInteractingRef.current) {
+        setResumeScheduled(false);
+        startNow();
+      }
+    }, Math.max(0, resumeDelay));
+  }, [resumeOnUserInput, resumeDelay, startNow, clearResume]);
 
   const step = useCallback(
     (ts) => {
       if (pausedRef.current || !active || !inView) return;
+
       const host = ref?.current;
       if (!host) return;
 
@@ -144,6 +171,7 @@ export function useAutoScroll({
       const delta = pps * dtClamped;
       floatTopRef.current = Math.min(max, floatTopRef.current + delta);
 
+      // our own scroll (ignore in onScroll)
       markProgrammaticScroll();
       try { host.scrollTo({ top: floatTopRef.current, left: 0, behavior: "auto" }); }
       catch { host.scrollTop = Math.floor(floatTopRef.current); }
@@ -164,30 +192,10 @@ export function useAutoScroll({
     [ref, active, inView, resolvePxPerSecond, loop, clearRAF, markProgrammaticScroll]
   );
 
-  const startNow = useCallback(() => {
-    clearRAF();
-    const host = ref?.current;
-    if (host) {
-      floatTopRef.current = host.scrollTop || 0;
-      startedThisCycleRef.current = true;
-      pausedRef.current = false;
-      setPaused(false);
-      rafRef.current = requestAnimationFrame(step);
-    }
-  }, [step, ref, clearRAF]);
-
-  const scheduleResume = useCallback(() => {
-    if (!resumeOnUserInput) return;
-    if (userInteractingRef.current) return;
-    clearResume();
-    setResumeScheduled(true);
-    resumeTimerRef.current = setTimeout(() => {
-      if (!userInteractingRef.current) {
-        setResumeScheduled(false);
-        startNow(); // only if still active/inView (checked in step)
-      }
-    }, Math.max(0, resumeDelay));
-  }, [resumeOnUserInput, resumeDelay, startNow, clearResume]);
+  // rebind startNow with current step
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   // ---- start/stop lifecycle
   useEffect(() => {
@@ -231,25 +239,22 @@ export function useAutoScroll({
     }
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // ======= INPUT HANDLERS (hook-owned) =======
-
-  // Touch
+  // ======= INPUT HANDLERS (abstractions) =======
   useTouchInteraction({
     elementRef: ref,
     tapThreshold: 8,
     longPressDelay: 600,
     onTouchStart: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
-    onTouchMove: (e, data) => { if (data.moved) { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); } },
+    onTouchMove: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
     onTouchEnd: () => { userInteractingRef.current = false; setUserEngaged(false); scheduleResume(); },
     onLongPress: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
     preventDefaultOnTouch: false,
   });
 
-  // Scroll/wheel via your abstraction (still helpful)
   useScrollInteraction({
     elementRef: ref,
-    scrollThreshold: 1,            // catch tiny trackpad deltas
-    debounceDelay: 80,             // faster ‘scroll end’
+    scrollThreshold: 1,
+    debounceDelay: 80,
     trustedOnly: true,
     internalFlagRef: internalScrollRef,
     wheelSensitivity: 1,
@@ -259,40 +264,93 @@ export function useAutoScroll({
     onScrollEnd: () => { userInteractingRef.current = false; setUserEngaged(false); scheduleResume(); },
   });
 
-  // 🔒 Belt & suspenders: add raw listeners so scrollbar drags & smooth trackpads always pause
+  usePointerInteraction({
+    elementRef: ref,
+    pointerTypes: ["mouse", "pen"],
+    clickThreshold: 10,
+    longPressDelay: 500,
+    onPointerDown: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
+    onPointerMove: (e, data) => { if (data.moved) { userInteractingRef.current = true; setUserEngaged(true); } },
+    onPointerUp: () => { userInteractingRef.current = false; setUserEngaged(false); scheduleResume(); },
+    onPointerClick: () => { userInteractingRef.current = false; setUserEngaged(false); scheduleResume(); },
+    onPointerLongPress: () => { userInteractingRef.current = true; setUserEngaged(true); pauseNow(); },
+    preventDefaultOnPointer: false,
+  });
+
+  // ======= RAW LISTENERS: guarantee mobile & scrollbar behavior =======
   useEffect(() => {
     const el = ref?.current;
     if (!el) return;
 
-    let wheelEndT = null;
     let scrollEndT = null;
+    let wheelEndT = null;
+    let touchEndT = null;
 
-    const onWheel = (/*e*/) => {
+    // Always pause on any wheel (trackpad)
+    const onWheel = () => {
       userInteractingRef.current = true; setUserEngaged(true); pauseNow();
       if (wheelEndT) clearTimeout(wheelEndT);
       wheelEndT = setTimeout(() => {
         userInteractingRef.current = false; setUserEngaged(false); scheduleResume();
-      }, 120);
+      }, 140);
     };
 
+    // Pause on any scroll that is not ours (covers scrollbar drag + mobile scrolling)
     const onScroll = () => {
-      // ignore only if it's OUR programmatic scroll from this very frame
-      if (internalScrollRef.current) return;
+      if (internalScrollRef.current) return; // ignore our own rAF scroll this frame
       userInteractingRef.current = true; setUserEngaged(true); pauseNow();
       if (scrollEndT) clearTimeout(scrollEndT);
       scrollEndT = setTimeout(() => {
         userInteractingRef.current = false; setUserEngaged(false); scheduleResume();
-      }, 100);
+      }, 120);
     };
 
-    el.addEventListener("wheel", onWheel, { passive: true });
-    el.addEventListener("scroll", onScroll, { passive: true });
+    // Mobile: explicit touch listeners (capture so we see them first)
+    let lastTouchY = null;
+    const onTouchStart = (e) => {
+      lastTouchY = e.touches?.[0]?.clientY ?? null;
+      userInteractingRef.current = true; setUserEngaged(true); pauseNow();
+      if (touchEndT) { clearTimeout(touchEndT); touchEndT = null; }
+    };
+    const onTouchMove = (e) => {
+      const y = e.touches?.[0]?.clientY ?? null;
+      if (y !== null && lastTouchY !== null && Math.abs(y - lastTouchY) > 2) {
+        userInteractingRef.current = true; setUserEngaged(true); pauseNow();
+      }
+      lastTouchY = y;
+    };
+    const onTouchEnd = () => {
+      // wait a tick for momentum to finish; scroll handler will also debounce
+      if (touchEndT) clearTimeout(touchEndT);
+      touchEndT = setTimeout(() => {
+        userInteractingRef.current = false; setUserEngaged(false); scheduleResume();
+      }, 160);
+    };
+
+    const supportsScrollEnd = "onscrollend" in el;
+    const onScrollEnd = () => {
+      userInteractingRef.current = false; setUserEngaged(false); scheduleResume();
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: true, capture: true });
+    el.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    el.addEventListener("touchstart", onTouchStart, { passive: true, capture: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: true, capture: true });
+    el.addEventListener("touchend", onTouchEnd, { passive: true, capture: true });
+    if (supportsScrollEnd) {
+      el.addEventListener("scrollend", onScrollEnd, { passive: true, capture: true });
+    }
 
     return () => {
-      el.removeEventListener("wheel", onWheel);
-      el.removeEventListener("scroll", onScroll);
-      if (wheelEndT) clearTimeout(wheelEndT);
+      el.removeEventListener("wheel", onWheel, { capture: true });
+      el.removeEventListener("scroll", onScroll, { capture: true });
+      el.removeEventListener("touchstart", onTouchStart, { capture: true });
+      el.removeEventListener("touchmove", onTouchMove, { capture: true });
+      el.removeEventListener("touchend", onTouchEnd, { capture: true });
+      if (supportsScrollEnd) el.removeEventListener("scrollend", onScrollEnd, { capture: true });
       if (scrollEndT) clearTimeout(scrollEndT);
+      if (wheelEndT) clearTimeout(wheelEndT);
+      if (touchEndT) clearTimeout(touchEndT);
     };
   }, [ref, pauseNow, scheduleResume]);
 
