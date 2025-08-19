@@ -31,7 +31,7 @@ export default function PortfolioItemComponent({
   const topClass = isActive ? "top-0" : "top-1/2";
   const baseTranslate = isActive ? "translate(-50%, 0)" : "translate(-50%, -50%)";
 
-  // ✅ SOLUTION 2: Detect mobile and bypass IntersectionObserver
+  // ✅ SOLUTION 1: Detect mobile and disable touch interactions
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   // Auto-scroll ONLY while active & visible. When inactive, it resets to top.
@@ -43,23 +43,22 @@ export default function PortfolioItemComponent({
     startDelay: 1500,
     resumeDelay: 0,
     resumeOnUserInput: false, // never resume during current active cycle
-    // ✅ For mobile, assume active items are always visible
-    threshold: isMobile ? 0.001 : 0.35, // Nearly 0% for mobile vs 35% for desktop
-    visibleRootMargin: 0,
+    threshold: 0.35,
     resetOnInactive: true,
+    // ✅ NEW: Disable touch interactions on mobile for auto-scroll
+    disableTouchInteraction: isMobile,
   });
 
-  // ✅ Optional: Add debugging to verify it's working
+  // ✅ Add debugging to verify it's working
   React.useEffect(() => {
     if (isActive && isMobile) {
-      console.log('📱 Mobile Auto-scroll Active:', {
+      console.log('📱 Mobile Auto-scroll (Touch Disabled):', {
         isActive,
         isMobile,
-        threshold: 0.001,
+        touchDisabled: true,
         elementExists: !!viewportRef.current,
         scrollHeight: viewportRef.current?.scrollHeight,
         clientHeight: viewportRef.current?.clientHeight,
-        canScroll: (viewportRef.current?.scrollHeight || 0) > (viewportRef.current?.clientHeight || 0)
       });
     }
   }, [isActive, isMobile]);

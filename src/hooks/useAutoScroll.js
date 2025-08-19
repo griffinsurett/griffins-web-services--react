@@ -23,6 +23,7 @@ import {
  *  - threshold:        threshold to consider "visible"
  *  - visibleRootMargin:number|string|object — IO rootMargin for early/late inView
  *  - resetOnInactive:  when active=false OR inView=false, snap back to top
+ *  - disableTouchInteraction: boolean — if true, don't listen to touch events (for mobile)
  */
 export function useAutoScroll({
   ref,
@@ -36,6 +37,7 @@ export function useAutoScroll({
   threshold = 0.1,
   visibleRootMargin = 0,   // control the visible band using IO rootMargin
   resetOnInactive = true,
+  disableTouchInteraction = false, // ✅ NEW: Disable touch interactions
 } = {}) {
   const rafRef = useRef(null);
   const lastTsRef = useRef(0);
@@ -200,35 +202,37 @@ export function useAutoScroll({
     }
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
-  // ✅ CENTRALIZED TOUCH INTERACTION
-  useTouchInteraction({
-    elementRef: ref,
-    tapThreshold: 8, // smaller threshold for scroll elements
-    longPressDelay: 600, // slightly longer for scroll containers
-    
-    onTouchStart: (e, data) => {
-      pauseNow();
-    },
-    
-    onTouchEnd: (e, data) => {
-      maybeScheduleResume();
-    },
-    
-    onTouchMove: (e, data) => {
-      // Only pause if they're actually moving significantly
-      if (data.moved) {
+  // ✅ CONDITIONALLY ENABLE TOUCH INTERACTION
+  if (!disableTouchInteraction) {
+    useTouchInteraction({
+      elementRef: ref,
+      tapThreshold: 8, // smaller threshold for scroll elements
+      longPressDelay: 600, // slightly longer for scroll containers
+      
+      onTouchStart: (e, data) => {
         pauseNow();
-      }
-    },
-    
-    onLongPress: (e, data) => {
-      // Long press also pauses (might be selecting text, etc.)
-      pauseNow();
-    },
-    
-    // Don't prevent default - we want native scroll to work
-    preventDefaultOnTouch: false,
-  });
+      },
+      
+      onTouchEnd: (e, data) => {
+        maybeScheduleResume();
+      },
+      
+      onTouchMove: (e, data) => {
+        // Only pause if they're actually moving significantly
+        if (data.moved) {
+          pauseNow();
+        }
+      },
+      
+      onLongPress: (e, data) => {
+        // Long press also pauses (might be selecting text, etc.)
+        pauseNow();
+      },
+      
+      // Don't prevent default - we want native scroll to work
+      preventDefaultOnTouch: false,
+    });
+  }
 
   // ✅ CENTRALIZED SCROLL INTERACTION
   useScrollInteraction({
