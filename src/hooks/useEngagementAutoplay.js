@@ -1,28 +1,32 @@
-// src/hooks/useEngagementAutoplay.js - FIXED VERSION
+// src/hooks/useEngagementAutoplay.js
 import { useEffect, useRef, useCallback } from "react";
 import useAutoplay from "./useAutoplay";
 import { usePauseableState } from "./usePauseableState";
 import { useScrollInteraction, useClickInteraction } from "./useInteractions";
 
 /**
- * Engagement-aware autoplay controller with MOBILE TOUCH SUPPORT.
+ * Engagement-aware autoplay controller.
+ *
+ * - `autoplayTime`: number | () => number (ms). If a function, it’s called each (re)schedule.
+ *   Great for “video remaining + delay” logic.
+ * - Engagement marks user as “engaged”; you decide whether to pause immediately via `pauseOnEngage`.
+ * - Resume after inactivity is handled by `usePauseableState` with `resumeDelay` and triggers.
  */
 export default function useEngagementAutoplay({
   totalItems,
   currentIndex,
   setIndex,
-  autoplayTime = 3000,
+  autoplayTime = 3000,        // number | () => number
   resumeDelay = 5000,
-  resumeTriggers = ["scroll", "click-outside", "hover-away", "touch-away"], // ✅ ADD touch-away
+  resumeTriggers = ["scroll", "click-outside", "hover-away"],
   containerSelector = "[data-autoplay-container]",
   itemSelector = "[data-autoplay-item]",
   inView = true,
-  pauseOnEngage = false,
+  pauseOnEngage = false,       // do not pause immediately by default
   engageOnlyOnActiveItem = false,
   activeItemAttr = "data-active",
 }) {
-  const graceRef = useRef(false);
-  
+    const graceRef = useRef(false);
   const {
     isPaused,
     userEngaged,
@@ -46,21 +50,24 @@ export default function useEngagementAutoplay({
     enabled: !isPaused && inView,
   });
 
-  // Grace window functionality
+    // ✅ Public hook method: enter “grace window” (e.g., right at video `ended`)
   const beginGraceWindow = useCallback(() => {
     graceRef.current = true;
+    // If the user is already engaged, pause now (cancels the scheduled advance).
     if (userEngaged && !isPaused) pause();
   }, [userEngaged, isPaused, pause]);
 
+  // Leave grace on index change (advance or manual selection)
   useEffect(() => {
     graceRef.current = false;
   }, [currentIndex]);
 
+  // If the user engages while in grace, pause immediately.
   useEffect(() => {
     if (graceRef.current && userEngaged && !isPaused) pause();
   }, [userEngaged, isPaused, pause]);
 
-  // Scroll interactions
+  // Scroll → schedule resume
   useScrollInteraction({
     scrollThreshold: 150,
     debounceDelay: 150,
@@ -83,7 +90,7 @@ export default function useEngagementAutoplay({
     },
   });
 
-  // ✅ FIXED: Enhanced interaction handling for both DESKTOP and MOBILE
+  // Hover: engage on eligible enter; treat leaving all eligible hosts as hover-away
   useEffect(() => {
     const items = Array.from(document.querySelectorAll(itemSelector));
     if (!items.length) return;
@@ -91,87 +98,39 @@ export default function useEngagementAutoplay({
     const isEligible = (el) =>
       !!el && (!engageOnlyOnActiveItem || el.getAttribute?.(activeItemAttr) === "true");
 
-    // ✅ DESKTOP: Mouse hover interactions (unchanged)
-    const onMouseEnter = (ev) => {
+    const onEnter = (ev) => {
       const host = ev.currentTarget;
       if (!isEligible(host)) return;
       engageUser();
       if (pauseOnEngage) pause();
     };
 
-    const onMouseLeave = (ev) => {
+    const onLeave = (ev) => {
       const nextHost = ev.relatedTarget?.closest?.(itemSelector);
       if (isEligible(nextHost)) return;
       handleResumeActivity("hover-away");
     };
 
-    // ✅ MOBILE: Touch interactions (NEW!)
-    const onTouchStart = (ev) => {
-      const host = ev.currentTarget;
-      if (!isEligible(host)) return;
-      engageUser();
-      if (pauseOnEngage) pause();
-    };
-
-    const onTouchEnd = (ev) => {
-      // Small delay to avoid immediate resume on quick taps
-      setTimeout(() => {
-        handleResumeActivity("touch-away");
-      }, 100);
-    };
-
-    // ✅ Add event listeners for both mouse AND touch
     items.forEach((el) => {
-      // Desktop events
-      el.addEventListener("mouseenter", onMouseEnter);
-      el.addEventListener("mouseleave", onMouseLeave);
-      
-      // Mobile events
-      el.addEventListener("touchstart", onTouchStart, { passive: true });
-      el.addEventListener("touchend", onTouchEnd, { passive: true });
+      el.addEventListener("mouseenter", onEnter);
+      el.addEventListener("mouseleave", onLeave);
     });
 
-    // ✅ Enhanced pointer tracking for both mouse AND touch
+    // Fallback: if engaged but pointer isn’t over any eligible host, treat as hover-away
     const onPointerMove = (e) => {
       if (!userEngaged) return;
       const under = document.elementFromPoint(e.clientX, e.clientY);
       const host = under?.closest?.(itemSelector);
-      if (!isEligible(host)) {
-        // Different handling for touch vs mouse
-        const eventType = e.pointerType === 'touch' ? 'touch-away' : 'hover-away';
-        handleResumeActivity(eventType);
-      }
+      if (!isEligible(host)) handleResumeActivity("hover-away");
     };
-
-    // ✅ Also listen to touchmove for mobile pointer tracking
-    const onTouchMove = (e) => {
-      if (!userEngaged) return;
-      const touch = e.touches[0];
-      if (!touch) return;
-      
-      const under = document.elementFromPoint(touch.clientX, touch.clientY);
-      const host = under?.closest?.(itemSelector);
-      if (!isEligible(host)) {
-        handleResumeActivity("touch-away");
-      }
-    };
-
     document.addEventListener("pointermove", onPointerMove, { passive: true });
-    document.addEventListener("touchmove", onTouchMove, { passive: true });
 
     return () => {
       items.forEach((el) => {
-        // Remove mouse events
-        el.removeEventListener("mouseenter", onMouseEnter);
-        el.removeEventListener("mouseleave", onMouseLeave);
-        
-        // Remove touch events
-        el.removeEventListener("touchstart", onTouchStart);
-        el.removeEventListener("touchend", onTouchEnd);
+        el.removeEventListener("mouseenter", onEnter);
+        el.removeEventListener("mouseleave", onLeave);
       });
-      
       document.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("touchmove", onTouchMove);
     };
   }, [
     itemSelector,
@@ -181,8 +140,8 @@ export default function useEngagementAutoplay({
     engageUser,
     handleResumeActivity,
     pause,
-    currentIndex,
-    userEngaged,
+    currentIndex,   // rebind when active item changes
+    userEngaged,    // keep fallback accurate
   ]);
 
   return {
