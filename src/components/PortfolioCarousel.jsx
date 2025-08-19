@@ -1,7 +1,7 @@
 // src/components/PortfolioCarousel.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
+import useCarouselAutoplay from "../hooks/useCarouselAutoplay";
 import { useVisibility } from "../hooks/useVisibility";
 import { useSideDragNavigation } from "../hooks/useInteractions";
 import PortfolioItemComponent from "./LoopComponents/PortfolioItemComponent";
@@ -39,21 +39,16 @@ export default function PortfolioCarousel({
   const ArrowClasses =
     "absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary-light/10 border border-primary-light/20 text-text backdrop-blur-sm hover:bg-primary-light/20 transition hover:border-primary-light/75";
 
-  // ✅ REFACTORED: Direct useEngagementAutoplay call with portfolio-specific config
-  const { isAutoplayPaused, isResumeScheduled, userEngaged } = useEngagementAutoplay({
-    totalItems: items.length,
-    currentIndex: index,
-    setIndex,
-    autoplayTime: autoAdvanceDelay,
-    resumeDelay: 5000,
-    resumeTriggers: ["scroll", "click-outside", "hover-away"],
-    containerSelector: `[data-autoplay-scope="${scopeId}"]`,
-    itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
-    inView: autoplay && inView,
-    pauseOnEngage: true,
-    engageOnlyOnActiveItem: true,
-    activeItemAttr: "data-active",
-  });
+  const { isAutoplayPaused, isResumeScheduled, userEngaged } =
+    useCarouselAutoplay({
+      totalItems: items.length,
+      currentIndex: index,
+      setIndex,
+      autoAdvanceDelay,
+      inView: autoplay && inView,
+      containerSelector: `[data-autoplay-scope="${scopeId}"]`,
+      itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
+    });
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -232,14 +227,12 @@ export default function PortfolioCarousel({
         </nav>
       )}
 
-      {/* Debug */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mt-4 text-xs opacity-70">
-          <div>⏸️ Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
-          <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
-          <div>⏲️ Resume in 5s: {isResumeScheduled ? "✅" : "❌"}</div>
-        </div>
-      )}
+      {/* (Optional) Debug */}
+      {/* <div className="mt-4 text-xs opacity-70">
+        <div>⏸️ Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
+        <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
+        <div>⏲️ Resume in 5s: {isResumeScheduled ? "✅" : "❌"}</div>
+      </div> */}
     </div>
   );
 }
