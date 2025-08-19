@@ -201,34 +201,34 @@ export function useAutoScroll({
   }, [active, inView, resetOnInactive, ref, clearRAF, clearResume, clearStartTimer]);
 
   // ✅ CENTRALIZED TOUCH INTERACTION
-  // useTouchInteraction({
-  //   elementRef: ref,
-  //   tapThreshold: 8, // smaller threshold for scroll elements
-  //   longPressDelay: 600, // slightly longer for scroll containers
+  useTouchInteraction({
+    elementRef: ref,
+    tapThreshold: 8, // smaller threshold for scroll elements
+    longPressDelay: 600, // slightly longer for scroll containers
     
-  //   onTouchStart: (e, data) => {
-  //     pauseNow();
-  //   },
+    onTouchStart: (e, data) => {
+      pauseNow();
+    },
     
-  //   onTouchEnd: (e, data) => {
-  //     maybeScheduleResume();
-  //   },
+    onTouchEnd: (e, data) => {
+      maybeScheduleResume();
+    },
     
-  //   onTouchMove: (e, data) => {
-  //     // Only pause if they're actually moving significantly
-  //     if (data.moved) {
-  //       pauseNow();
-  //     }
-  //   },
+    onTouchMove: (e, data) => {
+      // Only pause if they're actually moving significantly
+      if (data.moved) {
+        pauseNow();
+      }
+    },
     
-  //   onLongPress: (e, data) => {
-  //     // Long press also pauses (might be selecting text, etc.)
-  //     pauseNow();
-  //   },
+    onLongPress: (e, data) => {
+      // Long press also pauses (might be selecting text, etc.)
+      pauseNow();
+    },
     
-  //   // Don't prevent default - we want native scroll to work
-  //   preventDefaultOnTouch: false,
-  // });
+    // Don't prevent default - we want native scroll to work
+    preventDefaultOnTouch: false,
+  });
 
   // ✅ CENTRALIZED SCROLL INTERACTION
   useScrollInteraction({
