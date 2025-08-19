@@ -47,19 +47,19 @@
       themeMeta.setAttribute('content', statusColor);
 
       // iOS standalone/PWA text color for status bar
-      var iosMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+      var iosMeta = document.querySelector('meta[name="mobile-web-app-status-bar-style"]');
       if (!iosMeta) {
         iosMeta = document.createElement('meta');
-        iosMeta.setAttribute('name', 'apple-mobile-web-app-status-bar-style');
+        iosMeta.setAttribute('name', 'mobile-web-app-status-bar-style');
         document.head.appendChild(iosMeta);
       }
       iosMeta.setAttribute('content', theme === 'light' ? 'default' : 'black-translucent');
 
       // Optional: declare capability so iOS applies the style in standalone
-      var cap = document.querySelector('meta[name="apple-mobile-web-app-capable"]');
+      var cap = document.querySelector('meta[name="mobile-web-app-capable"]');
       if (!cap) {
         cap = document.createElement('meta');
-        cap.setAttribute('name', 'apple-mobile-web-app-capable');
+        cap.setAttribute('name', 'mobile-web-app-capable');
         cap.setAttribute('content', 'yes');
         document.head.appendChild(cap);
       }

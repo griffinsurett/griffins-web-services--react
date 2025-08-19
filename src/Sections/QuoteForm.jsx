@@ -26,11 +26,11 @@ const QuoteForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted:", formData);
-  };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // Handle form submission logic here
+  //   console.log("Form submitted:", formData);
+  // };
 
   const websiteTypeOptions = [
     { value: "landing-page", label: "Landing Page" },
@@ -82,7 +82,8 @@ const QuoteForm = () => {
         </div>
 
         <form
-          onSubmit={handleSubmit}
+          // onSubmit={handleSubmit}
+          action={"https://formspree.io/f/mjkgojyo"}
           className="group bg-bg2 section-box outer-card-transition"
         >
           <div className="inner-card-style"></div>
