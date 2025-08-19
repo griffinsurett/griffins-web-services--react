@@ -45,7 +45,7 @@ export default function PortfolioItemComponent({
     startDelay: 1500,
     resumeDelay: 0,
     resumeOnUserInput: false, // never resume during current active cycle
-    threshold: 0.35,
+    threshold: 0.1,
     resetOnInactive: true,
   });
 
