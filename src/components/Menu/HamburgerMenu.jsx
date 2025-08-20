@@ -51,7 +51,7 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
       isOpen={isOpen}
       onClose={handleClose}
       closeButton={false}
-      overlayClass="bg-primary/80"
+      overlayClass="bg-bg"
       className="w-full h-full bg-bg flex items-center justify-center"
       allowScroll={false}
     >
