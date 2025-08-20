@@ -141,9 +141,7 @@ export default function PortfolioItemComponent({
       </figure>
 
       {/* dev overlay — same vibe as WebsiteTypes */}
-      {
-      // process.env.NODE_ENV === "development" && 
-      isActive && (
+      {process.env.NODE_ENV === "development" && isActive && (
         <div className="absolute right-3 top-3 text-xs opacity-75 bg-zinc-800/95 p-3 rounded-lg shadow-lg border border-white/10">
           <div>👁️ In View: {auto.inView ? "✅" : "❌"}</div>
           <div>⏸️ Autoplay Paused: {auto.paused ? "✅" : "❌"}</div>
