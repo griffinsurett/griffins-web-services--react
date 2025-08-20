@@ -52,7 +52,7 @@ export default function PortfolioSection() {
           </p>
         </header>
 
-        <PortfolioCarousel items={items} autoAdvanceDelay={4000} autoplay />
+        <PortfolioCarousel items={items} autoAdvanceDelay={6000} autoplay />
       </div>
     </section>
   );
