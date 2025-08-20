@@ -1,12 +1,11 @@
 // src/Sections/WebsiteTypes.jsx
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import EnhancedAccordionItem from "../components/LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "../components/VideoPlayer";
-import useAccordionAutoplay from "../hooks/useAccordionAutoplay";
 import { useVisibility } from "../hooks/useVisibility";
+import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
 import Heading from "../components/Heading";
-
 import BorderTitle from "../components/BorderTitle";
 
 const demoVideo = EarRape;
@@ -90,21 +89,91 @@ const WebsiteTypes = () => {
     [autoAdvanceDelay]
   );
 
-  const {
-    activeIndex,
-    isAutoplayPaused,
-    userEngaged,
-    isResumeScheduled,
-    handleManualSelection,
-    handleVideoEnded,
-    reschedule, // we’ll call via a ref so the reset effect doesn’t re-run
-  } = useAccordionAutoplay({
+  // ===== INLINE ACCORDION AUTOPLAY LOGIC =====
+  const [activeIndex, setActiveIndex] = useState(0);
+  const radioName = "website-types";
+  
+  const suppressEngageRef = useRef(false);
+  const engageRef = useRef(null);
+
+  const selectIndex = useCallback(
+    (index) => {
+      const input = document.querySelector(
+        `input[type="radio"][name="${radioName}"][value="${index}"]`
+      );
+      if (input) {
+        suppressEngageRef.current = true;
+        input.click(); // semantic + fires 'change'
+      }
+    },
+    [radioName]
+  );
+
+  const core = useEngagementAutoplay({
     totalItems: websiteTypes.length,
-    initialIndex: 0,
+    currentIndex: activeIndex,
+    setIndex: selectIndex,
+    autoplayTime,
+    resumeDelay: 5000,
+    resumeTriggers: ["scroll", "click-outside", "hover-away"],
+    containerSelector: "[data-accordion-container], [data-video-container]",
+    itemSelector: "[data-accordion-item], [data-video-container]",
     inView: isInView,
-    radioName: "website-types",
-    autoplayTime, // remaining video + delay
+    pauseOnEngage: false,
+    engageOnlyOnActiveItem: true,
+    activeItemAttr: "data-active",
   });
+
+  useEffect(() => {
+    engageRef.current = core.engageUser;
+  }, [core.engageUser]);
+
+  // Listen to native radio changes
+  useEffect(() => {
+    const radios = Array.from(
+      document.querySelectorAll(`input[type="radio"][name="${radioName}"]`)
+    );
+
+    const onChange = (e) => {
+      if (!e.target.checked) return;
+      const idx = parseInt(e.target.value, 10);
+      setActiveIndex(Number.isFinite(idx) ? idx : 0);
+
+      if (suppressEngageRef.current) {
+        suppressEngageRef.current = false;
+      } else {
+        // mark engagement (so when the video ends, we pause autoplay)
+        engageRef.current?.();
+      }
+    };
+
+    radios.forEach((r) => r.addEventListener("change", onChange));
+
+    const checked = radios.find((r) => r.checked);
+    if (checked) {
+      const idx = parseInt(checked.value, 10);
+      setActiveIndex(Number.isFinite(idx) ? idx : 0);
+    } else if (websiteTypes.length > 0) {
+      selectIndex(0);
+    }
+
+    return () => radios.forEach((r) => r.removeEventListener("change", onChange));
+  }, [radioName, selectIndex, websiteTypes.length]);
+
+  const handleManualSelection = () => {
+    // clicking video/controls: just mark engagement
+    core.engageUser();
+  };
+
+  const handleVideoEnded = useCallback(() => {
+   core.beginGraceWindow(); // tell the engine we're in the delay/grace window
+ }, [core.beginGraceWindow]);
+
+  const isAutoplayPaused = core.isAutoplayPaused;
+  const userEngaged = core.userEngaged;
+  const isResumeScheduled = core.isResumeScheduled;
+  const reschedule = core.schedule; // call when video timing changes
+  // ===== END INLINE ACCORDION AUTOPLAY LOGIC =====
 
   const [progress, setProgress] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -137,7 +206,7 @@ const WebsiteTypes = () => {
         }
       });
 
-      // schedule timer based on fresh video duration (don’t rebind effect)
+      // schedule timer based on fresh video duration (don't rebind effect)
       rescheduleRef.current?.();
     }, 100);
 
@@ -253,17 +322,6 @@ const WebsiteTypes = () => {
                   desktop={true}
                   className="shadow-2xl shadow-accent/20"
                 />
-
-                {/* <div className="mt-6 p-6 card-bg rounded-xl">
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className="icon-small card-icon-color">
-                      {websiteTypes[activeIndex].icon}
-                    </div>
-                    <h3 className="h3">{websiteTypes[activeIndex].title}</h3>
-                  </div>
-                  <p className="text-text leading-relaxed">
-                    {websiteTypes[activeIndex].description}
-                  </p> */}
 
                   {/* Debug */}
                   {process.env.NODE_ENV === 'development' && (
