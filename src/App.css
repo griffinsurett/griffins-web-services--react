@@ -1,5 +1,6 @@
 /* App.css */
 @import "tailwindcss";
+@import "./animation.css"
 /* ───────────────────────────────────────────────────── */
 /* 0. CUSTOM VARIANTS FOR LIGHT + DARK                  */
 /* ───────────────────────────────────────────────────── */

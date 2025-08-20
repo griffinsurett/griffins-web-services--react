@@ -1,0 +1,226 @@
+/* src/styles/animations.css */
+
+/* ───────────────────────────────────────────────────── */
+/* ANIMATION BASE CLASSES                                */
+/* ───────────────────────────────────────────────────── */
+
+/* Base animation class - sets up CSS custom properties */
+.animated-element {
+  --animation-progress: 0%;
+  --animation-progress-decimal: 0;
+  --animation-direction: forward;
+  --animation-duration: 1000ms;
+  
+  transition: all var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ───────────────────────────────────────────────────── */
+/* FADE ANIMATIONS                                       */
+/* ───────────────────────────────────────────────────── */
+
+.fade-in-up {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateY(calc((1 - var(--animation-progress-decimal)) * 2rem));
+  transition: opacity var(--animation-duration) ease-out,
+              transform var(--animation-duration) ease-out;
+}
+
+.fade-in-down {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateY(calc((1 - var(--animation-progress-decimal)) * -2rem));
+  transition: opacity var(--animation-duration) ease-out,
+              transform var(--animation-duration) ease-out;
+}
+
+.fade-in-left {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateX(calc((1 - var(--animation-progress-decimal)) * -2rem));
+  transition: opacity var(--animation-duration) ease-out,
+              transform var(--animation-duration) ease-out;
+}
+
+.fade-in-right {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateX(calc((1 - var(--animation-progress-decimal)) * 2rem));
+  transition: opacity var(--animation-duration) ease-out,
+              transform var(--animation-duration) ease-out;
+}
+
+/* ───────────────────────────────────────────────────── */
+/* SCALE ANIMATIONS                                      */
+/* ───────────────────────────────────────────────────── */
+
+.scale-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(0.8 + (var(--animation-progress-decimal) * 0.2)));
+  transition: opacity var(--animation-duration) ease-out,
+              transform var(--animation-duration) ease-out;
+}
+
+.scale-up {
+  transform: scale(calc(1 + (var(--animation-progress-decimal) * 0.1)));
+  transition: transform var(--animation-duration) ease-out;
+}
+
+/* ───────────────────────────────────────────────────── */
+/* ROTATION ANIMATIONS                                   */
+/* ───────────────────────────────────────────────────── */
+
+.rotate-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: rotate(calc((1 - var(--animation-progress-decimal)) * -180deg)) 
+             scale(calc(0.8 + (var(--animation-progress-decimal) * 0.2)));
+  transition: all var(--animation-duration) ease-out;
+}
+
+.flip-in-x {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: rotateX(calc((1 - var(--animation-progress-decimal)) * -90deg));
+  transition: all var(--animation-duration) ease-out;
+}
+
+.flip-in-y {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: rotateY(calc((1 - var(--animation-progress-decimal)) * -90deg));
+  transition: all var(--animation-duration) ease-out;
+}
+
+/* ───────────────────────────────────────────────────── */
+/* SLIDE ANIMATIONS                                      */
+/* ───────────────────────────────────────────────────── */
+
+.slide-in-bottom {
+  transform: translateY(calc((1 - var(--animation-progress-decimal)) * 100%));
+  transition: transform var(--animation-duration) ease-out;
+}
+
+.slide-in-top {
+  transform: translateY(calc((1 - var(--animation-progress-decimal)) * -100%));
+  transition: transform var(--animation-duration) ease-out;
+}
+
+.slide-in-left {
+  transform: translateX(calc((1 - var(--animation-progress-decimal)) * -100%));
+  transition: transform var(--animation-duration) ease-out;
+}
+
+.slide-in-right {
+  transform: translateX(calc((1 - var(--animation-progress-decimal)) * 100%));
+  transition: transform var(--animation-duration) ease-out;
+}
+
+/* ───────────────────────────────────────────────────── */
+/* BLUR & FILTER ANIMATIONS                             */
+/* ───────────────────────────────────────────────────── */
+
+.blur-in {
+  opacity: calc(var(--animation-progress-decimal));
+  filter: blur(calc((1 - var(--animation-progress-decimal)) * 1rem));
+  transition: opacity var(--animation-duration) ease-out,
+              filter var(--animation-duration) ease-out;
+}
+
+.focus-in {
+  opacity: calc(var(--animation-progress-decimal));
+  filter: blur(calc((1 - var(--animation-progress-decimal)) * 0.5rem));
+  transform: scale(calc(0.95 + (var(--animation-progress-decimal) * 0.05)));
+  transition: all var(--animation-duration) ease-out;
+}
+
+/* ───────────────────────────────────────────────────── */
+/* COMPLEX COMBINED ANIMATIONS                          */
+/* ───────────────────────────────────────────────────── */
+
+.bounce-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(0.3 + (var(--animation-progress-decimal) * 0.7))) 
+             translateY(calc((1 - var(--animation-progress-decimal)) * 2rem));
+  animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: all var(--animation-duration) var(--animation-timing-function, ease-out);
+}
+
+.zoom-in-rotate {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(0.5 + (var(--animation-progress-decimal) * 0.5))) 
+             rotate(calc((1 - var(--animation-progress-decimal)) * 360deg));
+  transition: all var(--animation-duration) ease-out;
+}
+
+.elastic-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(0.1 + (var(--animation-progress-decimal) * 0.9)));
+  animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all var(--animation-duration) var(--animation-timing-function, ease-out);
+}
+
+/* ───────────────────────────────────────────────────── */
+/* STAGGER ANIMATIONS (for lists/grids)                 */
+/* ───────────────────────────────────────────────────── */
+
+.stagger-fade-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateY(calc((1 - var(--animation-progress-decimal)) * 1rem));
+  transition: all var(--animation-duration) ease-out;
+}
+
+/* Add delays for staggered items */
+.stagger-fade-in:nth-child(1) { transition-delay: 0ms; }
+.stagger-fade-in:nth-child(2) { transition-delay: 100ms; }
+.stagger-fade-in:nth-child(3) { transition-delay: 200ms; }
+.stagger-fade-in:nth-child(4) { transition-delay: 300ms; }
+.stagger-fade-in:nth-child(5) { transition-delay: 400ms; }
+.stagger-fade-in:nth-child(6) { transition-delay: 500ms; }
+
+/* ───────────────────────────────────────────────────── */
+/* UTILITY CLASSES                                       */
+/* ───────────────────────────────────────────────────── */
+
+/* Duration modifiers */
+.anim-duration-fast { --animation-duration: 300ms; }
+.anim-duration-normal { --animation-duration: 600ms; }
+.anim-duration-slow { --animation-duration: 1200ms; }
+.anim-duration-slower { --animation-duration: 2000ms; }
+
+/* Easing modifiers */
+.anim-ease-in { --animation-timing-function: ease-in; }
+.anim-ease-out { --animation-timing-function: ease-out; }
+.anim-ease-in-out { --animation-timing-function: ease-in-out; }
+.anim-ease-bounce { --animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+.anim-ease-elastic { --animation-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+/* ───────────────────────────────────────────────────── */
+/* RESPONSIVE ANIMATIONS                                 */
+/* ───────────────────────────────────────────────────── */
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animated-element,
+  [class*="fade-"],
+  [class*="scale-"],
+  [class*="rotate-"],
+  [class*="slide-"],
+  [class*="blur-"],
+  [class*="bounce-"],
+  [class*="zoom-"],
+  [class*="elastic-"],
+  [class*="stagger-"] {
+    transition: opacity 0.3s ease !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .animated-element {
+    --animation-duration: 600ms; /* Faster on mobile */
+  }
+  
+  /* Reduce complex animations on mobile */
+  .bounce-in,
+  .elastic-in,
+  .zoom-in-rotate {
+    transform: translateY(calc((1 - var(--animation-progress-decimal)) * 1rem)) !important;
+  }
+}
