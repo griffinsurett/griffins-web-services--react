@@ -1,12 +1,13 @@
-// src/Sections/Testimonials.jsx
 import React from "react";
 import TestimonialCard from "../components/LoopComponents/TestimonialCard";
 import BorderTitle from "../components/BorderTitle";
 import Carousel from "../components/Carousel";
 import Heading from "../components/Heading";
+import AnimatedElementWrapper from "../components/LoopComponents/AnimatedElementWrapper";
 import { testimonials } from "../testimonials";
 
 const Testimonials = () => {
+  const STAGGER_MS = 120;
 
   return (
     <section className="outer-section bg-bg relative">
@@ -29,7 +30,21 @@ const Testimonials = () => {
 
         <Carousel
           items={testimonials}
-          renderItem={(t) => <TestimonialCard data={t} />}
+          // If your Carousel passes (item, index) to renderItem, use i for a stagger
+          renderItem={(t, i = 0) => (
+            <AnimatedElementWrapper
+              variant="scale-in"
+              animationMode="load"
+              animationDuration={600}
+              animationDelay={i * STAGGER_MS}
+              threshold={0.2}
+              rootMargin="0px 0px -50px 0px"
+              reverse
+              once={false}
+            >
+              <TestimonialCard data={t} />
+            </AnimatedElementWrapper>
+          )}
           slidesPerView={{ base: 1, md: 2 }}
           gap={32}
           autoplay

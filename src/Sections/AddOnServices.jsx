@@ -1,17 +1,14 @@
-// src/Sections/AddOnServices.jsx
 import React, { useState } from "react";
 import BorderTitle from "../components/BorderTitle";
 import Heading from "../components/Heading";
 import Button from "../components/Buttons/Button";
 import FeatureCard from "../components/LoopComponents/FeatureCard";
 import RadioTab from "../components/LoopComponents/RadioTab";
+import AnimatedElementWrapper from "../components/LoopComponents/AnimatedElementWrapper"; // ⬅️ add this import
 
 const AddOnServices = () => {
   const [activeTab, setActiveTab] = useState("branding");
-
-  const handleTabChange = (e) => {
-    setActiveTab(e.target.value);
-  };
+  const handleTabChange = (e) => setActiveTab(e.target.value);
 
   const categories = {
     branding: {
@@ -350,20 +347,14 @@ const AddOnServices = () => {
         {/* Section Header */}
         <div className="text-section">
           <BorderTitle>Website Enhancements</BorderTitle>
-          <Heading
-            tagName="h2"
-            className="mb-4"
-            before="Add‑On "
-            text="Services"
-            textClass="emphasized-text"
-          />
+          <Heading tagName="h2" className="mb-4" before="Add-On " text="Services" textClass="emphasized-text" />
           <p className="large-text">
             Enhance your website with specialized features and support. Choose
             the categories that best fit your needs.
           </p>
         </div>
 
-        {/* Tab Navigation - Radio Inputs */}
+        {/* Tab Navigation */}
         <div className="flex flex-wrap gap-2 lg:gap-auto justify-center lg:justify-between">
           {Object.entries(categories).map(([key, category]) => (
             <RadioTab
@@ -384,24 +375,35 @@ const AddOnServices = () => {
           {/* Services Grid - Only Active Category */}
           <div className="max-3-primary my-6">
             {categories[activeTab].services.map((service, index) => (
-              <div key={index} className="relative">
+              <AnimatedElementWrapper
+                key={index}
+                variant="scale-in"
+                animationMode="load"
+                animationDuration={600}
+                animationDelay={index * 120}   // ⬅️ light stagger for grids
+                threshold={0.2}
+                rootMargin="0px 0px -50px 0px"
+                reverse
+                once={false}
+              >
                 <FeatureCard
                   data={service}
                   ringDuration={service.featured ? 600 : 800}
                 />
-                {/* {service.featured && (
-                  <div className="absolute -top-3 -right-3 z-30">
-                    <div className="icon-xsmall card-icon-color shadow-lg">
-                      <svg className="w-4 h-4 light:text-accent" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                )} */}
-              </div>
+              </AnimatedElementWrapper>
             ))}
           </div>
+
           {/* CTA Section */}
+          <AnimatedElementWrapper
+                variant="scale-in"
+                animationMode="load"
+                animationDuration={600}
+                threshold={0.2}
+                rootMargin="0px 0px -50px 0px"
+                reverse
+                once={false}
+              >
           <div className="text-center p-8 card-bg rounded-2xl w-full mx-auto">
             <Heading tagName="h3" className="h3 mb-3">
               Interested in {categories[activeTab].title} Services?
@@ -414,6 +416,7 @@ const AddOnServices = () => {
               Get a Custom Quote 💬
             </Button>
           </div>
+          </AnimatedElementWrapper>
         </div>
       </div>
     </section>

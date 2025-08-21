@@ -1,5 +1,6 @@
 // src/Sections/HostingMaintenance.jsx
 import React from "react";
+import AnimatedElementWrapper from "../components/LoopComponents/AnimatedElementWrapper";
 import FeatureCard from "../components/LoopComponents/FeatureCard";
 import PricingCard from "../components/LoopComponents/PricingCard";
 import StatisticListing from "../components/LoopComponents/StatisticListing";
@@ -160,7 +161,19 @@ const HostingMaintenance = () => {
 
           <div className="max-3-primary gap-8 align-middle">
             {hostingFeatures.map((feature, idx) => (
-              <FeatureCard key={idx} data={feature} />
+              <AnimatedElementWrapper
+                key={idx}
+                variant="scale-in"
+                animationMode="load"
+                animationDuration={600}
+                animationDelay={idx * 160}
+                threshold={0.2}
+                rootMargin="0px 0px -50px 0px"
+                reverse
+                once={false}
+              >
+                <FeatureCard data={feature} />
+              </AnimatedElementWrapper>
             ))}
           </div>
         </div>

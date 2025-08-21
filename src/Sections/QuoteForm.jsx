@@ -6,6 +6,7 @@ import Textarea from "../components/Form/Textarea";
 import Select from "../components/Form/Select";
 import BorderTitle from "../components/BorderTitle";
 import Heading from "../components/Heading";
+import AnimatedElementWrapper from "../components/LoopComponents/AnimatedElementWrapper"; // ⬅️ add this
 
 const QuoteForm = () => {
   const [formData, setFormData] = useState({
@@ -20,15 +21,11 @@ const QuoteForm = () => {
   });
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   // const handleSubmit = (e) => {
   //   e.preventDefault();
-  //   // Handle form submission logic here
   //   console.log("Form submitted:", formData);
   // };
 
@@ -40,10 +37,7 @@ const QuoteForm = () => {
     { value: "ecommerce", label: "E-Commerce Website" },
     { value: "nonprofit", label: "Non-Profit Website" },
     { value: "corporate", label: "Large Corporate Website" },
-    {
-      value: "custom-app",
-      label: "Custom Full-Stack Application",
-    },
+    { value: "custom-app", label: "Custom Full-Stack Application" },
   ];
 
   const budgetOptions = [
@@ -81,91 +75,96 @@ const QuoteForm = () => {
           </p>
         </div>
 
-        <form
-          // onSubmit={handleSubmit}
-          action={"https://formspree.io/f/mjkgojyo"}
-          method="POST"
-          className="group bg-bg2 section-box outer-card-transition"
+        {/* ⬇️ Animate the entire form: scale-in on enter, out on exit */}
+        <AnimatedElementWrapper
+          variant="scale-in"
+          animationMode="load"
+          animationDuration={800}
+          animationDelay={120}            // tweak or remove if you don’t want a delay
+          threshold={0.2}
+          rootMargin="0px"  // trigger a bit before entering
+          reverse
+          once={false}
         >
-          <div className="inner-card-style"></div>
+          <form
+            // onSubmit={handleSubmit}
+            action={"https://formspree.io/f/mjkgojyo"}
+            method="POST"
+            className="group bg-bg2 section-box outer-card-transition"
+          >
+            <div className="inner-card-style"></div>
 
-          <div className="grid md:grid-cols-2 gap-4 mb-5 relative z-10">
-            <Input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Full Name *"
-              required
-            />
+            <div className="grid md:grid-cols-2 gap-4 mb-5 relative z-10">
+              <Input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Full Name *"
+                required
+              />
+              <Input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="Email Address *"
+                required
+              />
+              <Input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                placeholder="Phone Number"
+              />
+              <Input
+                type="text"
+                name="company"
+                value={formData.company}
+                onChange={handleInputChange}
+                placeholder="Company Name"
+              />
+              <Select
+                name="websiteType"
+                value={formData.websiteType}
+                onChange={handleInputChange}
+                placeholder="Type of Website *"
+                colSpan="md:col-span-2"
+                required
+                options={websiteTypeOptions}
+              />
+              <Select
+                name="budget"
+                value={formData.budget}
+                onChange={handleInputChange}
+                placeholder="Project Budget"
+                options={budgetOptions}
+              />
+              <Select
+                name="timeline"
+                value={formData.timeline}
+                onChange={handleInputChange}
+                placeholder="Project Timeline"
+                options={timelineOptions}
+              />
+              <Textarea
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
+                placeholder="Project Details * - Tell us about your project, goals, and any specific requirements..."
+                colSpan="md:col-span-2"
+                required
+              />
+            </div>
 
-            <Input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Email Address *"
-              required
-            />
-
-            <Input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-              placeholder="Phone Number"
-            />
-
-            <Input
-              type="text"
-              name="company"
-              value={formData.company}
-              onChange={handleInputChange}
-              placeholder="Company Name"
-            />
-
-            <Select
-              name="websiteType"
-              value={formData.websiteType}
-              onChange={handleInputChange}
-              placeholder="Type of Website *"
-              colSpan="md:col-span-2"
-              required
-              options={websiteTypeOptions}
-            />
-
-            <Select
-              name="budget"
-              value={formData.budget}
-              onChange={handleInputChange}
-              placeholder="Project Budget"
-              options={budgetOptions}
-            />
-
-            <Select
-              name="timeline"
-              value={formData.timeline}
-              onChange={handleInputChange}
-              placeholder="Project Timeline"
-              options={timelineOptions}
-            />
-
-            <Textarea
-              name="message"
-              value={formData.message}
-              onChange={handleInputChange}
-              placeholder="Project Details * - Tell us about your project, goals, and any specific requirements..."
-              colSpan="md:col-span-2"
-              required
-            />
-          </div>
-
-          <div className="text-center relative z-10">
-            <Button type="submit" variant="primary">
-              Get a Quote
-            </Button>
-          </div>
-        </form>
+            <div className="text-center relative z-10">
+              <Button type="submit" variant="primary">
+                Get a Quote
+              </Button>
+            </div>
+          </form>
+        </AnimatedElementWrapper>
       </div>
     </section>
   );

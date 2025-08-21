@@ -2,47 +2,20 @@ import React from "react";
 import FeatureCard from "../components/LoopComponents/FeatureCard";
 import BorderTitle from "../components/BorderTitle";
 import Heading from "../components/Heading";
+import AnimatedElementWrapper from "../components/LoopComponents/AnimatedElementWrapper";
 
 const Benefits = () => {
-   const benefits = [
-    {
-      icon: "📱",
-      title: "Mobile First",
-      description:
-        "Responsive design that looks perfect on every device. Over 60% of traffic is mobile - we make sure you're ready.",
-    },
-    {
-      icon: "🎯",
-      title: "Conversion Focused",
-      description:
-        "Strategic design that turns visitors into customers. Every element is crafted to guide users toward your business goals.",
-    },
-    {
-      icon: "🔒",
-      title: "Secure & Reliable",
-      description:
-        "Enterprise-grade security and 99.9% uptime. Your website stays safe and accessible around the clock.",
-    },
-    {
-      icon: "🚀",
-      title: "SEO Optimized",
-      description:
-        "Built-in SEO best practices help you rank higher on Google and attract more organic traffic to grow your business.",
-    },
-    {
-      icon: "⚡",
-      title: "Lightning Fast",
-      description:
-        "Optimized for speed and performance. Your site loads in under 2 seconds, keeping visitors engaged and improving SEO rankings.",
-    },
-    {
-      icon: "💬",
-      title: "24/7 Support",
-      description:
-        "Round-the-clock support and maintenance included. We're here to help your website evolve as your business grows.",
-    },
+  const benefits = [
+    { icon: "📱", title: "Mobile First", description: "Responsive design that looks perfect on every device. Over 60% of traffic is mobile - we make sure you're ready." },
+    { icon: "🎯", title: "Conversion Focused", description: "Strategic design that turns visitors into customers. Every element is crafted to guide users toward your business goals." },
+    { icon: "🔒", title: "Secure & Reliable", description: "Enterprise-grade security and 99.9% uptime. Your website stays safe and accessible around the clock." },
+    { icon: "🚀", title: "SEO Optimized", description: "Built-in SEO best practices help you rank higher on Google and attract more organic traffic to grow your business." },
+    { icon: "⚡", title: "Lightning Fast", description: "Optimized for speed and performance. Your site loads in under 2 seconds, keeping visitors engaged and improving SEO rankings." },
+    { icon: "💬", title: "24/7 Support", description: "Round-the-clock support and maintenance included. We're here to help your website evolve as your business grows." },
   ];
-  
+
+  const STAGGER_MS = 200;
+
   return (
     <section className="outer-section primary-bg">
       <div className="section-color-border"></div>
@@ -63,7 +36,19 @@ const Benefits = () => {
 
         <div className="max-3-primary">
           {benefits.map((item, idx) => (
-            <FeatureCard key={idx} data={item} />
+            <AnimatedElementWrapper
+              key={idx}
+              variant="scale-in"
+              animationMode="load"
+              animationDuration={600}
+              animationDelay={idx * STAGGER_MS}
+              threshold={0.2}
+              rootMargin="0px 0px -50px 0px"
+              reverse
+              once={false}
+            >
+              <FeatureCard data={item} />
+            </AnimatedElementWrapper>
           ))}
         </div>
       </div>

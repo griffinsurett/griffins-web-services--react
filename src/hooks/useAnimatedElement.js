@@ -1,106 +1,118 @@
 // src/hooks/useAnimatedElement.js
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
 
 /**
- * Minimal "visibility-only" animation driver.
- * - Animates IN when entering viewport
- * - Animates OUT when leaving viewport
- * - Repeats forever (unless once=true is passed to useVisibility)
+ * Visibility-only animation driver (class-agnostic).
+ * - Does NOT add/remove any classes. You attach your animation classes yourself.
+ * - Returns props (style + data-attrs) you can spread onto the animated element.
+ * - CSS controls the actual effect using the variables/attrs provided here.
  *
- * Assumes your CSS transitions between states using data attributes:
- *   .animated-element.scale-in { opacity:0; transform:scale(.96);
- *     transition: transform var(--animation-duration) ease, opacity var(--animation-duration) ease; }
- *   .animated-element.scale-in[data-visible="true"]  { opacity:1; transform:scale(1); }
- *   .animated-element.scale-in[data-visible="false"] { opacity:0; transform:scale(.96); }
+ * CSS contract (examples):
+ *   .animated-element.scale-in {
+ *     opacity: var(--animation-progress-decimal, 0);
+ *     transform: scale(calc(0.5 + (var(--animation-progress-decimal, 0) * 0.5)));
+ *     transition:
+ *       transform var(--animation-duration, 600ms) var(--animation-easing, ease),
+ *       opacity   var(--animation-duration, 600ms) var(--animation-easing, ease);
+ *   }
+ *   .animated-element[data-visible="true"]  
+ *   .animated-element[data-visible="false"] 
  */
 export function useAnimatedElement({
   ref,
-  animation = "scale-in",
-  mode = "load",          // kept for API compatibility; only "load" behavior here
-  duration = 600,         // ms
+  // timing vars (JS only supplies values; CSS decides how to use them)
+  duration = 600,             // ms
+  delay = 0,                  // ms
+  easing = "cubic-bezier(0.4, 0, 0.2, 1)",
+  // visibility config
   threshold = 0.2,
-  // number (-50) becomes "0px 0px -50px 0px"
-  rootMargin = "50px",
-  // kept for API compat; CSS decides whether reverse looks animated
-  reverse = true,
-  // pass true if you really want a single fire; otherwise infinite
+  rootMargin = "0px 0px -50px 0px", // trigger shortly before enter by default
   once = false,
+  // callbacks
   onStart,
-  onComplete,   // NOTE: not timed; if you need exact end, listen for transitionend in the component
+  onComplete, // NOTE: fires on enter edge; for exact end, listen to transitionend in your component
   onReverse,
 } = {}) {
   const elementRef = ref || useRef(null);
 
-  // normalize rootMargin for IntersectionObserver
-  const ioRootMargin =
-    typeof rootMargin === "number" ? `0px 0px ${rootMargin}px 0px` : String(rootMargin || "0px");
+  // normalize rootMargin:
+  // - number => bottom offset (px)
+  // - "-50px" => bottom offset string expanded
+  // - "a b c d" => used as-is
+  const normalizeRootMargin = (rm) => {
+    if (typeof rm === "number") return `0px 0px ${rm}px 0px`;
+    const trimmed = String(rm || "").trim();
+    if (/^-?\d+px$/.test(trimmed)) return `0px 0px ${trimmed} 0px`;
+    return trimmed || "0px";
+  };
 
-  // visibility (pass through "once" exactly as requested)
-  const inView = useVisibility(elementRef, { threshold, rootMargin: ioRootMargin, once });
+  const inView = useVisibility(elementRef, {
+    threshold,
+    rootMargin: normalizeRootMargin(rootMargin),
+    once,
+  });
 
-  // simple bookkeeping (optional outputs)
+  // Edge-detected direction for data attributes
   const [direction, setDirection] = useState("forward"); // "forward" | "reverse"
   const prevInViewRef = useRef(false);
 
-  // apply static classes & duration
   useEffect(() => {
-    const el = elementRef.current;
-    if (!el) return;
-
-    const classes = String(animation).trim().split(/\s+/).filter(Boolean);
-    el.classList.add("animated-element", ...classes);
-    el.style.setProperty("--animation-duration", `${duration}ms`);
-
-    return () => {
-      el.classList.remove("animated-element", ...classes);
-      el.style.removeProperty("--animation-duration");
-      el.style.removeProperty("--animation-direction");
-      el.removeAttribute("data-visible");
-    };
-  }, [animation, duration]);
-
-  // core: toggle visibility attrs on enter/exit
-  useEffect(() => {
-    if (mode !== "load") return; // only "load" semantics here
-
-    const el = elementRef.current;
-    if (!el) return;
-
     const prev = prevInViewRef.current;
     const justEntered = inView && !prev;
-    const justExited  = !inView && prev;
+    const justExited = !inView && prev;
 
     if (justEntered) {
       setDirection("forward");
-      el.dataset.visible = "true";
-      el.style.setProperty("--animation-direction", "forward");
       onStart?.();
-      onComplete?.(); // fire immediately; remove if you rely on precise timing
+      onComplete?.();
     }
-
     if (justExited) {
       setDirection("reverse");
-      el.dataset.visible = "false";
-      el.style.setProperty("--animation-direction", "reverse");
       onReverse?.();
     }
 
-    // if neither edge, still reflect current visibility
-    if (!justEntered && !justExited) {
-      el.dataset.visible = inView ? "true" : "false";
-    }
-
     prevInViewRef.current = inView;
-  }, [inView, mode, onStart, onComplete, onReverse]);
+  }, [inView, onStart, onComplete, onReverse]);
 
-  // return a familiar shape; progress is binary here (0/100)
+  // Provide CSS vars & data attrs to spread on the element.
+  const progress = inView ? 100 : 0;
+  const progressDecimal = inView ? 1 : 0;
+
+  const style = useMemo(
+    () => ({
+      // timing
+      "--animation-duration": `${duration}ms`,
+      "--animation-delay": `${delay}ms`,
+      "--animation-easing": easing,
+      // progress model
+      "--animation-progress": `${progress}%`,
+      "--animation-progress-decimal": progressDecimal,
+      "--animation-direction": direction,
+    }),
+    [duration, delay, easing, progress, progressDecimal, direction]
+  );
+
+  const props = useMemo(
+    () => ({
+      style,
+      "data-visible": inView ? "true" : "false",
+      "data-animation-direction": direction,
+    }),
+    [style, inView, direction]
+  );
+
   return {
     ref: elementRef,
     inView,
-    progress: inView ? 100 : 0,
-    isAnimating: inView,           // with transition-based CSS, "animating" === visible state
-    hasAnimated: inView,           // simple alias; keep if your callers read it
-    direction,                     // "forward" | "reverse"
+    progress,
+    progressDecimal,
+    direction,             // "forward" | "reverse"
+    isAnimating: inView,   // with transition-based CSS, "visible" maps to animating
+    hasAnimated: inView,
+    // spread this on your element
+    props,
+    // exposed for convenience if you want to merge/override manually
+    style,
   };
 }
