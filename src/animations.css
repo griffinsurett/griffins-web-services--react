@@ -1,0 +1,136 @@
+/* Add these scale animations to your animation.css */
+
+/* ───────────────────────────────────────────────────── */
+/* SCALE ANIMATIONS (Additional)                         */
+/* ───────────────────────────────────────────────────── */
+
+/* Basic scale in - grows from 0 to full size */
+.scale-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(0.5 + (var(--animation-progress-decimal) * 0.5)));
+  transition: all var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scale in with overshoot */
+.scale-in-overshoot {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(
+    0.5 + (var(--animation-progress-decimal) * 0.55) - 
+    (var(--animation-progress-decimal) * var(--animation-progress-decimal) * 0.05)
+  ));
+  transition: all var(--animation-duration) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Scale from center */
+.scale-center {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(var(--animation-progress-decimal)));
+  transform-origin: center center;
+  transition: all var(--animation-duration) ease-out;
+}
+
+/* Scale X only */
+.scale-x {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scaleX(calc(var(--animation-progress-decimal)));
+  transform-origin: left center;
+  transition: all var(--animation-duration) ease-out;
+}
+
+/* Scale Y only */
+.scale-y {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scaleY(calc(var(--animation-progress-decimal)));
+  transform-origin: top center;
+  transition: all var(--animation-duration) ease-out;
+}
+
+/* Zoom effect (scale + slight blur) */
+.zoom-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(0.8 + (var(--animation-progress-decimal) * 0.2)));
+  filter: blur(calc((1 - var(--animation-progress-decimal)) * 2px));
+  transition: all var(--animation-duration) ease-out;
+}
+
+/* Pulse scale (for attention) */
+.scale-pulse {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(
+    0.95 + (var(--animation-progress-decimal) * 0.05) + 
+    (sin(var(--animation-progress-decimal) * 3.14159) * 0.02)
+  ));
+  transition: all var(--animation-duration) ease-in-out;
+}
+
+/* Scale with rotation */
+.scale-rotate {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: 
+    scale(calc(0.5 + (var(--animation-progress-decimal) * 0.5)))
+    rotate(calc((1 - var(--animation-progress-decimal)) * -180deg));
+  transition: all var(--animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pop in (scale with bounce) */
+.pop-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(
+    0.3 + (var(--animation-progress-decimal) * 0.7) +
+    (sin(var(--animation-progress-decimal) * 6.28318) * 0.05 * (1 - var(--animation-progress-decimal)))
+  ));
+  transition: all var(--animation-duration) cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Shrink out (inverse scale) */
+.shrink-out {
+  opacity: calc(1 - var(--animation-progress-decimal));
+  transform: scale(calc(1 - (var(--animation-progress-decimal) * 0.5)));
+  transition: all var(--animation-duration) ease-in;
+}
+
+/* ───────────────────────────────────────────────────── */
+/* STAGGER SUPPORT                                       */
+/* ───────────────────────────────────────────────────── */
+
+/* Add animation delay support for staggered animations */
+.animated-element {
+  animation-delay: var(--animation-delay, 0ms);
+  transition-delay: var(--animation-delay, 0ms);
+}
+
+/* Hover states for animated elements */
+.animated-element.scale-in:hover {
+  transform: scale(calc(
+    (0.5 + (var(--animation-progress-decimal) * 0.5)) * 1.05
+  ));
+}
+
+.animated-element.scale-center:hover {
+  transform: scale(calc(var(--animation-progress-decimal) * 1.05));
+}
+
+/* ───────────────────────────────────────────────────── */
+/* RESPONSIVE SCALE ADJUSTMENTS                         */
+/* ───────────────────────────────────────────────────── */
+
+/* Reduce scale animations on mobile for better performance */
+@media (max-width: 768px) {
+  .scale-in,
+  .scale-in-overshoot,
+  .scale-center,
+  .zoom-in,
+  .scale-rotate,
+  .pop-in {
+    transform: scale(calc(0.8 + (var(--animation-progress-decimal) * 0.2)));
+  }
+  
+  /* Disable complex animations on very small screens */
+  @media (max-width: 480px) {
+    .scale-rotate,
+    .pop-in {
+      transform: scale(calc(0.9 + (var(--animation-progress-decimal) * 0.1)));
+      filter: none;
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import "./App.css";
+import "./animations.css"
 import FAQSection from "./Sections/FAQ";
 import Header from "./Sections/Header";
 import Footer from "./Sections/Footer";

@@ -1,11 +1,11 @@
-// src/components/About.jsx
+// src/Sections/About.jsx
 import React from "react";
 import FeatureCard from "../components/LoopComponents/FeatureCard";
 import Heading from "../components/Heading";
 import { siteData } from "../siteData";
 
 const About = () => {
-   const Services = [
+  const Services = [
     {
       icon: "💭",
       title: "Dream",
@@ -24,12 +24,6 @@ const About = () => {
       description:
         "Fast, secure, and scalable websites built with modern technology. From simple landing pages to complex e-commerce platforms, we bring your vision to life.",
     },
-    // {
-    //   icon: "🛠️",
-    //   title: "Ongoing Support",
-    //   description:
-    //     "24/7 maintenance, updates, and support to keep your website running smoothly. We're your long-term partner in digital growth and success.",
-    // },
   ];
 
   return (
@@ -45,13 +39,18 @@ const About = () => {
             textClass="emphasized-text"
           />
           <p className="large-text mb-8">
-Websites is what we do, we’re here to make you a lightning fast, secure, and scalable website that handles your marketing campaigns, integrates with ai, and stands the test of time. 
+            Websites is what we do, we're here to make you a lightning fast, secure, and scalable website that handles your marketing campaigns, integrates with ai, and stands the test of time.
           </p>
         </div>
 
         <div className="max-3-secondary">
           {Services.map((item, idx) => (
-            <FeatureCard key={idx} data={item} />
+            <FeatureCard 
+              key={idx} 
+              data={item}
+              animationDelay={idx * 300} // Stagger by 300ms
+              animationDuration={600}
+            />
           ))}
         </div>
       </div>
