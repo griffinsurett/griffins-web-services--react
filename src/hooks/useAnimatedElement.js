@@ -1,196 +1,106 @@
 // src/hooks/useAnimatedElement.js
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useVisibility } from "./useVisibility";
-import { useScrollInteraction } from "./useInteractions";
-import { useReversibleProgress } from "./useReversibleProgress";
 
 /**
- * useAnimatedElement - Drive CSS animations via visibility and scroll
- * 
- * @param {Object} options
- * @param {React.RefObject} options.ref - Element to animate
- * @param {string} options.animation - CSS animation class name(s)
- * @param {string} options.mode - "load" | "scroll"
- * @param {number} options.duration - Animation duration in ms
- * @param {number} options.threshold - Visibility threshold (0-1)
- * @param {string|number} options.rootMargin - IO rootMargin for early/late trigger
- * @param {boolean} options.reverse - Allow reverse on scroll up/exit
- * @param {boolean} options.once - Only animate once
- * @param {Function} options.onStart - Animation start callback
- * @param {Function} options.onComplete - Animation complete callback
- * @param {Function} options.onReverse - Animation reverse callback
+ * Minimal "visibility-only" animation driver.
+ * - Animates IN when entering viewport
+ * - Animates OUT when leaving viewport
+ * - Repeats forever (unless once=true is passed to useVisibility)
+ *
+ * Assumes your CSS transitions between states using data attributes:
+ *   .animated-element.scale-in { opacity:0; transform:scale(.96);
+ *     transition: transform var(--animation-duration) ease, opacity var(--animation-duration) ease; }
+ *   .animated-element.scale-in[data-visible="true"]  { opacity:1; transform:scale(1); }
+ *   .animated-element.scale-in[data-visible="false"] { opacity:0; transform:scale(.96); }
  */
 export function useAnimatedElement({
   ref,
   animation = "scale-in",
-  mode = "load",
-  duration = 1000,
-  threshold = 0.3,
-  rootMargin = "0px",
+  mode = "load",          // kept for API compatibility; only "load" behavior here
+  duration = 600,         // ms
+  threshold = 0.2,
+  // number (-50) becomes "0px 0px -50px 0px"
+  rootMargin = "50px",
+  // kept for API compat; CSS decides whether reverse looks animated
   reverse = true,
+  // pass true if you really want a single fire; otherwise infinite
   once = false,
   onStart,
-  onComplete,
+  onComplete,   // NOTE: not timed; if you need exact end, listen for transitionend in the component
   onReverse,
 } = {}) {
   const elementRef = ref || useRef(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const animationStartedRef = useRef(false);
 
-  // Visibility detection
-  const inView = useVisibility(elementRef, {
-    threshold,
-    rootMargin,
-    once: once && mode === "load",
-  });
+  // normalize rootMargin for IntersectionObserver
+  const ioRootMargin =
+    typeof rootMargin === "number" ? `0px 0px ${rootMargin}px 0px` : String(rootMargin || "0px");
 
-  // Progress engine for reversible animations
-  const { 
-    percent, 
-    reversing, 
-    setEngaged, 
-    reverseOnce, 
-    reset 
-  } = useReversibleProgress({
-    duration,
-    mode: reverse ? "backAndForth" : "forwardOnly",
-  });
+  // visibility (pass through "once" exactly as requested)
+  const inView = useVisibility(elementRef, { threshold, rootMargin: ioRootMargin, once });
 
-  // Scroll-based progress tracking
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const scrollDirRef = useRef("none");
+  // simple bookkeeping (optional outputs)
+  const [direction, setDirection] = useState("forward"); // "forward" | "reverse"
+  const prevInViewRef = useRef(false);
 
-  // Calculate scroll-based progress
-  const calculateScrollProgress = useCallback(() => {
-    const el = elementRef.current;
-    if (!el || mode !== "scroll") return 0;
-
-    const rect = el.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const elementCenter = rect.top + rect.height / 2;
-    const screenCenter = windowHeight / 2;
-    
-    // Progress based on element center vs screen center
-    // 0 = element below screen center
-    // 50 = element at screen center
-    // 100 = element above screen center
-    const offset = screenCenter - elementCenter;
-    const maxOffset = screenCenter + rect.height / 2;
-    const progress = Math.max(0, Math.min(100, (offset / maxOffset) * 50 + 50));
-    
-    return progress;
-  }, [mode, elementRef]);
-
-  // Scroll interaction for scroll mode
-  useScrollInteraction({
-    elementRef: null, // Use window
-    scrollThreshold: 1,
-    debounceDelay: 16, // ~60fps
-    
-    onScrollActivity: useCallback(({ dir }) => {
-      if (mode !== "scroll" || !inView) return;
-      
-      const progress = calculateScrollProgress();
-      setScrollProgress(progress);
-      scrollDirRef.current = dir;
-      
-      // Update element based on scroll
-      const el = elementRef.current;
-      if (el) {
-        el.style.setProperty("--animation-progress", `${progress}%`);
-        el.style.setProperty("--animation-progress-decimal", progress / 100);
-        el.style.setProperty("--animation-direction", dir === "down" ? "forward" : "reverse");
-      }
-    }, [mode, inView, calculateScrollProgress, elementRef]),
-  });
-
-  // Apply animation classes and properties
+  // apply static classes & duration
   useEffect(() => {
     const el = elementRef.current;
     if (!el) return;
 
-    // Add animation classes
-    const animationClasses = animation.split(" ");
-    el.classList.add("animated-element", ...animationClasses);
-
-    // Set initial CSS custom properties
+    const classes = String(animation).trim().split(/\s+/).filter(Boolean);
+    el.classList.add("animated-element", ...classes);
     el.style.setProperty("--animation-duration", `${duration}ms`);
 
     return () => {
-      // Cleanup
-      el.classList.remove("animated-element", ...animationClasses);
-      el.style.removeProperty("--animation-progress");
-      el.style.removeProperty("--animation-progress-decimal");
-      el.style.removeProperty("--animation-direction");
+      el.classList.remove("animated-element", ...classes);
       el.style.removeProperty("--animation-duration");
+      el.style.removeProperty("--animation-direction");
+      el.removeAttribute("data-visible");
     };
-  }, [animation, duration, elementRef]);
+  }, [animation, duration]);
 
-  // Handle load mode animation
+  // core: toggle visibility attrs on enter/exit
   useEffect(() => {
-    if (mode !== "load") return;
-    
+    if (mode !== "load") return; // only "load" semantics here
+
     const el = elementRef.current;
     if (!el) return;
 
-    if (inView && !hasAnimated) {
-      setEngaged(true);
-      if (!animationStartedRef.current) {
-        animationStartedRef.current = true;
-        onStart?.();
-      }
-    } else if (!inView && reverse && hasAnimated && !once) {
-      reverseOnce();
-      onReverse?.();
-    }
+    const prev = prevInViewRef.current;
+    const justEntered = inView && !prev;
+    const justExited  = !inView && prev;
 
-    // Update progress
-    el.style.setProperty("--animation-progress", `${percent}%`);
-    el.style.setProperty("--animation-progress-decimal", percent / 100);
-    el.style.setProperty("--animation-direction", reversing ? "reverse" : "forward");
-
-    // Check completion
-    if (percent >= 100 && !hasAnimated) {
-      setHasAnimated(true);
-      onComplete?.();
-    }
-  }, [mode, inView, percent, reversing, hasAnimated, once, reverse, setEngaged, reverseOnce, onStart, onComplete, onReverse, elementRef]);
-
-  // Handle scroll mode animation  
-  useEffect(() => {
-    if (mode !== "scroll") return;
-    
-    if (scrollProgress > 0 && !animationStartedRef.current) {
-      animationStartedRef.current = true;
+    if (justEntered) {
+      setDirection("forward");
+      el.dataset.visible = "true";
+      el.style.setProperty("--animation-direction", "forward");
       onStart?.();
+      onComplete?.(); // fire immediately; remove if you rely on precise timing
     }
-    
-    if (scrollProgress >= 100 && !hasAnimated) {
-      setHasAnimated(true);
-      onComplete?.();
-    } else if (scrollProgress <= 0 && hasAnimated && reverse) {
-      setHasAnimated(false);
+
+    if (justExited) {
+      setDirection("reverse");
+      el.dataset.visible = "false";
+      el.style.setProperty("--animation-direction", "reverse");
       onReverse?.();
     }
-  }, [mode, scrollProgress, hasAnimated, reverse, onStart, onComplete, onReverse]);
 
-  // Reset when leaving view (for non-once animations)
-  useEffect(() => {
-    if (once && hasAnimated) return;
-    
-    if (!inView && mode === "load" && !once) {
-      reset();
-      setHasAnimated(false);
-      animationStartedRef.current = false;
+    // if neither edge, still reflect current visibility
+    if (!justEntered && !justExited) {
+      el.dataset.visible = inView ? "true" : "false";
     }
-  }, [inView, mode, once, hasAnimated, reset]);
 
+    prevInViewRef.current = inView;
+  }, [inView, mode, onStart, onComplete, onReverse]);
+
+  // return a familiar shape; progress is binary here (0/100)
   return {
     ref: elementRef,
     inView,
-    progress: mode === "load" ? percent : scrollProgress,
-    isAnimating: mode === "load" ? (percent > 0 && percent < 100) : (scrollProgress > 0 && scrollProgress < 100),
-    hasAnimated,
-    direction: mode === "load" ? (reversing ? "reverse" : "forward") : scrollDirRef.current,
+    progress: inView ? 100 : 0,
+    isAnimating: inView,           // with transition-based CSS, "animating" === visible state
+    hasAnimated: inView,           // simple alias; keep if your callers read it
+    direction,                     // "forward" | "reverse"
   };
 }
