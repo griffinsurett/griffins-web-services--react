@@ -3,7 +3,6 @@ import React from "react";
 import Button from "../components/Buttons/Button";
 import Heading from "../components/Heading";
 import { siteData } from "../siteData";
-import TestimonialsCirclesSection from "./TestimonialsCirclesSection";
 
 const Hero = () => {
   return (
@@ -30,7 +29,6 @@ const Hero = () => {
             View Our Work 👀
           </Button>
         </div>
-                  {/* <TestimonialsCirclesSection /> */}
         </div>
       </div>
     </section>

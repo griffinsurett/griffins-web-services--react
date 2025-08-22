@@ -1,4 +1,3 @@
-// src/Sections/WebsiteTypes.jsx
 import React, {
   useState,
   useEffect,
@@ -8,76 +7,26 @@ import React, {
 } from "react";
 import EnhancedAccordionItem from "../components/LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "../components/VideoPlayer";
-import { useVisibility } from "../hooks/useVisibility";
 import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
 import Heading from "../components/Heading";
 import BorderTitle from "../components/BorderTitle";
-import AnimatedElementWrapper from "../components/AnimatedElementWrapper"; // ⬅️ add this import
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
 
 const demoVideo = EarRape;
 
 const WebsiteTypes = () => {
-  const sectionRef = useRef(null);
-
   const websiteTypes = [
-    {
-      icon: "🚀",
-      title: "Landing Pages",
-      description:
-        "High-converting single-page websites designed to capture leads and drive specific actions for your marketing campaigns.",
-      videoSrc: demoVideo,
-    },
-    {
-      icon: "🏢",
-      title: "Small Business Websites",
-      description:
-        "Professional websites that establish credibility and help local businesses attract and retain customers online.",
-      videoSrc: demoVideo,
-    },
-    {
-      icon: "💼",
-      title: "Personal Portfolio Websites",
-      description:
-        "Showcase your work, skills, and achievements with a stunning portfolio that makes you stand out from the competition.",
-      videoSrc: demoVideo,
-    },
-    {
-      icon: "✍️",
-      title: "Blogs",
-      description:
-        "Content-focused websites with easy-to-use publishing tools to share your expertise and build your audience.",
-      videoSrc: demoVideo,
-    },
-    {
-      icon: "🛒",
-      title: "E-Commerce Websites",
-      description:
-        "Complete online stores with shopping carts, secure payments, inventory management, and everything you need to sell online.",
-      videoSrc: demoVideo,
-    },
-    {
-      icon: "🏛️",
-      title: "Large Corporate Websites",
-      description:
-        "Enterprise-level websites with advanced functionality, multi-user management, and scalable architecture for growing companies.",
-      videoSrc: demoVideo,
-    },
-    {
-      icon: "⚙️",
-      title: "Custom Full-Stack Applications",
-      description:
-        "Bespoke web applications tailored to your unique business processes, with custom databases and advanced functionality.",
-      videoSrc: demoVideo,
-    },
+    { icon: "🚀", title: "Landing Pages",            description: "High-converting single-page websites designed to capture leads and drive specific actions for your marketing campaigns.",     videoSrc: demoVideo },
+    { icon: "🛠️", title: "Custom Websites", description: "Fully custom sites built around your brand and workflow—unique UX, motion, integrations, and back-end logic tailored end-to-end.", videoSrc: demoVideo},
+    { icon: "🏢", title: "Small Business Websites",  description: "Professional websites that establish credibility and help local businesses attract and retain customers online.",            videoSrc: demoVideo },
+    { icon: "💼", title: "Personal Portfolio Websites", description: "Showcase your work, skills, and achievements with a stunning portfolio that makes you stand out from the competition.", videoSrc: demoVideo },
+    { icon: "✍️", title: "Blogs",                    description: "Content-focused websites with easy-to-use publishing tools to share your expertise and build your audience.",              videoSrc: demoVideo },
+    { icon: "🛒", title: "E-Commerce Websites",      description: "Complete online stores with shopping carts, secure payments, inventory management, and everything you need to sell online.", videoSrc: demoVideo },
+    { icon: "🤝", title: "Restaurant Websites",      description: "Websites designed specifically for restaurants, featuring menus, reservations, and online ordering.",   videoSrc: demoVideo },
+    { icon: "🏛️", title: "Large Corporate Websites", description: "Enterprise-level websites with advanced functionality, multi-user management, and scalable architecture for growing companies.", videoSrc: demoVideo },
+    { icon: "⚙️", title: "Custom Full-Stack Applications", description: "Bespoke web applications tailored to your unique business processes, with custom databases and advanced functionality.", videoSrc: demoVideo },
   ];
-
-  // Just need IO to know when the section is visible
-  const isInView = useVisibility(sectionRef, {
-    threshold: 0.3,
-    onForward: () => {},
-    onBackward: () => {},
-  });
 
   const desktopVideoRef = useRef(null);
   const mobileVideoRef = useRef(null);
@@ -125,7 +74,7 @@ const WebsiteTypes = () => {
     resumeTriggers: ["scroll", "click-outside", "hover-away"],
     containerSelector: "[data-accordion-container], [data-video-container]",
     itemSelector: "[data-accordion-item], [data-video-container]",
-    inView: isInView,
+    inView: true,                 // ✅ always in-view; accordion drives behavior
     pauseOnEngage: false,
     engageOnlyOnActiveItem: true,
     activeItemAttr: "data-active",
@@ -169,7 +118,6 @@ const WebsiteTypes = () => {
   }, [radioName, selectIndex, websiteTypes.length]);
 
   const handleManualSelection = () => {
-    // clicking video/controls: just mark engagement
     core.engageUser();
   };
 
@@ -195,7 +143,7 @@ const WebsiteTypes = () => {
 
   // Reset & play ONLY when the ACTIVE INDEX changes
   useEffect(() => {
-    if (isTransitioning || !isInView) return;
+    if (isTransitioning) return; // ❌ removed !isInView check
 
     if (advanceTimeoutRef.current) {
       clearTimeout(advanceTimeoutRef.current);
@@ -219,20 +167,19 @@ const WebsiteTypes = () => {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [activeIndex, isTransitioning, isInView]); // ❗ no dependency on `reschedule`
+  }, [activeIndex, isTransitioning]); // ❗ removed isInView from deps
 
   const handleTimeUpdate = () => {
     const v = desktopVideoRef.current || mobileVideoRef.current;
     if (!v?.duration) return;
     setProgress((v.currentTime / v.duration) * 100);
-    // Recompute auto-advance timing as user scrubs/plays
     rescheduleRef.current?.();
   };
 
   const handleEnded = () => {
     setProgress(100);
     if (advanceTimeoutRef.current) clearTimeout(advanceTimeoutRef.current);
-    if (isInView) handleVideoEnded();
+    handleVideoEnded(); // ❌ no isInView gate
   };
 
   const handleVideoLoad = () => {
@@ -252,13 +199,12 @@ const WebsiteTypes = () => {
   };
 
   const handleVideoClick = () => {
-    // mark engagement only; do NOT pause the video
-    handleManualSelection();
+    core.engageUser();
   };
 
   return (
     <section
-      ref={sectionRef}
+      /* ref={sectionRef} ❌ removed */
       className="outer-section bg-bg2 relative"
       id="website-types"
     >
@@ -287,9 +233,9 @@ const WebsiteTypes = () => {
                 key={idx}
                 variant="fade-in"
                 animationDuration={600}
-                animationDelay={idx * 300} // ⬅️ same stagger you had
+                animationDelay={idx * 300}
                 threshold={0}
-                rootMargin="0px 0px -50px 0px" // early trigger
+                rootMargin="0px 0px -50px 0px"
                 once={false}
               >
                 <EnhancedAccordionItem
@@ -330,6 +276,14 @@ const WebsiteTypes = () => {
                 data-video-container
                 data-active="true"
               >
+                <AnimatedElementWrapper
+                variant="fade-in"
+                animationDuration={600}
+                animationDelay={300}
+                threshold={0}
+                rootMargin="0px 0px -50px 0px"
+                once={false}
+              >
                 <VideoPlayer
                   key={`desktop-${activeIndex}`}
                   ref={desktopVideoRef}
@@ -341,18 +295,14 @@ const WebsiteTypes = () => {
                   desktop={true}
                   className="shadow-2xl shadow-accent/20"
                 />
-
+                </AnimatedElementWrapper>
                 {/* Debug */}
                 {process.env.NODE_ENV === "development" && (
                   <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
-                    <div>👁️ In View: {isInView ? "✅" : "❌"}</div>
-                    <div>
-                      ⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}
-                    </div>
+                    {/* ❌ removed In View line */}
+                    <div>⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
                     <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
-                    <div>
-                      ⏲️ Resume Scheduled: {isResumeScheduled ? "✅" : "❌"}
-                    </div>
+                    <div>⏲️ Resume Scheduled: {isResumeScheduled ? "✅" : "❌"}</div>
                     <div>🎪 Active Index: {activeIndex}</div>
                     <div>📊 Progress: {Math.round(progress)}%</div>
                   </div>

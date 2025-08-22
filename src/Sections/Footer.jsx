@@ -16,9 +16,11 @@ const footerNav = [
 
 export default function Footer() {
   return (
-    <footer className="relative">
+    <footer className="relative w-19/20 lg:9/10 mx-auto flex-col">
         {/* Contact Information */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 lg:gap-12">
+        <div className="footer-top flex justify-between items-center">
+          <Logo loading="lazy" trigger="visible" />
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6 lg:gap-12">
           {contactItems.map((item) => (
             <a 
               key={item.href}
@@ -43,7 +45,8 @@ export default function Footer() {
             </a>
           ))}
         </div>
-      <div className="text-center flex flex-wrap justify-between items-center w-19/20 lg:9/10 mx-auto py-3">
+        </div>
+      <div className="footer-bottom text-center py-3 w-full flex justify-between items-center">
         {/* Footer Navigation */}
         <div className="flex flex-wrap justify-center gap-6">
           {footerNav.map((item) => (
