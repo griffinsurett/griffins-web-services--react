@@ -89,7 +89,7 @@ function AccordionItem({
           <h3 className="h3 pr-4">{question}</h3>
           <div
             className={`flex-shrink-0 icon-xsmall transition-all main-duration ${
-              isOpen ? "bg-bg rotate-45" : "bg-primary/20 rotate-0"
+              isOpen ? "light:bg-heading dark:bg-primary dark:text-bg rotate-45" : "bg-primary/20 rotate-0"
             }`}
           >
             <svg
