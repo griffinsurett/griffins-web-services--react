@@ -2,6 +2,7 @@
 import React from "react";
 import AnimatedBorder from "../AnimatedBorder";
 import IconListItem from "./IconListItem";
+import { useAnimatedElement } from "../../hooks/useAnimatedElement";
 
 const RadioTab = ({
   id,
@@ -13,6 +14,18 @@ const RadioTab = ({
   className = "",
   size = "sm", // "sm" | "md" | "lg"
 }) => {
+  // Drive visibility + timing for the text only
+  const {
+    ref: textRef,
+    inView,
+    style: animStyle,
+  } = useAnimatedElement({
+    duration: 400, // fade length
+    delay: 0,
+    threshold: 0, // flip as soon as it's on screen
+    rootMargin: "0px 0px -15% 0px",
+  });
+  const isActiveVisible = checked && inView;
   const sizeClasses = {
     sm: {
       padding: "px-1.5 py-2",
@@ -61,9 +74,15 @@ const RadioTab = ({
         <label
           htmlFor={id}
           className={`
-            ${currentSize.padding} rounded-full flex-grow font-medium main-duration transition-all 
-            flex items-center ${currentSize.gap} cursor-pointer ${currentSize.text}
-          `}
+    ${
+      currentSize.padding
+    } rounded-full flex-grow font-medium main-duration transition-all
+    flex items-center ${currentSize.gap} cursor-pointer ${currentSize.text}
+    text-heading ${isActiveVisible ? "animated-element color-text-fade" : ""}
+  `}
+          ref={textRef}
+          style={isActiveVisible ? animStyle : undefined}
+          {...(isActiveVisible ? { "data-visible": "true" } : {})}
         >
           <IconListItem
             data={{ icon: category.icon, title: category.title }}

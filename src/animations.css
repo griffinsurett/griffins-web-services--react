@@ -250,3 +250,31 @@
     transform var(--animation-duration) var(--animation-easing);
 }
 
+/* BorderTitle text fade, then color swap to primary */
+.color-text-fade {
+  /* start hidden, keep current color (e.g., text-heading) */
+  opacity: 0;
+
+  /* animate ONLY opacity; color switches at the end with a 0ms delayed transition */
+  transition-property: opacity, color;
+  transition-duration: var(--animation-duration, 600ms), 0ms;
+  transition-timing-function: var(--animation-easing, ease), linear;
+  transition-delay:
+    var(--animation-delay, 0ms),
+    calc(var(--animation-delay, 0ms) + var(--animation-duration, 600ms));
+}
+
+.color-text-fade[data-visible="true"] {
+  opacity: 1;
+  /* swap to your "text-primary" token; matches the rest of your system */
+  color: var(--color-primary);
+}
+
+/* reduced motion: skip fade but still apply final color */
+@media (prefers-reduced-motion: reduce) {
+  .color-text-fade {
+    transition: none;
+    opacity: 1;
+    color: var(--color-primary);
+  }
+}

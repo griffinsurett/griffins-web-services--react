@@ -1,6 +1,7 @@
 // src/components/BorderTitle.jsx
 import React from "react";
 import AnimatedBorder from "./AnimatedBorder";
+import { useAnimatedElement } from "../hooks/useAnimatedElement";
 import Heading from "./Heading";
 
 /**
@@ -15,6 +16,14 @@ export default function BorderTitle({
   hoverSweep = true,
   pillClassName = "text-sm px-5 py-2.5 tracking-wider",
 }) {
+  // Drive visibility + timing for the text only
+  const { ref: textRef, props: textAnimProps } = useAnimatedElement({
+    duration,          // fade length
+    delay: 0,
+    threshold: 0,      // flip as soon as it's on screen
+    rootMargin: "0px 0px -15% 0px",
+  });
+
   return (
     <div className="inline-block mb-3">
       <div className="relative inline-block">
@@ -30,9 +39,15 @@ export default function BorderTitle({
         >
           <Heading
             tagName="span"
-            className={`uppercase tracking-wider font-semibold text-heading${className}`}
+            className={`uppercase tracking-wider font-semibold text-heading ${className}`}
           >
-            {children}
+            <span
+              ref={textRef}
+              className="animated-element color-text-fade"
+              {...textAnimProps}
+            >
+              {children}
+            </span>
           </Heading>
         </AnimatedBorder>
 
