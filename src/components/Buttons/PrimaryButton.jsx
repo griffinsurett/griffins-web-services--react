@@ -19,13 +19,12 @@ const PrimaryButton = ({ Base = "button", className = "", ...props }) => {
   ].join(" ");
 
   return (
-    <div ref={anim.ref} className="block w-full lg:w-auto">
-      <Base
-        className={`animated-element zoom-in w-full ${classes} ${className}`}
-        style={anim.style}
-        {...props}
-      />
-    </div>
+    <Base
+      ref={anim.ref}                     // observe THIS element
+      className={`animated-element zoom-in ${classes} ${className}`}
+      {...anim.props}                    // adds data-visible & CSS vars
+      {...props}
+    />
   );
 };
 
