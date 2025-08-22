@@ -4,6 +4,7 @@ import Button from "../components/Buttons/Button";
 import AccordionItem from "../components/LoopComponents/AccordionItem";
 import BorderTitle from "../components/BorderTitle";
 import Heading from "../components/Heading";
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper"; // Import the animated wrapper
 
 const FAQ = () => {
   const faqs = [
@@ -37,6 +38,15 @@ const FAQ = () => {
 
         <div className="space-y-4">
           {faqs.map((faq, idx) => (
+        <AnimatedElementWrapper
+            key={`faq-${idx}`}
+            variant="fade-in"
+            animationDuration={600}
+            animationDelay={idx *300} // ⬅️ same stagger you had
+            threshold={0.2}
+            rootMargin="0px 0px -50px 0px" // early trigger
+            once={false}
+          >
             <AccordionItem
               key={idx}
               data={faq}
@@ -44,6 +54,7 @@ const FAQ = () => {
               value={String(idx)} // radio value
               defaultOpen={idx === 0} // open the first by default (optional)
             />
+            </AnimatedElementWrapper>
           ))}
         </div>
 

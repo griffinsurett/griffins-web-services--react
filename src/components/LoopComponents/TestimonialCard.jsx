@@ -7,7 +7,6 @@ export default function TestimonialCard({
   className = "",
   ringDuration = 800,
   // animation props intentionally ignored here; animation now happens in the loop wrapper
-  animationMode,
   animationDuration,
   animationDelay,
 }) {

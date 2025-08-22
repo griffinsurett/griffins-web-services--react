@@ -4,7 +4,7 @@ import Heading from "../components/Heading";
 import Button from "../components/Buttons/Button";
 import FeatureCard from "../components/LoopComponents/FeatureCard";
 import RadioTab from "../components/LoopComponents/RadioTab";
-import AnimatedElementWrapper from "../components/LoopComponents/AnimatedElementWrapper"; // ⬅️ add this import
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper"; // ⬅️ add this import
 
 const AddOnServices = () => {
   const [activeTab, setActiveTab] = useState("branding");
@@ -98,7 +98,7 @@ const AddOnServices = () => {
             "Analyze and improve your website's conversion performance.",
           featured: false,
         },
-          {
+        {
           icon: "📱",
           title: "Social Media Design Templates",
           description:
@@ -240,7 +240,7 @@ const AddOnServices = () => {
             "Real-time data synchronization and third-party integrations.",
           featured: false,
         },
-          {
+        {
           icon: "🧠",
           title: "AI Agents",
           description:
@@ -347,7 +347,13 @@ const AddOnServices = () => {
         {/* Section Header */}
         <div className="text-section">
           <BorderTitle>Website Enhancements</BorderTitle>
-          <Heading tagName="h2" className="mb-4" before="Add-On " text="Services" textClass="emphasized-text" />
+          <Heading
+            tagName="h2"
+            className="mb-4"
+            before="Add-On "
+            text="Services"
+            textClass="emphasized-text"
+          />
           <p className="large-text">
             Enhance your website with specialized features and support. Choose
             the categories that best fit your needs.
@@ -357,16 +363,26 @@ const AddOnServices = () => {
         {/* Tab Navigation */}
         <div className="flex flex-wrap gap-2 lg:gap-auto justify-center lg:justify-between">
           {Object.entries(categories).map(([key, category]) => (
-            <RadioTab
+            <AnimatedElementWrapper
               key={key}
-              id={`addon-tab-${key}`}
-              name="addon-category"
-              value={key}
-              checked={activeTab === key}
-              onChange={handleTabChange}
-              category={category}
-              size="sm"
-            />
+              variant="fade-in"
+              animationDuration={600}
+              animationDelay={key * 600} // ⬅️ same stagger you had
+              threshold={0.2}
+              rootMargin="0px 0px -50px 0px" // early trigger
+              once={false}
+            >
+              <RadioTab
+                key={key}
+                id={`addon-tab-${key}`}
+                name="addon-category"
+                value={key}
+                checked={activeTab === key}
+                onChange={handleTabChange}
+                category={category}
+                size="sm"
+              />
+            </AnimatedElementWrapper>
           ))}
         </div>
 
@@ -378,12 +394,10 @@ const AddOnServices = () => {
               <AnimatedElementWrapper
                 key={index}
                 variant="scale-in"
-                animationMode="load"
                 animationDuration={600}
-                animationDelay={index * 120}   // ⬅️ light stagger for grids
+                animationDelay={index * 120} // ⬅️ light stagger for grids
                 threshold={0.2}
                 rootMargin="0px 0px -50px 0px"
-                reverse
                 once={false}
               >
                 <FeatureCard
@@ -396,26 +410,24 @@ const AddOnServices = () => {
 
           {/* CTA Section */}
           <AnimatedElementWrapper
-                variant="scale-in"
-                animationMode="load"
-                animationDuration={600}
-                threshold={0.2}
-                rootMargin="0px 0px -50px 0px"
-                reverse
-                once={false}
-              >
-          <div className="text-center p-8 card-bg rounded-2xl w-full mx-auto">
-            <Heading tagName="h3" className="h3 mb-3">
-              Interested in {categories[activeTab].title} Services?
-            </Heading>
-            <p className="secondary-text mb-6">
-              Let's discuss how we can enhance your website with these premium
-              features.
-            </p>
-            <Button variant="primary" href="#contact">
-              Get a Custom Quote 💬
-            </Button>
-          </div>
+            variant="scale-in"
+            animationDuration={600}
+            threshold={0.2}
+            rootMargin="0px 0px -50px 0px"
+            once={false}
+          >
+            <div className="text-center p-8 card-bg rounded-2xl w-full mx-auto">
+              <Heading tagName="h3" className="h3 mb-3">
+                Interested in {categories[activeTab].title} Services?
+              </Heading>
+              <p className="secondary-text mb-6">
+                Let's discuss how we can enhance your website with these premium
+                features.
+              </p>
+              <Button variant="primary" href="#contact">
+                Get a Custom Quote 💬
+              </Button>
+            </div>
           </AnimatedElementWrapper>
         </div>
       </div>

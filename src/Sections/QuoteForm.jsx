@@ -6,7 +6,7 @@ import Textarea from "../components/Form/Textarea";
 import Select from "../components/Form/Select";
 import BorderTitle from "../components/BorderTitle";
 import Heading from "../components/Heading";
-import AnimatedElementWrapper from "../components/LoopComponents/AnimatedElementWrapper"; // ⬅️ add this
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper"; // ⬅️ add this
 
 const QuoteForm = () => {
   const [formData, setFormData] = useState({
@@ -78,12 +78,10 @@ const QuoteForm = () => {
         {/* ⬇️ Animate the entire form: scale-in on enter, out on exit */}
         <AnimatedElementWrapper
           variant="scale-in"
-          animationMode="load"
           animationDuration={800}
-          animationDelay={120}            // tweak or remove if you don’t want a delay
+          animationDelay={120} // tweak or remove if you don’t want a delay
           threshold={0.2}
-          rootMargin="0px"  // trigger a bit before entering
-          reverse
+          rootMargin="0px" // trigger a bit before entering
           once={false}
         >
           <form

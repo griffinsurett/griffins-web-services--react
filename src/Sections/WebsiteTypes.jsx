@@ -1,5 +1,11 @@
 // src/Sections/WebsiteTypes.jsx
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import EnhancedAccordionItem from "../components/LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "../components/VideoPlayer";
 import { useVisibility } from "../hooks/useVisibility";
@@ -7,6 +13,7 @@ import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
 import Heading from "../components/Heading";
 import BorderTitle from "../components/BorderTitle";
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper"; // ⬅️ add this import
 
 const demoVideo = EarRape;
 
@@ -92,7 +99,7 @@ const WebsiteTypes = () => {
   // ===== INLINE ACCORDION AUTOPLAY LOGIC =====
   const [activeIndex, setActiveIndex] = useState(0);
   const radioName = "website-types";
-  
+
   const suppressEngageRef = useRef(false);
   const engageRef = useRef(null);
 
@@ -157,7 +164,8 @@ const WebsiteTypes = () => {
       selectIndex(0);
     }
 
-    return () => radios.forEach((r) => r.removeEventListener("change", onChange));
+    return () =>
+      radios.forEach((r) => r.removeEventListener("change", onChange));
   }, [radioName, selectIndex, websiteTypes.length]);
 
   const handleManualSelection = () => {
@@ -166,8 +174,8 @@ const WebsiteTypes = () => {
   };
 
   const handleVideoEnded = useCallback(() => {
-   core.beginGraceWindow(); // tell the engine we're in the delay/grace window
- }, [core.beginGraceWindow]);
+    core.beginGraceWindow(); // tell the engine we're in the delay/grace window
+  }, [core.beginGraceWindow]);
 
   const isAutoplayPaused = core.isAutoplayPaused;
   const userEngaged = core.userEngaged;
@@ -249,7 +257,11 @@ const WebsiteTypes = () => {
   };
 
   return (
-    <section ref={sectionRef} className="outer-section bg-bg2 relative" id="website-types">
+    <section
+      ref={sectionRef}
+      className="outer-section bg-bg2 relative"
+      id="website-types"
+    >
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">
@@ -267,39 +279,46 @@ const WebsiteTypes = () => {
           </p>
         </div>
 
-        <div
-          className="max-2-primary"
-          data-accordion-container
-        >
+        <div className="max-2-primary" data-accordion-container>
           {/* Left: Accordion list */}
           <div className="flex flex-col space-y-4">
-            {websiteTypes.map((websiteType, i) => (
-              <EnhancedAccordionItem
-                key={i}
-                data={websiteType}
-                isActive={activeIndex === i}
-                progress={progress}
-                onToggle={handleRadioChange}
-                shouldShowFullBorder={false}
-                index={i}
-                name="website-types"
-                value={i.toString()}
-                className="transition-all duration-300"
+            {websiteTypes.map((websiteType, idx) => (
+              <AnimatedElementWrapper
+                key={idx}
+                variant="fade-in"
+                animationDuration={600}
+                animationDelay={idx * 300} // ⬅️ same stagger you had
+                threshold={0}
+                rootMargin="0px 0px -50px 0px" // early trigger
+                once={false}
               >
-                {/* Mobile video for active item */}
-                {activeIndex === i && (
-                  <VideoPlayer
-                    key={`mobile-${i}-${activeIndex}`}
-                    ref={mobileVideoRef}
-                    src={websiteType.videoSrc}
-                    onTimeUpdate={handleTimeUpdate}
-                    onEnded={handleEnded}
-                    onLoadedData={handleVideoLoad}
-                    onClick={handleVideoClick}
-                    desktop={false}
-                  />
-                )}
-              </EnhancedAccordionItem>
+                <EnhancedAccordionItem
+                  key={idx}
+                  data={websiteType}
+                  isActive={activeIndex === idx}
+                  progress={progress}
+                  onToggle={handleRadioChange}
+                  shouldShowFullBorder={false}
+                  index={idx}
+                  name="website-types"
+                  value={idx.toString()}
+                  className="transition-all duration-300"
+                >
+                  {/* Mobile video for active item */}
+                  {activeIndex === idx && (
+                    <VideoPlayer
+                      key={`mobile-${idx}-${activeIndex}`}
+                      ref={mobileVideoRef}
+                      src={websiteType.videoSrc}
+                      onTimeUpdate={handleTimeUpdate}
+                      onEnded={handleEnded}
+                      onLoadedData={handleVideoLoad}
+                      onClick={handleVideoClick}
+                      desktop={false}
+                    />
+                  )}
+                </EnhancedAccordionItem>
+              </AnimatedElementWrapper>
             ))}
           </div>
 
@@ -323,8 +342,8 @@ const WebsiteTypes = () => {
                   className="shadow-2xl shadow-accent/20"
                 />
 
-                  {/* Debug */}
-                  {process.env.NODE_ENV === 'development' && (
+                {/* Debug */}
+                {process.env.NODE_ENV === "development" && (
                   <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
                     <div>👁️ In View: {isInView ? "✅" : "❌"}</div>
                     <div>

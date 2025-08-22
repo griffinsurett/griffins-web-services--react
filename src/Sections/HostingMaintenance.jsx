@@ -1,6 +1,6 @@
 // src/Sections/HostingMaintenance.jsx
 import React from "react";
-import AnimatedElementWrapper from "../components/LoopComponents/AnimatedElementWrapper";
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
 import FeatureCard from "../components/LoopComponents/FeatureCard";
 import PricingCard from "../components/LoopComponents/PricingCard";
 import StatisticListing from "../components/LoopComponents/StatisticListing";
@@ -164,12 +164,10 @@ const HostingMaintenance = () => {
               <AnimatedElementWrapper
                 key={idx}
                 variant="scale-in"
-                animationMode="load"
                 animationDuration={600}
                 animationDelay={idx * 160}
                 threshold={0.2}
                 rootMargin="0px 0px -50px 0px"
-                reverse
                 once={false}
               >
                 <FeatureCard data={feature} />

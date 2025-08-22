@@ -16,12 +16,9 @@ const footerNav = [
 
 export default function Footer() {
   return (
-    <footer className="bg-bg2 relative">
-      <div className="section-color-border"></div>
-      <div className="inner-section py-16 text-center">
-        
+    <footer className="relative">
         {/* Contact Information */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 lg:gap-12 mb-8">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 lg:gap-12">
           {contactItems.map((item) => (
             <a 
               key={item.href}
@@ -46,16 +43,9 @@ export default function Footer() {
             </a>
           ))}
         </div>
-
-        {/* Social Links */}
-        <div className="flex justify-center gap-4 mb-8">
-          {socialMediaLinks.map((item) => (
-            <SocialLink key={item.name} data={item} />
-          ))}
-        </div>
-
+      <div className="text-center flex flex-wrap justify-between items-center w-19/20 lg:9/10 mx-auto py-3">
         {/* Footer Navigation */}
-        <div className="flex flex-wrap justify-center gap-6 mb-8">
+        <div className="flex flex-wrap justify-center gap-6">
           {footerNav.map((item) => (
             <UnderlineLink 
               key={item.label}
@@ -66,10 +56,15 @@ export default function Footer() {
             </UnderlineLink>
           ))}
         </div>
-
         {/* Copyright */}
-        <div className="text-muted text-sm">
+        <div className="text-muted">
           © {new Date().getFullYear()} {siteData.legalName}. All rights reserved.
+        </div>
+         {/* Social Links */}
+        <div className="flex justify-center gap-4">
+          {socialMediaLinks.map((item) => (
+            <SocialLink key={item.name} data={item} />
+          ))}
         </div>
       </div>
     </footer>

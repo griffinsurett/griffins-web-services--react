@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Heading from "../components/Heading";
 import BorderTitle from "../components/BorderTitle";
 import LabelIcon from "../components/LoopComponents/LabelIcon";
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
 import SmoothScrollCarousel from "../components/SmoothScrollCarousel";
 import {
   Code2,
@@ -25,7 +26,8 @@ const TechStack = () => {
   const [activeMobileItem, setActiveMobileItem] = useState(null);
   const mobileTimeoutRef = useRef(null);
 
-  const description = "From modern frameworks, CMS platforms, to a wide range of hosting platforms we build with the right tools for your project.";
+  const description =
+    "From modern frameworks, CMS platforms, to a wide range of hosting platforms we build with the right tools for your project.";
 
   // Technology stack with lucide-react icons
   const technologies = [
@@ -97,10 +99,10 @@ const TechStack = () => {
     if (mobileTimeoutRef.current) {
       clearTimeout(mobileTimeoutRef.current);
     }
-    
+
     // Set active item
     setActiveMobileItem(`${techName}-${index}`);
-    
+
     // Auto-hide after 2.5 seconds
     mobileTimeoutRef.current = setTimeout(() => {
       setActiveMobileItem(null);
@@ -109,7 +111,7 @@ const TechStack = () => {
 
   // Handle carousel item interactions
   const handleItemInteraction = (item, index, type) => {
-    if (type === 'touch') {
+    if (type === "touch") {
       handleMobileTouch(item.name, index);
     }
   };
@@ -130,7 +132,7 @@ const TechStack = () => {
     >
       <div className="inner-section text-center lg:text-left">
         <BorderTitle>Our Tech Stack</BorderTitle>
-        
+
         <div className="flex flex-col lg:grid lg:grid-cols-[1fr_2fr] gap-4 lg:gap-12 items-center">
           {/* Left side - Text content */}
           <div className="w-sm">
@@ -142,39 +144,47 @@ const TechStack = () => {
               text="the tools that matter."
               textClass="text-heading block lg:inline"
             />
-            <p className="text-text text-lg hidden lg:block">
-              {description}
-            </p>
+            <p className="text-text text-lg hidden lg:block">{description}</p>
           </div>
 
-          {/* Right side - Smooth Scroll Carousel */}
-          <SmoothScrollCarousel
-            items={technologies}
-            renderItem={(tech, index, { onInteraction }) => {
-              const itemKey = `${tech.name}-${index}`;
-              const isMobileActive = activeMobileItem === itemKey;
+            {/* Right side - Smooth Scroll Carousel */}
+            <SmoothScrollCarousel
+              items={technologies}
+              renderItem={(tech, index, { onInteraction }) => {
+                const itemKey = `${tech.name}-${index}`;
+                const isMobileActive = activeMobileItem === itemKey;
+
+                return (
+                       <AnimatedElementWrapper
+            variant="fade-in"
+            animationDuration={600}
+            animationDelay={300} // ⬅️ same stagger you had
+            threshold={0.2}
+            rootMargin="0px 0px -50px 0px" // early trigger
+            once={false}
+          >
+                  <LabelIcon
+                    tech={tech}
+                    index={index}
+                    isActive={isMobileActive}
+                    onTouch={handleMobileTouch}
+                    onMouseEnter={() => onInteraction?.("hover")}
+                  />
+                  </AnimatedElementWrapper>
+                );
+              }}
               
-              return (
-                <LabelIcon
-                  tech={tech}
-                  index={index}
-                  isActive={isMobileActive}
-                  onTouch={handleMobileTouch}
-                  onMouseEnter={() => onInteraction?.('hover')}
-                />
-              );
-            }}
-            speed={30}
-            gap={32} // Matches gap-8 (32px) to gap-10 (40px) from original
-            itemWidth={120}
-            autoplay={true}
-            pauseOnHover={true}
-            pauseOnEngage={true}
-            gradientMask={true}
-            gradientWidth={{ base: 48, md: 80 }} // w-12 md:w-20 converted to px
-            onItemInteraction={handleItemInteraction}
-            className="relative w-full"
-          />
+              speed={30}
+              gap={32} // Matches gap-8 (32px) to gap-10 (40px) from original
+              itemWidth={120}
+              autoplay={true}
+              pauseOnHover={true}
+              pauseOnEngage={true}
+              gradientMask={true}
+              gradientWidth={{ base: 48, md: 80 }} // w-12 md:w-20 converted to px
+              onItemInteraction={handleItemInteraction}
+              className="relative w-full"
+            />
         </div>
 
         {/* Mobile subtitle */}

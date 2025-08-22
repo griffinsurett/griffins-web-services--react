@@ -134,3 +134,119 @@
     }
   }
 }
+
+/* ───────────────────────────────────────────────────── */
+/* FADE ANIMATIONS                                       */
+/* ───────────────────────────────────────────────────── */
+
+/* Basic fade in - simple opacity transition */
+.fade-in {
+  opacity: calc(var(--animation-progress-decimal));
+  transition: opacity var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in from top */
+.fade-in-up {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateY(calc(20px * (1 - var(--animation-progress-decimal))));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in from bottom */
+.fade-in-down {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateY(calc(-20px * (1 - var(--animation-progress-decimal))));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in from left */
+.fade-in-left {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateX(calc(-30px * (1 - var(--animation-progress-decimal))));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in from right */
+.fade-in-right {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateX(calc(30px * (1 - var(--animation-progress-decimal))));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in with scale */
+.fade-in-scale {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: scale(calc(0.95 + (var(--animation-progress-decimal) * 0.05)));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in with blur effect */
+.fade-in-blur {
+  opacity: calc(var(--animation-progress-decimal));
+  filter: blur(calc((1 - var(--animation-progress-decimal)) * 3px));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    filter var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in with rotation */
+.fade-in-rotate {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: rotate(calc((1 - var(--animation-progress-decimal)) * -10deg));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in with elastic effect */
+.fade-in-elastic {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: 
+    translateY(calc(25px * (1 - var(--animation-progress-decimal))))
+    scale(calc(0.9 + (var(--animation-progress-decimal) * 0.1)));
+  transition: 
+    opacity var(--animation-duration) cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    transform var(--animation-duration) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Fade in stagger (for use with staggered delays) */
+.fade-in-stagger {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: translateY(calc(15px * (1 - var(--animation-progress-decimal))));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in with perspective flip */
+.fade-in-flip {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: 
+    perspective(1000px) 
+    rotateX(calc((1 - var(--animation-progress-decimal)) * -20deg));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
+/* Fade in with slide and scale combined */
+.fade-in-slide-scale {
+  opacity: calc(var(--animation-progress-decimal));
+  transform: 
+    translateY(calc(30px * (1 - var(--animation-progress-decimal))))
+    scale(calc(0.8 + (var(--animation-progress-decimal) * 0.2)));
+  transition: 
+    opacity var(--animation-duration) var(--animation-easing),
+    transform var(--animation-duration) var(--animation-easing);
+}
+
