@@ -1,3 +1,4 @@
+// src/Sections/WebsiteTypes.jsx
 import React, {
   useState,
   useEffect,
@@ -7,16 +8,19 @@ import React, {
 } from "react";
 import EnhancedAccordionItem from "../components/LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "../components/VideoPlayer";
+import { useAnimatedElement } from "../hooks/useAnimatedElement";
 import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
 import Heading from "../components/Heading";
 import BorderTitle from "../components/BorderTitle";
-import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper"; // ⬅️ add this import
 
 const demoVideo = EarRape;
 
 const WebsiteTypes = () => {
-  const websiteTypes = [
+  const sectionRef = useRef(null);
+
+   const websiteTypes = [
     { icon: "🚀", title: "Landing Pages",            description: "High-converting single-page websites designed to capture leads and drive specific actions for your marketing campaigns.",     videoSrc: demoVideo },
     { icon: "🛠️", title: "Custom Websites", description: "Fully custom sites built around your brand and workflow—unique UX, motion, integrations, and back-end logic tailored end-to-end.", videoSrc: demoVideo},
     { icon: "🏢", title: "Small Business Websites",  description: "Professional websites that establish credibility and help local businesses attract and retain customers online.",            videoSrc: demoVideo },
@@ -27,6 +31,16 @@ const WebsiteTypes = () => {
     { icon: "🏛️", title: "Large Corporate Websites", description: "Enterprise-level websites with advanced functionality, multi-user management, and scalable architecture for growing companies.", videoSrc: demoVideo },
     { icon: "⚙️", title: "Custom Full-Stack Applications", description: "Bespoke web applications tailored to your unique business processes, with custom databases and advanced functionality.", videoSrc: demoVideo },
   ];
+
+  // Just need IO to know when the section is visible
+  const isInView = useAnimatedElement({
+    ref: sectionRef,
+    duration: 500,
+    delay: 0,
+    easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+    threshold: 0.25,
+    rootMargin: "0px 0px -20% 0px", // start fading out before fully leaving
+  });
 
   const desktopVideoRef = useRef(null);
   const mobileVideoRef = useRef(null);
@@ -74,7 +88,7 @@ const WebsiteTypes = () => {
     resumeTriggers: ["scroll", "click-outside", "hover-away"],
     containerSelector: "[data-accordion-container], [data-video-container]",
     itemSelector: "[data-accordion-item], [data-video-container]",
-    inView: true,                 // ✅ always in-view; accordion drives behavior
+    inView: isInView,
     pauseOnEngage: false,
     engageOnlyOnActiveItem: true,
     activeItemAttr: "data-active",
@@ -118,6 +132,7 @@ const WebsiteTypes = () => {
   }, [radioName, selectIndex, websiteTypes.length]);
 
   const handleManualSelection = () => {
+    // clicking video/controls: just mark engagement
     core.engageUser();
   };
 
@@ -143,7 +158,7 @@ const WebsiteTypes = () => {
 
   // Reset & play ONLY when the ACTIVE INDEX changes
   useEffect(() => {
-    if (isTransitioning) return; // ❌ removed !isInView check
+    if (isTransitioning || !isInView) return;
 
     if (advanceTimeoutRef.current) {
       clearTimeout(advanceTimeoutRef.current);
@@ -167,19 +182,20 @@ const WebsiteTypes = () => {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [activeIndex, isTransitioning]); // ❗ removed isInView from deps
+  }, [activeIndex, isTransitioning, isInView]); // ❗ no dependency on `reschedule`
 
   const handleTimeUpdate = () => {
     const v = desktopVideoRef.current || mobileVideoRef.current;
     if (!v?.duration) return;
     setProgress((v.currentTime / v.duration) * 100);
+    // Recompute auto-advance timing as user scrubs/plays
     rescheduleRef.current?.();
   };
 
   const handleEnded = () => {
     setProgress(100);
     if (advanceTimeoutRef.current) clearTimeout(advanceTimeoutRef.current);
-    handleVideoEnded(); // ❌ no isInView gate
+    if (isInView) handleVideoEnded();
   };
 
   const handleVideoLoad = () => {
@@ -199,12 +215,13 @@ const WebsiteTypes = () => {
   };
 
   const handleVideoClick = () => {
-    core.engageUser();
+    // mark engagement only; do NOT pause the video
+    handleManualSelection();
   };
 
   return (
     <section
-      /* ref={sectionRef} ❌ removed */
+      ref={sectionRef}
       className="outer-section bg-bg2 relative"
       id="website-types"
     >
@@ -233,9 +250,9 @@ const WebsiteTypes = () => {
                 key={idx}
                 variant="fade-in"
                 animationDuration={600}
-                animationDelay={idx * 300}
+                animationDelay={idx * 300} // ⬅️ same stagger you had
                 threshold={0}
-                rootMargin="0px 0px -50px 0px"
+                rootMargin="0px 0px -50px 0px" // early trigger
                 once={false}
               >
                 <EnhancedAccordionItem
@@ -278,9 +295,9 @@ const WebsiteTypes = () => {
               >
                 <AnimatedElementWrapper
                 variant="fade-in"
-                animationDuration={600}
+                animationDuration={900}
                 animationDelay={300}
-                threshold={0}
+                threshold={0.2}
                 rootMargin="0px 0px -50px 0px"
                 once={false}
               >
@@ -296,13 +313,18 @@ const WebsiteTypes = () => {
                   className="shadow-2xl shadow-accent/20"
                 />
                 </AnimatedElementWrapper>
+
                 {/* Debug */}
                 {process.env.NODE_ENV === "development" && (
                   <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
-                    {/* ❌ removed In View line */}
-                    <div>⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}</div>
+                    <div>👁️ In View: {isInView ? "✅" : "❌"}</div>
+                    <div>
+                      ⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}
+                    </div>
                     <div>👤 Engaged: {userEngaged ? "✅" : "❌"}</div>
-                    <div>⏲️ Resume Scheduled: {isResumeScheduled ? "✅" : "❌"}</div>
+                    <div>
+                      ⏲️ Resume Scheduled: {isResumeScheduled ? "✅" : "❌"}
+                    </div>
                     <div>🎪 Active Index: {activeIndex}</div>
                     <div>📊 Progress: {Math.round(progress)}%</div>
                   </div>

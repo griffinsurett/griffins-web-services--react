@@ -17,16 +17,17 @@ const PrimaryButton = ({ Base, className = "", ...props }) => {
   ].join(" ");
 
   return (
-    <AnimatedElementWrapper
-      variant="zoom-in"
-      animationDuration={400}
-      animationDelay={200} // ⬅️ same stagger you had
-      threshold={0.2}
-    rootMargin="0px 0px -50px 0px" // early trigger
-    once={false}
-  >
+  //   <AnimatedElementWrapper
+  //     variant="zoom-in"
+  //     animationDuration={400}
+  //     animationDelay={200} // ⬅️ same stagger you had
+  //     threshold={0.2}
+  //     className="w-full lg:w-auto"
+  //   rootMargin="0px 0px -50px 0px" // early trigger
+  //   once={false}
+  // >
     <Base className={`${classes} ${className}`} {...props} />
-  </AnimatedElementWrapper>
+  // </AnimatedElementWrapper>
   )
 };
 
