@@ -98,18 +98,6 @@
   animation-delay: var(--animation-delay, 0ms);
   transition-delay: var(--animation-delay, 0ms);
 }
-
-/* Hover states for animated elements */
-.animated-element.scale-in:hover {
-  transform: scale(calc(
-    (0.5 + (var(--animation-progress-decimal) * 0.5)) * 1.05
-  ));
-}
-
-.animated-element.scale-center:hover {
-  transform: scale(calc(var(--animation-progress-decimal) * 1.05));
-}
-
 /* ───────────────────────────────────────────────────── */
 /* RESPONSIVE SCALE ADJUSTMENTS                         */
 /* ───────────────────────────────────────────────────── */
