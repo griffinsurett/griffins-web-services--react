@@ -1,7 +1,7 @@
 import React from "react";
 import IconListItem from "../components/LoopComponents/IconListItem";
 import SocialLink from "../components/LoopComponents/SocialLink";
-import UnderlineLink from "../components/LoopComponents/UnderlineLink";
+import UnderlineLink from "../components/LoopComponents/Link";
 import { siteData, contactItems, socialMediaLinks } from "../siteData";
 import Logo from "../components/Logo/Logo";
 
@@ -28,14 +28,22 @@ export default function Footer() {
   return (
     <footer className="relative w-19/20 lg:9/10 gap-6 lg:gap-0 mx-auto flex-col">
       {/* Contact Information */}
-      <div className={`footer-top ${TW.row} ${TW.betweenResp} ${TW.yStackResp} ${TW.gap3_6} text-center`}>
+      <div
+        className={`footer-top ${TW.row} ${TW.betweenResp} ${TW.yStackResp} ${TW.gap3_6} text-center`}
+      >
         <Logo loading="lazy" trigger="visible" />
 
-        <div className={`flex flex-col sm:flex-row justify-center items-center ${TW.gap1_12}`}>
+        <div
+          className={`flex flex-col sm:flex-row justify-center items-center ${TW.gap1_12}`}
+        >
           {contactItems.map((item) => (
             <a key={item.href} href={item.href} className="group">
               <IconListItem
-                data={{ icon: <item.icon />, title: item.label, description: item.label }}
+                data={{
+                  icon: <item.icon />,
+                  title: item.label,
+                  description: item.label,
+                }}
                 layout="horizontal"
                 alignment="center"
                 className="gap-3 group"
@@ -50,11 +58,17 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className={`footer-bottom flex flex-col lg:flex-row items-center ${TW.betweenResp} space-y-6 gap-6 text-center py-3 w-full`}>
+      <div
+        className={`footer-bottom flex flex-col lg:flex-row items-center ${TW.betweenResp} space-y-6 gap-6 text-center py-3 w-full`}
+      >
         {/* Footer Navigation */}
         <div className={`flex flex-col lg:flex-row justify-center gap-4 m-0`}>
           {footerNav.map((item) => (
-            <UnderlineLink key={item.label} href={item.href} className="text-text hover:text-accent transition-colors">
+            <UnderlineLink
+              key={item.label}
+              href={item.href}
+              className="text-text hover:text-accent transition-colors"
+            >
               {item.label}
             </UnderlineLink>
           ))}
