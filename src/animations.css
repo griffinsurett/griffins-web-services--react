@@ -266,3 +266,35 @@
     color: var(--color-primary);
   }
 }
+
+/* Hover-only rolling icon that moves left while rotating (ball-roll) */
+.link-roll {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(0) rotate(0);
+  opacity: 0;
+  will-change: transform;
+  transition:
+    transform var(--roll-duration, 600ms) var(--roll-ease, cubic-bezier(0.22,1,0.36,1)),
+    opacity 180ms ease-out;
+}
+
+.group:hover .link-roll,
+.group:focus-visible .link-roll {
+  opacity: 1;
+  transform:
+    translateY(-50%)
+    translateX(calc(-1 * var(--roll-dist, 0.9rem)))
+    rotate(calc(-360deg * var(--roll-turns, 1.5)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-roll,
+  .group:hover .link-roll,
+  .group:focus-visible .link-roll {
+    transition: none;
+    transform: translateY(-50%);
+    opacity: 1;
+  }
+}
