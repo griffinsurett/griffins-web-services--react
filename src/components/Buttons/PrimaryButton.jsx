@@ -2,12 +2,11 @@ import React from "react";
 import { useAnimatedElement } from "../../hooks/useAnimatedElement";
 
 const PrimaryButton = ({ Base = "button", className = "", ...props }) => {
-  // IO-driven zoom timing
-  const zoom = useAnimatedElement({
+  const anim = useAnimatedElement({
     duration: 400,
     delay: 0,
-    threshold: 0.1,
-    rootMargin: "0px 0px -50px 0px",
+    threshold: 0,
+    rootMargin: "0px 0px -15% 0px",
   });
 
   const classes = [
@@ -20,13 +19,13 @@ const PrimaryButton = ({ Base = "button", className = "", ...props }) => {
   ].join(" ");
 
   return (
-    <span
-      ref={zoom.ref}
-      className="inline-block animated-element zoom-in"
-      {...zoom.props}   // adds data-visible + CSS vars for the zoom animation
-    >
-      <Base className={`${classes} ${className}`} {...props} />
-    </span>
+    <div ref={anim.ref} className="block w-full lg:w-auto">
+      <Base
+        className={`animated-element zoom-in w-full ${classes} ${className}`}
+        style={anim.style}
+        {...props}
+      />
+    </div>
   );
 };
 
