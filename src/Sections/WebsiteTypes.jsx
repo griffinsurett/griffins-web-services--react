@@ -33,12 +33,11 @@ const WebsiteTypes = () => {
   ];
 
   // Just need IO to know when the section is visible
-  const isInView = useAnimatedElement({
-    ref: sectionRef,
+const secAnim = useAnimatedElement({    ref: sectionRef,
     duration: 500,
     delay: 0,
     easing: "cubic-bezier(0.4, 0, 0.2, 1)",
-    threshold: 0.25,
+    threshold: 0.1,
     rootMargin: "0px 0px -20% 0px", // start fading out before fully leaving
   });
 
@@ -88,7 +87,7 @@ const WebsiteTypes = () => {
     resumeTriggers: ["scroll", "click-outside", "hover-away"],
     containerSelector: "[data-accordion-container], [data-video-container]",
     itemSelector: "[data-accordion-item], [data-video-container]",
-    inView: isInView,
+    inView: secAnim.inView,
     pauseOnEngage: false,
     engageOnlyOnActiveItem: true,
     activeItemAttr: "data-active",
@@ -158,7 +157,7 @@ const WebsiteTypes = () => {
 
   // Reset & play ONLY when the ACTIVE INDEX changes
   useEffect(() => {
-    if (isTransitioning || !isInView) return;
+    if (isTransitioning || !secAnim.inView) return;
 
     if (advanceTimeoutRef.current) {
       clearTimeout(advanceTimeoutRef.current);
@@ -182,7 +181,7 @@ const WebsiteTypes = () => {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [activeIndex, isTransitioning, isInView]); // ❗ no dependency on `reschedule`
+  }, [activeIndex, isTransitioning, secAnim.inView]); // ❗ no dependency on `reschedule`
 
   const handleTimeUpdate = () => {
     const v = desktopVideoRef.current || mobileVideoRef.current;
@@ -195,7 +194,7 @@ const WebsiteTypes = () => {
   const handleEnded = () => {
     setProgress(100);
     if (advanceTimeoutRef.current) clearTimeout(advanceTimeoutRef.current);
-    if (isInView) handleVideoEnded();
+    if (secAnim.inView) handleVideoEnded();
   };
 
   const handleVideoLoad = () => {
@@ -222,8 +221,9 @@ const WebsiteTypes = () => {
   return (
     <section
       ref={sectionRef}
-      className="outer-section bg-bg2 relative"
+      className="outer-section bg-bg2 relative fade-in animated-element"
       id="website-types"
+      {...secAnim.props}
     >
       <div className="section-dim-border"></div>
       <div className="inner-section">
@@ -317,7 +317,7 @@ const WebsiteTypes = () => {
                 {/* Debug */}
                 {process.env.NODE_ENV === "development" && (
                   <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
-                    <div>👁️ In View: {isInView ? "✅" : "❌"}</div>
+                    <div>👁️ In View: {secAnim.inView ? "✅" : "❌"}</div>
                     <div>
                       ⏸️ Autoplay Paused: {isAutoplayPaused ? "✅" : "❌"}
                     </div>
