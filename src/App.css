@@ -309,7 +309,7 @@
 
   /* Typography - updated with theme-aware color utilities */
   .h1 {
-    @apply text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight text-heading;
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight text-heading;
   }
   .h2 {
     @apply text-3xl md:text-4xl lg:text-5xl font-bold text-heading;

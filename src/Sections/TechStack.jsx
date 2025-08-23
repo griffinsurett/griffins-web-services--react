@@ -24,7 +24,7 @@ import {
   SiGithub,
   SiNodedotjs,
 } from "react-icons/si";
-import { FaAws, FaFigma } from "react-icons/fa"; // Font Awesome (brands)
+import { FaAws, FaFigma, FaCloudflare } from "react-icons/fa"; // Font Awesome (brands)
 
 const TechStack = () => {
   // Mobile touch state for LabelIcon interactions
@@ -50,6 +50,7 @@ const technologies = [
   { name: "Figma",       icon: <FaFigma className={iconClass} aria-hidden /> }, // ← FA
   { name: "Framer",      icon: <SiFramer className={iconClass} aria-hidden /> },
   { name: "Vercel",      icon: <SiVercel className={iconClass} aria-hidden /> },
+  { name: "Cloudflare",  icon: <FaCloudflare className={iconClass} aria-hidden /> },
   { name: "GitHub",      icon: <SiGithub className={iconClass} aria-hidden /> },
   { name: "Node.js",     icon: <SiNodedotjs className={iconClass} aria-hidden /> },
   { name: "AWS",         icon: <FaAws className={iconClass} aria-hidden /> },   // ← FA
