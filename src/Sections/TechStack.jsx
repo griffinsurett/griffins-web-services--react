@@ -7,7 +7,7 @@ import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
 import SmoothScrollCarousel from "../components/Carousels/SmoothScrollCarousel";
 import { useHoverInteraction } from "../hooks/animations/useInteractions";
 
-// Brand icons via react-icons (Simple Icons)
+// imports (keep Simple Icons, add Font Awesome brands)
 import {
   SiAstro,
   SiNextdotjs,
@@ -23,8 +23,8 @@ import {
   SiVercel,
   SiGithub,
   SiNodedotjs,
-  // FaAmazonaws,
 } from "react-icons/si";
+import { FaAws, FaFigma } from "react-icons/fa"; // Font Awesome (brands)
 
 const TechStack = () => {
   // Mobile touch state for LabelIcon interactions
@@ -36,23 +36,24 @@ const TechStack = () => {
 
   const iconClass = "w-8 h-8"; // adjust globally here
 
-  const technologies = [
-    { name: "Astro",       icon: <SiAstro className={iconClass} aria-hidden /> },
-    { name: "Next.js",     icon: <SiNextdotjs className={iconClass} aria-hidden /> },
-    { name: "React",       icon: <SiReact className={iconClass} aria-hidden /> },
-    { name: "Gatsby",      icon: <SiGatsby className={iconClass} aria-hidden /> },
-    { name: "Svelte",      icon: <SiSvelte className={iconClass} aria-hidden /> },
-    { name: "Shopify",     icon: <SiShopify className={iconClass} aria-hidden /> },
-    { name: "WordPress",   icon: <SiWordpress className={iconClass} aria-hidden /> },
-    { name: "Elementor",   icon: <SiElementor className={iconClass} aria-hidden /> },
-    { name: "Payload CMS", icon: <SiPayloadcms className={iconClass} aria-hidden /> },
-    { name: "Webflow",     icon: <SiWebflow className={iconClass} aria-hidden /> },
-    { name: "Framer",      icon: <SiFramer className={iconClass} aria-hidden /> },
-    { name: "Vercel",      icon: <SiVercel className={iconClass} aria-hidden /> },
-    { name: "GitHub",      icon: <SiGithub className={iconClass} aria-hidden /> },
-    { name: "Node.js",     icon: <SiNodedotjs className={iconClass} aria-hidden /> },
-    // { name: "AWS",         icon: <SiAmazonaws className={iconClass} aria-hidden /> },
-  ];
+const technologies = [
+  { name: "Astro",       icon: <SiAstro className={iconClass} aria-hidden /> },
+  { name: "Next.js",     icon: <SiNextdotjs className={iconClass} aria-hidden /> },
+  { name: "React",       icon: <SiReact className={iconClass} aria-hidden /> },
+  { name: "Gatsby",      icon: <SiGatsby className={iconClass} aria-hidden /> },
+  { name: "Svelte",      icon: <SiSvelte className={iconClass} aria-hidden /> },
+  { name: "Shopify",     icon: <SiShopify className={iconClass} aria-hidden /> },
+  { name: "WordPress",   icon: <SiWordpress className={iconClass} aria-hidden /> },
+  { name: "Elementor",   icon: <SiElementor className={iconClass} aria-hidden /> },
+  { name: "Payload CMS", icon: <SiPayloadcms className={iconClass} aria-hidden /> },
+  { name: "Webflow",     icon: <SiWebflow className={iconClass} aria-hidden /> },
+  { name: "Figma",       icon: <FaFigma className={iconClass} aria-hidden /> }, // ← FA
+  { name: "Framer",      icon: <SiFramer className={iconClass} aria-hidden /> },
+  { name: "Vercel",      icon: <SiVercel className={iconClass} aria-hidden /> },
+  { name: "GitHub",      icon: <SiGithub className={iconClass} aria-hidden /> },
+  { name: "Node.js",     icon: <SiNodedotjs className={iconClass} aria-hidden /> },
+  { name: "AWS",         icon: <FaAws className={iconClass} aria-hidden /> },   // ← FA
+];
 
   const DEFAULT_BEFORE = "We've mastered ";
   const DEFAULT_HEADING_TEXT = "the tools that matter.";
