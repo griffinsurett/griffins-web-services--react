@@ -1,4 +1,4 @@
-// src/components/WebsiteTypes/WebsiteTypes.jsx
+// src/components/WebsiteTypes.jsx
 import React, { useCallback, useEffect, useMemo, useRef, useState, useId } from "react";
 import EnhancedAccordionItem from "./LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "./VideoPlayer";
@@ -234,7 +234,7 @@ export default function WebsiteTypes({
         </div>
 
         {/* Right: fills remaining space exactly (desktop player) */}
-        <div className="hidden lg:block lg:flex-1 min-w-0">
+        <div className="hidden lg:block lg:flex-1 min-w-0 sticky top-0">
           <div className="sticky top-8">
             <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-card/40 shadow-2xl shadow-accent/20" data-video-slot>
               <VideoPlayer
