@@ -3,9 +3,11 @@ import React from "react";
 import BorderTitle from "../components/BorderTitle";
 import Heading from "../components/Heading";
 import WebsiteTypes from "../components/WebsiteTypes";
+import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
 
 // Keep the marketing/content data here (or import from /data if you prefer)
 import EarRape from "../assets/Black-Microwave-Earrape.mp4";
+import FeatureCard from "../components/LoopComponents/FeatureCard";
 const demoVideo = EarRape;
 
 const WEBSITE_TYPES = [
@@ -41,7 +43,25 @@ export default function WebsiteTypesSection() {
         </div>
 
         {/* Functional component handles all IO + autoplay internally */}
-        <WebsiteTypes types={WEBSITE_TYPES} />
+        {/* Will be after videos */}
+        {/* <WebsiteTypes types={WEBSITE_TYPES} /> */}
+        
+        {/* before videos are made */}
+        <div className="max-3-secondary">
+          {WEBSITE_TYPES.map((item, idx) => (
+            <AnimatedElementWrapper
+              key={idx}
+              variant="scale-in"
+              animationDuration={600}
+              animationDelay={idx * 300} // ⬅️ same stagger you had
+              threshold={0.1}
+              rootMargin="0px 0px -10px 0px" // early trigger
+              once={false}
+            >
+              <FeatureCard data={item} />
+            </AnimatedElementWrapper>
+          ))}
+        </div>
       </div>
     </section>
   );
