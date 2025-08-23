@@ -18,17 +18,17 @@ export function useVisibility(
     threshold = 0.1,
     root = null,
     rootMargin = "0px",
-    once = false,               // if true, return true after the first entry and stop observing
+    once = false, // if true, return true after the first entry and stop observing
 
     // Callbacks for entering/leaving the IO threshold
     onEnter,
     onExit,
 
     // Optional scroll-direction behaviors (ported from useScrollAnimation)
-    onForward,                  // called on downward scroll
-    onBackward,                 // called on upward scroll near top
-    pauseDelay = 100,           // debounce between direction callbacks
-    restoreAtTopOffset = 100,   // show-on-up only when near top
+    onForward, // called on downward scroll
+    onBackward, // called on upward scroll near top
+    pauseDelay = 100, // debounce between direction callbacks
+    restoreAtTopOffset = 100, // show-on-up only when near top
     menuCheckboxId = "nav-toggle",
   } = {}
 ) {
@@ -62,36 +62,41 @@ export function useVisibility(
 
   // ✅ REFACTORED: Use centralized scroll interaction instead of hardcoded listeners
   // Direction-aware scroll handlers (only if callbacks provided)
-  const wantsDirection = typeof onForward === "function" || typeof onBackward === "function";
-  
+  const wantsDirection =
+    typeof onForward === "function" || typeof onBackward === "function";
+
   useScrollInteraction({
     elementRef: null, // Use window (default)
     scrollThreshold: 5, // Small threshold for direction detection
     debounceDelay: pauseDelay,
     trustedOnly: true,
-    
+
     // Only register callbacks if direction tracking is wanted
-    onScrollActivity: wantsDirection ? ({ dir }) => {
-      if (dir === "down") {
-        onForward?.();
-      } else if (dir === "up") {
-        // Only call onBackward when near the top
-        if (window.pageYOffset <= restoreAtTopOffset) {
-          onBackward?.();
+    onScrollActivity: wantsDirection
+      ? ({ dir }) => {
+          if (dir === "down") {
+            onForward?.();
+          } else if (dir === "up") {
+            // Only call onBackward when near the top
+            if (window.pageYOffset <= restoreAtTopOffset) {
+              onBackward?.();
+            }
+          }
         }
-      }
-    } : undefined,
-    
-    onWheelActivity: wantsDirection ? ({ deltaY }) => {
-      if (deltaY > 0) {
-        onForward?.();
-      } else if (deltaY < 0) {
-        // Only call onBackward when near the top
-        if (window.pageYOffset <= restoreAtTopOffset) {
-          onBackward?.();
+      : undefined,
+
+    onWheelActivity: wantsDirection
+      ? ({ deltaY }) => {
+          if (deltaY > 0) {
+            onForward?.();
+          } else if (deltaY < 0) {
+            // Only call onBackward when near the top
+            if (window.pageYOffset <= restoreAtTopOffset) {
+              onBackward?.();
+            }
+          }
         }
-      }
-    } : undefined,
+      : undefined,
   });
 
   // Optional: react to a menu checkbox toggling (force show/hide behavior)
@@ -117,7 +122,13 @@ export function useVisibility(
     syncMenu();
 
     return () => box.removeEventListener("change", syncMenu);
-  }, [menuCheckboxId, onForward, onBackward, restoreAtTopOffset, wantsDirection]);
+  }, [
+    menuCheckboxId,
+    onForward,
+    onBackward,
+    restoreAtTopOffset,
+    wantsDirection,
+  ]);
 
   // For `once: true`, return "have we ever been visible?"
   return once ? seen : visible;

@@ -1,6 +1,6 @@
 // src/components/AccentPicker.jsx
 import { useState, useRef, useEffect } from "react";
-import { useAccentColor } from "../../hooks/useAccentColor.js";
+import { useAccentColor } from "../../hooks/theme/useAccentColor.js";
 import { CircleCheckbox } from "./checkboxes/CircleCheckbox.jsx";
 import { SquareCheckbox } from "./checkboxes/SquareCheckbox.jsx";
 
@@ -28,7 +28,13 @@ export default function AccentPicker() {
         aria-label="Pick accent color"
         className="faded-bg"
       >
-        <svg width="22" height="22" viewBox="0 0 100 100"> <path d="M50 10C50 10 25 35 25 55C25 70.464 37.536 83 50 83C62.464 83 75 70.464 75 55C75 35 50 10 50 10Z" fill="var(--color-accent)"/> </svg>
+        <svg width="22" height="22" viewBox="0 0 100 100">
+          {" "}
+          <path
+            d="M50 10C50 10 25 35 25 55C25 70.464 37.536 83 50 83C62.464 83 75 70.464 75 55C75 35 50 10 50 10Z"
+            fill="var(--color-accent)"
+          />{" "}
+        </svg>
       </CircleCheckbox>
 
       {/* dropdown panel */}

@@ -1,9 +1,8 @@
-// src/components/Carousel.jsx
+// src/components/Carousels/Carousel.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
-import { useVisibility } from "../hooks/useVisibility";
-import { useSideDragNavigation } from "../hooks/useInteractions";
+import useCarouselAutoplay from "./useCarouselAutoplay";
+import { useSideDragNavigation } from "../../hooks/animations/useInteractions";
 
 /**
  * Simple 2D carousel that pages through groups of slides.
@@ -57,8 +56,7 @@ export default function Carousel({
 
   const pages = useMemo(() => {
     const out = [];
-    for (let i = 0; i < items.length; i += spv)
-      out.push(items.slice(i, i + spv));
+    for (let i = 0; i < items.length; i += spv) out.push(items.slice(i, i + spv));
     return out.length ? out : [[]];
   }, [items, spv]);
 
@@ -71,28 +69,22 @@ export default function Carousel({
     if (pageIndex >= pageCount) setPageIndex(pageCount - 1);
   }, [pageIndex, pageCount]);
 
-  const scopeId = useMemo(
-    () => `carousel-${Math.random().toString(36).slice(2, 8)}`,
-    []
-  );
-
-  const inView = useVisibility(containerRef, { threshold: 0.3 });
-
-  // ✅ REFACTORED: Direct useEngagementAutoplay call with carousel-specific config
-  const { isAutoplayPaused, isResumeScheduled, userEngaged } = useEngagementAutoplay({
-    totalItems: pageCount,
-    currentIndex: pageIndex,
-    setIndex: setPageIndex,
-    autoplayTime: autoAdvanceDelay,
-    resumeDelay: 5000,
-    resumeTriggers: ["scroll", "click-outside", "hover-away"],
-    containerSelector: `[data-autoplay-scope="${scopeId}"]`,
-    itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
-    inView: autoplay && inView,
-    pauseOnEngage: true,
-    engageOnlyOnActiveItem: true,
-    activeItemAttr: "data-active",
-  });
+  // Engagement-aware autoplay wired for this carousel
+  const { scopeId, isAutoplayPaused, isResumeScheduled, userEngaged } =
+    useCarouselAutoplay({
+      containerRef,
+      totalItems: pageCount,
+      currentIndex: pageIndex,
+      setIndex: setPageIndex,
+      autoplay,
+      autoplayTime: autoAdvanceDelay,
+      threshold: 0.3,
+      resumeDelay: 5000,
+      resumeTriggers: ["scroll", "click-outside", "hover-away"],
+      pauseOnEngage: true,
+      engageOnlyOnActiveItem: true,
+      activeItemAttr: "data-active",
+    });
 
   const goPrev = () => setPageIndex((p) => (p === 0 ? pageCount - 1 : p - 1));
   const goNext = () => setPageIndex((p) => (p === pageCount - 1 ? 0 : p + 1));

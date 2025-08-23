@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import TextLogo from "./TextLogo";
 import VideoLogo from "./VideoLogo";
-import { useVisibility } from "../../hooks/useVisibility";
+import { useVisibility } from "../../hooks/animations/useVisibility";
 
 /**
  * Logo combines the video logo and the animated text logo.
@@ -12,7 +12,7 @@ const Logo = ({
   loading = "lazy",
   trigger = "auto",
   textFadeMs = 1200,
-  animateOutText = false,              // ← requested prop name
+  animateOutText = false, // ← requested prop name
 }) => {
   const textRef = useRef(null);
   const [textHidden, setTextHidden] = useState(false);
@@ -21,7 +21,9 @@ const Logo = ({
   useVisibility(textRef, {
     threshold: 0,
     pauseDelay: textFadeMs,
-    onForward:  () => { if (animateOutText) setTextHidden(true); },
+    onForward: () => {
+      if (animateOutText) setTextHidden(true);
+    },
     onBackward: () => setTextHidden(false),
   });
 

@@ -1,10 +1,9 @@
-// src/components/PortfolioCarousel.jsx
+// src/components/Carousels/PortfolioCarousel.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import useEngagementAutoplay from "../hooks/useEngagementAutoplay";
-import { useVisibility } from "../hooks/useVisibility";
-import { useSideDragNavigation } from "../hooks/useInteractions";
-import PortfolioItemComponent from "./LoopComponents/PortfolioItemComponent";
+import useCarouselAutoplay from "./useCarouselAutoplay";
+import { useSideDragNavigation } from "../../hooks/animations/useInteractions";
+import PortfolioItemComponent from "../LoopComponents/PortfolioItemComponent";
 
 /**
  * 3D carousel with engagement-aware autoplay + side-only drag/tap navigation.
@@ -20,7 +19,7 @@ export default function PortfolioCarousel({
   autoAdvanceDelay = 5000,
   showArrows = true,
   showDots = true,
-  drag = false, // ⬅️ NEW: enable horizontal drag/tap on side zones
+  drag = false, // enable horizontal drag/tap on side zones
   className = "",
 }) {
   const containerRef = useRef(null);
@@ -29,32 +28,21 @@ export default function PortfolioCarousel({
   );
   const [index, setIndex] = useState(defaultIndex);
 
-  const scopeId = useMemo(
-    () => `carousel-${Math.random().toString(36).slice(2, 8)}`,
-    []
-  );
-
-  const inView = useVisibility(containerRef, { threshold: 0.3 });
-
-  const ArrowClasses =
-    "absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary-light/10 border border-primary-light/20 text-text backdrop-blur-sm hover:bg-primary-light/20 transition hover:border-primary-light/75";
-
-  // ===== INLINE CAROUSEL AUTOPLAY LOGIC =====
-  const { isAutoplayPaused, isResumeScheduled, userEngaged } = useEngagementAutoplay({
-    totalItems: items.length,
-    currentIndex: index,
-    setIndex,
-    autoplayTime: autoAdvanceDelay,
-    resumeDelay: 5000,
-    resumeTriggers: ["scroll", "click-outside", "hover-away"],
-    containerSelector: `[data-autoplay-scope="${scopeId}"]`,
-    itemSelector: `[data-autoplay-scope="${scopeId}"] [data-carousel-item]`,
-    inView: autoplay && inView,
-    pauseOnEngage: true,
-    engageOnlyOnActiveItem: true,
-    activeItemAttr: "data-active",
-  });
-  // ===== END INLINE CAROUSEL AUTOPLAY LOGIC =====
+  const { scopeId, isAutoplayPaused, isResumeScheduled, userEngaged } =
+    useCarouselAutoplay({
+      containerRef,
+      totalItems: items.length,
+      currentIndex: index,
+      setIndex,
+      autoplay,
+      autoplayTime: autoAdvanceDelay,
+      threshold: 0.3,
+      resumeDelay: 5000,
+      resumeTriggers: ["scroll", "click-outside", "hover-away"],
+      pauseOnEngage: true,
+      engageOnlyOnActiveItem: true,
+      activeItemAttr: "data-active",
+    });
 
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -65,10 +53,8 @@ export default function PortfolioCarousel({
   const getSizes = () => {
     if (vw < 640) return { centerW: 280, centerH: 190, sideW: 180, sideH: 120 };
     if (vw < 768) return { centerW: 340, centerH: 230, sideW: 220, sideH: 150 };
-    if (vw < 1024)
-      return { centerW: 460, centerH: 310, sideW: 290, sideH: 190 };
-    if (vw < 1280)
-      return { centerW: 680, centerH: 450, sideW: 420, sideH: 290 };
+    if (vw < 1024) return { centerW: 460, centerH: 310, sideW: 290, sideH: 190 };
+    if (vw < 1280) return { centerW: 680, centerH: 450, sideW: 420, sideH: 290 };
     return { centerW: 860, centerH: 540, sideW: 520, sideH: 360 };
   };
 
@@ -84,8 +70,7 @@ export default function PortfolioCarousel({
 
   const stageBase = "relative w-full overflow-visible [perspective:1200px]";
 
-  const goToPrevious = () =>
-    setIndex(index === 0 ? items.length - 1 : index - 1);
+  const goToPrevious = () => setIndex(index === 0 ? items.length - 1 : index - 1);
   const goToNext = () => setIndex(index === items.length - 1 ? 0 : index + 1);
 
   // Arrow geometry
@@ -134,6 +119,9 @@ export default function PortfolioCarousel({
 
   const leftZoneLeftPx = isLarge ? tx : sideOffsetFromCenterSlide;
   const rightZoneLeftPx = isLarge ? tx : sideOffsetFromCenterSlide;
+
+  const ArrowClasses =
+    "absolute z-40 w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary-light/10 border border-primary-light/20 text-text backdrop-blur-sm hover:bg-primary-light/20 transition hover:border-primary-light/75";
 
   return (
     <div

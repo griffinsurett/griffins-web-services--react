@@ -4,7 +4,7 @@ import Heading from "../components/Heading";
 import BorderTitle from "../components/BorderTitle";
 import LabelIcon from "../components/LoopComponents/LabelIcon";
 import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
-import SmoothScrollCarousel from "../components/SmoothScrollCarousel";
+import SmoothScrollCarousel from "../components/Carousels/SmoothScrollCarousel";
 import {
   Code2,
   Layers,
@@ -147,22 +147,22 @@ const TechStack = () => {
             <p className="text-text text-lg hidden lg:block">{description}</p>
           </div>
 
-            {/* Right side - Smooth Scroll Carousel */}
-            <SmoothScrollCarousel
-              items={technologies}
-              renderItem={(tech, index, { onInteraction }) => {
-                const itemKey = `${tech.name}-${index}`;
-                const isMobileActive = activeMobileItem === itemKey;
+          {/* Right side - Smooth Scroll Carousel */}
+          <SmoothScrollCarousel
+            items={technologies}
+            renderItem={(tech, index, { onInteraction }) => {
+              const itemKey = `${tech.name}-${index}`;
+              const isMobileActive = activeMobileItem === itemKey;
 
-                return (
-                       <AnimatedElementWrapper
-            variant="fade-in"
-            animationDuration={600}
-            animationDelay={300} // ⬅️ same stagger you had
-            threshold={0.2}
-            rootMargin="0px 0px -50px 0px" // early trigger
-            once={false}
-          >
+              return (
+                <AnimatedElementWrapper
+                  variant="fade-in"
+                  animationDuration={600}
+                  animationDelay={300} // ⬅️ same stagger you had
+                  threshold={0.2}
+                  rootMargin="0px 0px -50px 0px" // early trigger
+                  once={false}
+                >
                   <LabelIcon
                     tech={tech}
                     index={index}
@@ -170,21 +170,20 @@ const TechStack = () => {
                     onTouch={handleMobileTouch}
                     onMouseEnter={() => onInteraction?.("hover")}
                   />
-                  </AnimatedElementWrapper>
-                );
-              }}
-              
-              speed={30}
-              gap={32} // Matches gap-8 (32px) to gap-10 (40px) from original
-              itemWidth={120}
-              autoplay={true}
-              pauseOnHover={true}
-              pauseOnEngage={true}
-              gradientMask={true}
-              gradientWidth={{ base: 48, md: 80 }} // w-12 md:w-20 converted to px
-              onItemInteraction={handleItemInteraction}
-              className="relative w-full"
-            />
+                </AnimatedElementWrapper>
+              );
+            }}
+            speed={30}
+            gap={32} // Matches gap-8 (32px) to gap-10 (40px) from original
+            itemWidth={120}
+            autoplay={true}
+            pauseOnHover={true}
+            pauseOnEngage={true}
+            gradientMask={true}
+            gradientWidth={{ base: 48, md: 80 }} // w-12 md:w-20 converted to px
+            onItemInteraction={handleItemInteraction}
+            className="relative w-full"
+          />
         </div>
 
         {/* Mobile subtitle */}

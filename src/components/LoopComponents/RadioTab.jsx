@@ -2,7 +2,7 @@
 import React from "react";
 import AnimatedBorder from "../AnimatedBorder/AnimatedBorder";
 import IconListItem from "./IconListItem";
-import { useAnimatedElement } from "../../hooks/useAnimatedElement";
+import { useAnimatedElement } from "../../hooks/animations/useViewAnimation";
 
 const RadioTab = ({
   id,

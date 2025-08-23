@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import PortfolioCarousel from "../components/PortfolioCarousel";
-import { useAnimatedElement } from "../hooks/useAnimatedElement"; // ⬅️ replace useVisibility
+import PortfolioCarousel from "../components/Carousels/PortfolioCarousel";
+import { useAnimatedElement } from "../hooks/animations/useViewAnimation"; // ⬅️ replace useVisibility
 import BorderTitle from "../components/BorderTitle";
 import Heading from "../components/Heading";
 import ProntoDesktop from "../assets/ProntoJunkRemoval/pronto-desktop.jpg";
@@ -36,7 +36,7 @@ export default function PortfolioSection() {
       id="projects"
       data-portfolio-section
       className="w-screen overflow-x-hidden outer-section bg-bg relative animated-element fade-in"
-      {...sectionAnimProps}  // adds data-visible + css vars for fade
+      {...sectionAnimProps} // adds data-visible + css vars for fade
     >
       <div className="section-color-border"></div>
 

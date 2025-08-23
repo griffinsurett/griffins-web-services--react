@@ -1,7 +1,7 @@
 // src/components/BorderTitle.jsx
 import React from "react";
 import AnimatedBorder from "./AnimatedBorder/AnimatedBorder";
-import { useAnimatedElement } from "../hooks/useAnimatedElement";
+import { useAnimatedElement } from "../hooks/animations/useViewAnimation";
 import Heading from "./Heading";
 
 /**

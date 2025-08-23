@@ -1,10 +1,17 @@
 // src/components/WebsiteTypes.jsx
-import React, { useCallback, useEffect, useMemo, useRef, useState, useId } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useId,
+} from "react";
 import EnhancedAccordionItem from "./LoopComponents/EnhancedAccordionItem";
 import VideoPlayer from "./VideoPlayer";
 import AnimatedElementWrapper from "./AnimatedElementWrapper";
-import useEngagementAutoplay from "./../hooks/useEngagementAutoplay";
-import { useAnimatedElement } from "./../hooks/useAnimatedElement";
+import useEngagementAutoplay from "../hooks/autoplay/useEngagementAutoplay";
+import { useAnimatedElement } from "../hooks/animations/useViewAnimation";
 
 export default function WebsiteTypes({
   types = [],
@@ -107,7 +114,8 @@ export default function WebsiteTypes({
       selectIndex(0);
     }
 
-    return () => radios.forEach((r) => r.removeEventListener("change", onChange));
+    return () =>
+      radios.forEach((r) => r.removeEventListener("change", onChange));
   }, [groupName, types.length, selectIndex]);
 
   // Progress + transitions
@@ -201,7 +209,11 @@ export default function WebsiteTypes({
               once={false}
             >
               <EnhancedAccordionItem
-                data={{ icon: t.icon, title: t.title, description: t.description }}
+                data={{
+                  icon: t.icon,
+                  title: t.title,
+                  description: t.description,
+                }}
                 isActive={activeIndex === idx}
                 progress={progress}
                 onToggle={handleRadioChange}
@@ -213,7 +225,10 @@ export default function WebsiteTypes({
                 {/* MOBILE video lives INSIDE the active accordion item */}
                 {activeIndex === idx && (
                   <div className="lg:hidden mt-4">
-                    <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-card/40" data-video-slot>
+                    <div
+                      className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-card/40"
+                      data-video-slot
+                    >
                       <VideoPlayer
                         key={`mobile-${idx}-${activeIndex}`}
                         ref={mobileVideoRef}
@@ -236,7 +251,10 @@ export default function WebsiteTypes({
         {/* Right: fills remaining space exactly (desktop player) */}
         <div className="hidden lg:block lg:flex-1 min-w-0 sticky top-0">
           <div className="sticky top-8">
-            <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-card/40 shadow-2xl shadow-accent/20" data-video-slot>
+            <div
+              className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-card/40 shadow-2xl shadow-accent/20"
+              data-video-slot
+            >
               <VideoPlayer
                 key={`desktop-${activeIndex}`}
                 ref={desktopVideoRef}
@@ -252,9 +270,13 @@ export default function WebsiteTypes({
 
             {debug && (
               <div className="mt-4 text-xs opacity-75 bg-zinc-800 p-2 rounded">
-                <div>⏸️ Autoplay Paused: {core.isAutoplayPaused ? "✅" : "❌"}</div>
+                <div>
+                  ⏸️ Autoplay Paused: {core.isAutoplayPaused ? "✅" : "❌"}
+                </div>
                 <div>👤 Engaged: {core.userEngaged ? "✅" : "❌"}</div>
-                <div>⏲️ Resume Scheduled: {core.isResumeScheduled ? "✅" : "❌"}</div>
+                <div>
+                  ⏲️ Resume Scheduled: {core.isResumeScheduled ? "✅" : "❌"}
+                </div>
                 <div>🎪 Active Index: {activeIndex}</div>
                 <div>📊 Progress: {Math.round(progress)}%</div>
               </div>

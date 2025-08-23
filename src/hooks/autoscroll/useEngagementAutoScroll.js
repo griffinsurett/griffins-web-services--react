@@ -4,13 +4,17 @@
 
 // src/hooks/useEngagementAutoScroll.js
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useVisibility } from "./useVisibility";
-import { useTouchInteraction, useScrollInteraction, usePointerInteraction } from "./useInteractions";
+import { useVisibility } from "../animations/useVisibility";
+import {
+  useTouchInteraction,
+  useScrollInteraction,
+  usePointerInteraction,
+} from "../animations/useInteractions";
 import { useAutoScroll } from "./useAutoScroll";
 
 /**
  * Engagement-aware auto-scroll that combines core auto-scrolling with user interaction detection.
- * 
+ *
  * - Pauses scrolling when user interacts (touch/scroll/pointer)
  * - Resumes after a delay when interaction stops
  * - Emits custom events for external autoplay coordination
@@ -50,7 +54,10 @@ export function useEngagementAutoScroll({
   const [userEngaged, setUserEngaged] = useState(false);
 
   // ---- Visibility detection
-  const inView = useVisibility(ref, { threshold, rootMargin: visibleRootMargin });
+  const inView = useVisibility(ref, {
+    threshold,
+    rootMargin: visibleRootMargin,
+  });
 
   // ---- Core auto-scroll (only active when not paused and in view)
   const scrollActive = active && inView && !paused;
@@ -79,7 +86,7 @@ export function useEngagementAutoScroll({
   const scheduleResume = useCallback(() => {
     if (!resumeOnUserInput) return;
     if (userInteractingRef.current) return; // still interacting
-    
+
     clearResume();
     setResumeScheduled(true);
     resumeTimerRef.current = setTimeout(() => {
@@ -91,14 +98,19 @@ export function useEngagementAutoScroll({
   }, [resumeOnUserInput, resumeDelay, clearResume]);
 
   // ---- Event emission for external autoplay coordination
-  const emitUserEvent = useCallback((phase) => {
-    const el = ref?.current;
-    if (!el) return;
-    el.dispatchEvent(new CustomEvent("autoscroll-user", {
-      bubbles: true,
-      detail: { phase }, // "start" | "end"
-    }));
-  }, [ref]);
+  const emitUserEvent = useCallback(
+    (phase) => {
+      const el = ref?.current;
+      if (!el) return;
+      el.dispatchEvent(
+        new CustomEvent("autoscroll-user", {
+          bubbles: true,
+          detail: { phase }, // "start" | "end"
+        })
+      );
+    },
+    [ref]
+  );
 
   // ---- Interaction handlers
   const handleInteractionStart = useCallback(() => {
@@ -155,7 +167,7 @@ export function useEngagementAutoScroll({
     const el = ref?.current;
     if (!el) return;
 
-    const SCROLL_IDLE = 160;  // ms without events = idle
+    const SCROLL_IDLE = 160; // ms without events = idle
     const WHEEL_IDLE = 160;
 
     let scrollIdleTimer = null;
@@ -183,12 +195,17 @@ export function useEngagementAutoScroll({
       if (scrollIdleTimer) clearTimeout(scrollIdleTimer);
       if (wheelIdleTimer) clearTimeout(wheelIdleTimer);
     };
-  }, [ref, autoScroll.internalScrollRef, handleInteractionStart, handleInteractionEnd]);
+  }, [
+    ref,
+    autoScroll.internalScrollRef,
+    handleInteractionStart,
+    handleInteractionEnd,
+  ]);
 
   // ---- Reset engagement state when inactive/invisible
   useEffect(() => {
     if (!resetOnInactive) return;
-    
+
     if (!active || !inView) {
       userInteractingRef.current = false;
       setUserEngaged(false);
@@ -214,14 +231,14 @@ export function useEngagementAutoScroll({
     paused,
     resumeScheduled,
     engaged: userEngaged,
-    
+
     // Control methods
     pauseNow,
     resumeNow: () => {
       clearResume();
       setPaused(false);
     },
-    
+
     // Pass-through from core auto-scroll
     startNow: autoScroll.startNow,
     stopNow: autoScroll.stopNow,

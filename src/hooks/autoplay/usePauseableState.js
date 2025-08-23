@@ -1,13 +1,14 @@
-// src/hooks/usePauseableState.js
+// src/hooks/autoplay/usePauseableState.js
 import { useState, useEffect, useRef, useCallback } from "react";
 
 /**
- * Central pause/engagement state + delayed resume scheduler
+ * Central pause/engagement state + delayed resume scheduler.
+ * Generic: usable by autoplay or autoscroll.
  */
 export const usePauseableState = ({
   initialPausedState = false,
   resumeTriggers = ["scroll", "click-outside", "hover-away"],
-  resumeDelay = 5000, // default delay (ms)
+  resumeDelay = 5000, // ms
 } = {}) => {
   const [isPaused, setIsPaused] = useState(initialPausedState);
   const [userEngaged, setUserEngaged] = useState(false);
@@ -31,7 +32,7 @@ export const usePauseableState = ({
       setIsResumeScheduled(false);
       setUserEngaged(false);
       setShouldPauseAfterVideo(false);
-      setIsPaused(false); // resume autoplay
+      setIsPaused(false); // resume
     }, resumeDelay);
   }, [cancelScheduledResume, resumeDelay]);
 
@@ -49,7 +50,7 @@ export const usePauseableState = ({
   const engageUser = useCallback(() => {
     cancelScheduledResume(); // any pending resume is now invalid
     setUserEngaged(true);
-    setShouldPauseAfterVideo(true); // pause when current video ends
+    setShouldPauseAfterVideo(true); // pause when current video ends (if applicable)
   }, [cancelScheduledResume]);
 
   const disengageUser = useCallback(() => {
@@ -65,21 +66,21 @@ export const usePauseableState = ({
     return false;
   }, [shouldPauseAfterVideo, userEngaged]);
 
-const handleResumeActivity = useCallback(
-  (triggerType) => {
-    if (!resumeTriggers.includes(triggerType)) return;
+  const handleResumeActivity = useCallback(
+    (triggerType) => {
+      if (!resumeTriggers.includes(triggerType)) return;
 
-    // Disengage immediately for all resume triggers
-    setUserEngaged(false);
-    setShouldPauseAfterVideo(false);
+      // Disengage immediately for all resume triggers
+      setUserEngaged(false);
+      setShouldPauseAfterVideo(false);
 
-    // Schedule resume only if actually paused
-    if (isPaused) {
-      scheduleResume();
-    }
-  },
-  [resumeTriggers, isPaused, scheduleResume]
-);
+      // Schedule resume only if actually paused
+      if (isPaused) {
+        scheduleResume();
+      }
+    },
+    [resumeTriggers, isPaused, scheduleResume]
+  );
 
   useEffect(() => () => cancelScheduledResume(), [cancelScheduledResume]);
 

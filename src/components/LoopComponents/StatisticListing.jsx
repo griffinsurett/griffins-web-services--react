@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from "react";
 import Counter from "../Counter";
-import { useVisibility } from "../../hooks/useVisibility"; // uses your IO hook
+import { useVisibility } from "../../hooks/animations/useVisibility"; // uses your IO hook
 
 export default function StatisticListing({
   data,
@@ -23,10 +23,16 @@ export default function StatisticListing({
 
   // Extract numeric part, keep prefix/suffix like “100+”
   const { value, prefix, suffix } = useMemo(() => {
-    if (typeof number === "number") return { value: number, prefix: "", suffix: "" };
+    if (typeof number === "number")
+      return { value: number, prefix: "", suffix: "" };
     const str = String(number ?? "");
     const m = str.match(/^\s*([^0-9\-+]*)(-?\d+(?:\.\d+)?)(.*)$/);
-    if (m) return { value: parseFloat(m[2]), prefix: m[1] ?? "", suffix: m[3] ?? "" };
+    if (m)
+      return {
+        value: parseFloat(m[2]),
+        prefix: m[1] ?? "",
+        suffix: m[3] ?? "",
+      };
     return { value: 0, prefix: "", suffix: str };
   }, [number]);
 

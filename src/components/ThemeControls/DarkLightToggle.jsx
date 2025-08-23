@@ -1,6 +1,6 @@
 import React, { useId } from "react";
 import { CircleCheckbox } from "./checkboxes/CircleCheckbox";
-import { UseMode } from "../../hooks/UseMode.js";
+import { UseMode } from "../../hooks/theme/UseMode.js";
 
 export default function ThemeToggle() {
   const moonSize = 14;
@@ -12,7 +12,7 @@ export default function ThemeToggle() {
   const R = 18; // outer radius (same as sun disc)
   const ratio = 0.69; // inner/outer radius ratio = slim crescent
   const rIn = R * ratio; // inner cutout radius
-const dx = -R * 0.4; // flip horizontally so the crescent faces the other way
+  const dx = -R * 0.4; // flip horizontally so the crescent faces the other way
   const dy = R * -0.2; // y-offset of cutout
 
   return (
@@ -51,28 +51,31 @@ const dx = -R * 0.4; // flip horizontally so the crescent faces the other way
 
         {/* Light icon (sun) — unchanged */}
         <div className="light:block dark:hidden">
-  <svg
-    width={sunSize}
-    height={sunSize}
-    viewBox="13 13 74 74"   // crops to the ray tips (includes stroke caps)
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="block"       // kills baseline gap
-  >
-    <circle cx="50" cy="50" r="18" fill="var(--color-primary)" />
-    <g stroke="var(--color-primary)" strokeWidth="4" strokeLinecap="round">
-      <line x1="50" y1="15" x2="50" y2="25" />
-      <line x1="50" y1="75" x2="50" y2="85" />
-      <line x1="15" y1="50" x2="25" y2="50" />
-      <line x1="75" y1="50" x2="85" y2="50" />
-      <line x1="25.86" y1="25.86" x2="32.32" y2="32.32" />
-      <line x1="67.68" y1="67.68" x2="74.14" y2="74.14" />
-      <line x1="25.86" y1="74.14" x2="32.32" y2="67.68" />
-      <line x1="67.68" y1="32.32" x2="74.14" y2="25.86" />
-    </g>
-  </svg>
-</div>
-
+          <svg
+            width={sunSize}
+            height={sunSize}
+            viewBox="13 13 74 74" // crops to the ray tips (includes stroke caps)
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="block" // kills baseline gap
+          >
+            <circle cx="50" cy="50" r="18" fill="var(--color-primary)" />
+            <g
+              stroke="var(--color-primary)"
+              strokeWidth="4"
+              strokeLinecap="round"
+            >
+              <line x1="50" y1="15" x2="50" y2="25" />
+              <line x1="50" y1="75" x2="50" y2="85" />
+              <line x1="15" y1="50" x2="25" y2="50" />
+              <line x1="75" y1="50" x2="85" y2="50" />
+              <line x1="25.86" y1="25.86" x2="32.32" y2="32.32" />
+              <line x1="67.68" y1="67.68" x2="74.14" y2="74.14" />
+              <line x1="25.86" y1="74.14" x2="32.32" y2="67.68" />
+              <line x1="67.68" y1="32.32" x2="74.14" y2="25.86" />
+            </g>
+          </svg>
+        </div>
       </CircleCheckbox>
     </div>
   );

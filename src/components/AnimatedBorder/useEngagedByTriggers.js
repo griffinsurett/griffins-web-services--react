@@ -1,7 +1,7 @@
 // src/hooks/useEngagedByTriggers.js
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { useVisibility } from "../../hooks/useVisibility";
-import { useHoverInteraction } from "../../hooks/useInteractions";
+import { useVisibility } from "../../hooks/animations/useVisibility";
+import { useHoverInteraction } from "../../hooks/animations/useInteractions";
 
 /**
  * useEngagedByTriggers

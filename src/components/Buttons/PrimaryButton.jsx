@@ -1,5 +1,5 @@
 import React from "react";
-import { useAnimatedElement } from "../../hooks/useAnimatedElement";
+import { useAnimatedElement } from "../../hooks/animations/useViewAnimation";
 
 const PrimaryButton = ({ Base = "button", className = "", ...props }) => {
   const anim = useAnimatedElement({
@@ -20,9 +20,9 @@ const PrimaryButton = ({ Base = "button", className = "", ...props }) => {
 
   return (
     <Base
-      ref={anim.ref}                     // observe THIS element
+      ref={anim.ref} // observe THIS element
       className={`animated-element zoom-in ${classes} ${className}`}
-      {...anim.props}                    // adds data-visible & CSS vars
+      {...anim.props} // adds data-visible & CSS vars
       {...props}
     />
   );

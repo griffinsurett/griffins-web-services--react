@@ -16,14 +16,14 @@ import { useVisibility } from "./useVisibility";
  *       transform var(--animation-duration, 600ms) var(--animation-easing, ease),
  *       opacity   var(--animation-duration, 600ms) var(--animation-easing, ease);
  *   }
- *   .animated-element[data-visible="true"]  
- *   .animated-element[data-visible="false"] 
+ *   .animated-element[data-visible="true"]
+ *   .animated-element[data-visible="false"]
  */
 export function useAnimatedElement({
   ref,
   // timing vars (JS only supplies values; CSS decides how to use them)
-  duration = 600,             // ms
-  delay = 0,                  // ms
+  duration = 600, // ms
+  delay = 0, // ms
   easing = "cubic-bezier(0.4, 0, 0.2, 1)",
   // visibility config
   threshold = 0.2,
@@ -107,8 +107,8 @@ export function useAnimatedElement({
     inView,
     progress,
     progressDecimal,
-    direction,             // "forward" | "reverse"
-    isAnimating: inView,   // with transition-based CSS, "visible" maps to animating
+    direction, // "forward" | "reverse"
+    isAnimating: inView, // with transition-based CSS, "visible" maps to animating
     hasAnimated: inView,
     // spread this on your element
     props,

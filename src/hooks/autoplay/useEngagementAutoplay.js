@@ -2,7 +2,10 @@
 import { useEffect, useRef, useCallback } from "react";
 import useAutoplay from "./useAutoplay";
 import { usePauseableState } from "./usePauseableState";
-import { useScrollInteraction, useClickInteraction } from "./useInteractions";
+import {
+  useScrollInteraction,
+  useClickInteraction,
+} from "../animations/useInteractions";
 
 /**
  * Engagement-aware autoplay controller.
@@ -16,7 +19,7 @@ export default function useEngagementAutoplay({
   totalItems,
   currentIndex,
   setIndex,
-  autoplayTime = 3000,        // number | () => number
+  autoplayTime = 3000, // number | () => number
   resumeDelay = 5000,
   resumeTriggers = ["scroll", "click-outside", "hover-away"],
   containerSelector = "[data-autoplay-container]",
@@ -96,7 +99,8 @@ export default function useEngagementAutoplay({
     if (!items.length) return;
 
     const isEligible = (el) =>
-      !!el && (!engageOnlyOnActiveItem || el.getAttribute?.(activeItemAttr) === "true");
+      !!el &&
+      (!engageOnlyOnActiveItem || el.getAttribute?.(activeItemAttr) === "true");
 
     const onEnter = (ev) => {
       const host = ev.currentTarget;
@@ -169,7 +173,8 @@ export default function useEngagementAutoplay({
     };
 
     container.addEventListener("autoscroll-user", onAutoScrollUser);
-    return () => container.removeEventListener("autoscroll-user", onAutoScrollUser);
+    return () =>
+      container.removeEventListener("autoscroll-user", onAutoScrollUser);
   }, [
     containerSelector,
     itemSelector,

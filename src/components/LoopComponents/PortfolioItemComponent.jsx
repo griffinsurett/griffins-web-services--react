@@ -1,6 +1,6 @@
 // src/components/LoopComponents/PortfolioItemComponent.jsx
 import React, { useRef, useEffect, useState } from "react";
-import { useEngagementAutoScroll } from "../../hooks/useEngagementAutoScroll";
+import { useEngagementAutoScroll } from "../../hooks/autoscroll/useEngagementAutoScroll";
 
 export default function PortfolioItemComponent({
   item,
@@ -25,7 +25,9 @@ export default function PortfolioItemComponent({
 
   const isActive = pos === "center";
   const topClass = isActive ? "top-0" : "top-1/2";
-  const baseTranslate = isActive ? "translate(-50%, 0)" : "translate(-50%, -50%)";
+  const baseTranslate = isActive
+    ? "translate(-50%, 0)"
+    : "translate(-50%, -50%)";
 
   // ✅ Updated to use explicit engagement hook
   const auto = useEngagementAutoScroll({

@@ -1,7 +1,7 @@
 import React from "react";
 import TestimonialCard from "../components/LoopComponents/TestimonialCard";
 import BorderTitle from "../components/BorderTitle";
-import Carousel from "../components/Carousel";
+import Carousel from "../components/Carousels/Carousel";
 import Heading from "../components/Heading";
 import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
 import { testimonials } from "../testimonials";

@@ -1,7 +1,7 @@
 // src/hooks/useScrollTriggeredVideo.js
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useVisibility } from "../../hooks/useVisibility";
-import { useScrollInteraction } from "../../hooks/useInteractions";
+import { useVisibility } from "../../hooks/animations/useVisibility";
+import { useScrollInteraction } from "../../hooks/animations/useInteractions";
 
 /**
  * useScrollTriggeredVideo(containerRef, videoRef, menuCheckboxIdOrOptions?, options?)

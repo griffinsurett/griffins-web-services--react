@@ -1,7 +1,7 @@
 // src/components/Logo/VideoLogo.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useScrollTriggeredVideo } from "./useScrollTriggeredVideo";
-import { useVisibility } from "../../hooks/useVisibility";
+import { useVisibility } from "../../hooks/animations/useVisibility";
 
 import POSTER_SRC from "../../assets/GWS-animated.png";
 import VIDEO_SRC from "../../assets/GWS-animated.webm";
