@@ -1,6 +1,6 @@
 // src/components/LoopComponents/PricingCard.jsx
 import React from "react";
-import AnimatedBorder from "../AnimatedBorder";
+import AnimatedBorder from "../AnimatedBorder/AnimatedBorder";
 import Button from "../Buttons/Button";
 import CheckListItem from "./CheckListItem";
 
@@ -10,7 +10,16 @@ export default function PricingCard({
   ringDuration = 800,
   featured = false,
 }) {
-  const { icon, title, description, price, period = "monthly", features, buttonText = "Choose Plan", buttonVariant = "primary" } = data;
+  const {
+    icon,
+    title,
+    description,
+    price,
+    period = "monthly",
+    features,
+    buttonText = "Choose Plan",
+    buttonVariant = "primary",
+  } = data;
 
   return (
     <div className={`group relative ${className}`}>
@@ -41,19 +50,23 @@ export default function PricingCard({
         <div className="relative z-10 flex flex-col h-full">
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="icon-large mb-4 card-icon-color mx-auto">{icon}</div>
+            <div className="icon-large mb-4 card-icon-color mx-auto">
+              {icon}
+            </div>
             <h4 className="h3 mb-3">{title}</h4>
-            
+
             {/* Price */}
             {price && (
               <div className="mb-4">
                 <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-4xl lg:text-5xl font-bold text-accent">${price}</span>
+                  <span className="text-4xl lg:text-5xl font-bold text-accent">
+                    ${price}
+                  </span>
                   <span className="text-lg text-muted">/{period}</span>
                 </div>
               </div>
             )}
-            
+
             <p className="text-text leading-relaxed">{description}</p>
           </div>
 
@@ -61,19 +74,14 @@ export default function PricingCard({
           <div className="flex-grow mb-8">
             <div className="space-y-3">
               {features?.map((feature, featureIdx) => (
-                <CheckListItem key={featureIdx}>
-                  {feature}
-                </CheckListItem>
+                <CheckListItem key={featureIdx}>{feature}</CheckListItem>
               ))}
             </div>
           </div>
 
           {/* CTA Button */}
           <div className="mt-auto">
-            <Button 
-              variant={buttonVariant} 
-              className="w-full justify-center"
-            >
+            <Button variant={buttonVariant} className="w-full justify-center">
               {buttonText}
             </Button>
           </div>

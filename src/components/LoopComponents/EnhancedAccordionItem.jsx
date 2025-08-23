@@ -1,6 +1,6 @@
 // EnhancedAccordionItem.jsx
 import React from "react";
-import AnimatedBorder from "../AnimatedBorder";
+import AnimatedBorder from "../AnimatedBorder/AnimatedBorder";
 import IconListItem from "./IconListItem";
 
 const EnhancedAccordionItem = ({

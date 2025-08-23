@@ -1,7 +1,7 @@
 // src/hooks/useScrollTriggeredVideo.js
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useVisibility } from "./useVisibility";
-import { useScrollInteraction } from "./useInteractions";
+import { useVisibility } from "../../hooks/useVisibility";
+import { useScrollInteraction } from "../../hooks/useInteractions";
 
 /**
  * useScrollTriggeredVideo(containerRef, videoRef, menuCheckboxIdOrOptions?, options?)
@@ -20,7 +20,10 @@ export function useScrollTriggeredVideo(
   // ── normalize args
   let menuCheckboxId = "headerMenu-toggle";
   let opts = {};
-  if (typeof menuCheckboxIdOrOptions === "string" || menuCheckboxIdOrOptions == null) {
+  if (
+    typeof menuCheckboxIdOrOptions === "string" ||
+    menuCheckboxIdOrOptions == null
+  ) {
     menuCheckboxId = menuCheckboxIdOrOptions ?? "headerMenu-toggle";
     opts = maybeOptions ?? {};
   } else {
@@ -48,45 +51,52 @@ export function useScrollTriggeredVideo(
   }, [visibleRootMargin]);
 
   // ✅ rely on our hook; "once" mimics the old "disconnect on first view"
-  const seenOnce = useVisibility(containerRef, { threshold, rootMargin, once: true });
+  const seenOnce = useVisibility(containerRef, {
+    threshold,
+    rootMargin,
+    once: true,
+  });
 
   const [activated, setActivated] = useState(false);
   const pauseTimeout = useRef(null);
 
   // ✅ REFACTORED: Use centralized scroll interaction instead of hardcoded listeners
-  const handleMovement = useMemo(() => (deltaY) => {
-    const vid = videoRef.current;
+  const handleMovement = useMemo(
+    () => (deltaY) => {
+      const vid = videoRef.current;
 
-    // first scroll down ever → activate
-    if (!activated && deltaY > 0) {
-      setActivated(true);
-      return;
-    }
-    if (!vid) return;
-
-    clearTimeout(pauseTimeout.current);
-
-    if (deltaY > 0) {
-      vid.playbackRate = 0.5;
-      vid.play().catch(() => {});
-    } else if (deltaY < 0) {
-      vid.pause();
-      const reverseStep = 0.02;
-      vid.currentTime =
-        vid.currentTime > reverseStep
-          ? vid.currentTime - reverseStep
-          : vid.duration;
-
-      if (window.pageYOffset <= 0) {
-        vid.currentTime = 0;
-        vid.play().catch(() => {});
+      // first scroll down ever → activate
+      if (!activated && deltaY > 0) {
+        setActivated(true);
+        return;
       }
-    }
+      if (!vid) return;
 
-    pauseTimeout.current = setTimeout(() => {
-      vid.pause();
-    }, 100);
-  }, [activated, videoRef]);
+      clearTimeout(pauseTimeout.current);
+
+      if (deltaY > 0) {
+        vid.playbackRate = 0.5;
+        vid.play().catch(() => {});
+      } else if (deltaY < 0) {
+        vid.pause();
+        const reverseStep = 0.02;
+        vid.currentTime =
+          vid.currentTime > reverseStep
+            ? vid.currentTime - reverseStep
+            : vid.duration;
+
+        if (window.pageYOffset <= 0) {
+          vid.currentTime = 0;
+          vid.play().catch(() => {});
+        }
+      }
+
+      pauseTimeout.current = setTimeout(() => {
+        vid.pause();
+      }, 100);
+    },
+    [activated, videoRef]
+  );
 
   // ✅ REFACTORED: Use useScrollInteraction instead of manual event listeners
   useScrollInteraction({
@@ -95,17 +105,21 @@ export function useScrollTriggeredVideo(
     debounceDelay: 16, // ~60fps for smooth video control
     trustedOnly: true,
     wheelSensitivity: 1,
-    
+
     // Only attach when the section has been seen once
-    onScrollActivity: seenOnce ? ({ dir, delta }) => {
-      // Convert direction to deltaY for compatibility
-      const deltaY = dir === "down" ? delta : -delta;
-      handleMovement(deltaY);
-    } : undefined,
-    
-    onWheelActivity: seenOnce ? ({ deltaY }) => {
-      handleMovement(deltaY);
-    } : undefined,
+    onScrollActivity: seenOnce
+      ? ({ dir, delta }) => {
+          // Convert direction to deltaY for compatibility
+          const deltaY = dir === "down" ? delta : -delta;
+          handleMovement(deltaY);
+        }
+      : undefined,
+
+    onWheelActivity: seenOnce
+      ? ({ deltaY }) => {
+          handleMovement(deltaY);
+        }
+      : undefined,
   });
 
   // Autoplay as soon as "activated"
@@ -137,9 +151,12 @@ export function useScrollTriggeredVideo(
   }, [menuCheckboxId, videoRef]);
 
   // Cleanup pause timeout on unmount
-  useEffect(() => () => {
-    clearTimeout(pauseTimeout.current);
-  }, []);
+  useEffect(
+    () => () => {
+      clearTimeout(pauseTimeout.current);
+    },
+    []
+  );
 
   return { activated };
 }

@@ -1,7 +1,7 @@
 // src/components/AnimatedBorder.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useReversibleProgress } from "../hooks/useReversibleProgress";
-import { useEngagedByTriggers } from "../hooks/useEngagedByTriggers";
+import { useReversibleProgress } from "./useReversibleProgress";
+import { useEngagedByTriggers } from "./useEngagedByTriggers";
 
 /**
  * AnimatedBorder
@@ -95,8 +95,13 @@ const AnimatedBorder = ({
       ? "backAndForth"
       : "forwardOnly";
 
-  const { percent, reversing, setEngaged: setEngineEngaged, reverseOnce, reset } =
-    useReversibleProgress({ duration, mode: hookMode });
+  const {
+    percent,
+    reversing,
+    setEngaged: setEngineEngaged,
+    reverseOnce,
+    reset,
+  } = useReversibleProgress({ duration, mode: hookMode });
 
   // External controller
   const controllerIsFn = typeof controller === "function";
@@ -174,7 +179,13 @@ const AnimatedBorder = ({
         setEngineEngaged(false);
       }
     }
-  }, [controllerProvided, variant, engagedFinal, setEngineEngaged, reverseOnce]);
+  }, [
+    controllerProvided,
+    variant,
+    engagedFinal,
+    setEngineEngaged,
+    reverseOnce,
+  ]);
 
   useEffect(() => {
     if (variant !== "progress" || !fadingOut) return;
@@ -194,7 +205,11 @@ const AnimatedBorder = ({
   const handleLeave = (e) => {
     onMouseLeave?.(e);
     onLeave(e);
-    if (!controllerProvided && variant === "progress-b-f" && derivedReversePolicy === "leave") {
+    if (
+      !controllerProvided &&
+      variant === "progress-b-f" &&
+      derivedReversePolicy === "leave"
+    ) {
       reverseOnce();
     }
   };
@@ -216,7 +231,8 @@ const AnimatedBorder = ({
 
   const baseMask = {
     mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+    WebkitMask:
+      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
     maskComposite: "exclude",
     WebkitMaskComposite: "xor",
   };
@@ -270,7 +286,9 @@ const AnimatedBorder = ({
         />
       )}
 
-      <div className={`relative z-10 overflow-hidden ${borderRadius} ${innerClassName}`}>
+      <div
+        className={`relative z-10 overflow-hidden ${borderRadius} ${innerClassName}`}
+      >
         {children}
       </div>
     </div>

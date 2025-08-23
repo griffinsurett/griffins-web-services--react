@@ -1,7 +1,7 @@
 // src/hooks/useEngagedByTriggers.js
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { useVisibility } from "./useVisibility";
-import { useHoverInteraction } from "./useInteractions";
+import { useVisibility } from "../../hooks/useVisibility";
+import { useHoverInteraction } from "../../hooks/useInteractions";
 
 /**
  * useEngagedByTriggers
@@ -26,8 +26,8 @@ export function useEngagedByTriggers({
   unhoverIntent,
 
   // IO early/late engage window
-  visibleRootMargin = 120,                  // number|string|{top,right,bottom,left}
-  visibilityOptions = { threshold: 0.25 },  // other IO opts (threshold, root, etc.)
+  visibleRootMargin = 120, // number|string|{top,right,bottom,left}
+  visibilityOptions = { threshold: 0.25 }, // other IO opts (threshold, root, etc.)
 }) {
   // ── parse triggers
   const list = Array.isArray(triggers) ? triggers : [triggers ?? "hover"];
@@ -61,8 +61,7 @@ export function useEngagedByTriggers({
   );
 
   // ── normalize rootMargin
-  const normalizePx = (v) =>
-    typeof v === "number" ? `${v}px` : (v ?? 0);
+  const normalizePx = (v) => (typeof v === "number" ? `${v}px` : v ?? 0);
 
   const normalizedRootMargin = useMemo(() => {
     // number → shrink top/bottom by N px

@@ -1,4 +1,4 @@
-import AnimatedBorder from "../AnimatedBorder";
+import AnimatedBorder from "../AnimatedBorder/AnimatedBorder";
 
 export default function SocialLink({ data }) {
   const { href, label, icon: Icon } = data;

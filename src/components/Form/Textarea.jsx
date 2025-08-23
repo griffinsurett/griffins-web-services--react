@@ -1,6 +1,6 @@
 // src/components/Form/Textarea.jsx
 import React, { useState, useCallback } from "react";
-import AnimatedBorder from "../AnimatedBorder";
+import AnimatedBorder from "../AnimatedBorder/AnimatedBorder";
 
 const Textarea = ({
   name,
@@ -19,15 +19,21 @@ const Textarea = ({
 }) => {
   const [focused, setFocused] = useState(false);
 
-  const handleFocus = useCallback((e) => {
-    setFocused(true);
-    props.onFocus?.(e);
-  }, [props]);
+  const handleFocus = useCallback(
+    (e) => {
+      setFocused(true);
+      props.onFocus?.(e);
+    },
+    [props]
+  );
 
-  const handleBlur = useCallback((e) => {
-    setFocused(false);
-    props.onBlur?.(e);
-  }, [props]);
+  const handleBlur = useCallback(
+    (e) => {
+      setFocused(false);
+      props.onBlur?.(e);
+    },
+    [props]
+  );
 
   return (
     <div className={`space-y-2 ${colSpan}`}>

@@ -1,6 +1,6 @@
 // src/components/BorderTitle.jsx
 import React from "react";
-import AnimatedBorder from "./AnimatedBorder";
+import AnimatedBorder from "./AnimatedBorder/AnimatedBorder";
 import { useAnimatedElement } from "../hooks/useAnimatedElement";
 import Heading from "./Heading";
 
@@ -18,9 +18,9 @@ export default function BorderTitle({
 }) {
   // Drive visibility + timing for the text only
   const { ref: textRef, props: textAnimProps } = useAnimatedElement({
-    duration,          // fade length
+    duration, // fade length
     delay: 0,
-    threshold: 0,      // flip as soon as it's on screen
+    threshold: 0, // flip as soon as it's on screen
     rootMargin: "0px 0px -15% 0px",
   });
 

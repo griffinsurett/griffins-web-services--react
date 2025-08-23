@@ -1,10 +1,10 @@
 // src/components/Logo/VideoLogo.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useScrollTriggeredVideo } from "../../hooks/useScrollTriggeredVideo";
+import { useScrollTriggeredVideo } from "./useScrollTriggeredVideo";
 import { useVisibility } from "../../hooks/useVisibility";
 
 import POSTER_SRC from "../../assets/GWS-animated.png";
-import VIDEO_SRC  from "../../assets/GWS-animated.webm";
+import VIDEO_SRC from "../../assets/GWS-animated.webm";
 
 /**
  * VideoLogo
@@ -19,7 +19,7 @@ export default function VideoLogo({
   className = "logo-class",
   mediaClasses = "block w-[35px] p-0 m-0 md:w-[40px] lg:w-[45px] h-auto",
   loading = "lazy",
-  trigger = "auto",                // "auto" | "scroll" | "visible"
+  trigger = "auto", // "auto" | "scroll" | "visible"
   respectReducedMotion = true,
 }) {
   const containerRef = useRef(null);
@@ -53,7 +53,7 @@ export default function VideoLogo({
 
   // 2) Visibility-triggered activation (IntersectionObserver)
   const visible = useVisibility(containerRef, {
-    threshold: 0,              // flip as soon as it touches the viewport
+    threshold: 0, // flip as soon as it touches the viewport
     rootMargin: "0px 0px 0px 0px",
     once: false,
   });
@@ -95,7 +95,7 @@ export default function VideoLogo({
           muted
           loop
           playsInline
-          autoPlay                // important: allow autoplay in visibility mode
+          autoPlay // important: allow autoplay in visibility mode
           preload="metadata"
           aria-label={alt}
           className={`${className} ${mediaClasses}`}

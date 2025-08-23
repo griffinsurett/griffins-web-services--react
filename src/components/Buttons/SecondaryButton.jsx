@@ -1,6 +1,6 @@
 // src/components/buttons/SecondaryButton.jsx
 import React from "react";
-import AnimatedBorder from "../AnimatedBorder";
+import AnimatedBorder from "../AnimatedBorder/AnimatedBorder";
 
 /** Secondary always uses the AnimatedBorder load effect. */
 const SecondaryButton = ({
@@ -22,8 +22,10 @@ const SecondaryButton = ({
     borderRadius = "rounded-full",
   } = animatedBorder || {};
 
-  const containerClasses = fullWidth ? "block w-full lg:w-auto" : "inline-block";
-  const innerWrapWidth   = fullWidth ? "w-full" : "";
+  const containerClasses = fullWidth
+    ? "block w-full lg:w-auto"
+    : "inline-block";
+  const innerWrapWidth = fullWidth ? "w-full" : "";
 
   const innerButtonClasses =
     `bg-transparent text-heading${borderRadius} ` +
@@ -32,7 +34,7 @@ const SecondaryButton = ({
   return (
     <AnimatedBorder
       variant="progress"
-      triggers="always"              // run once on mount (no reverse)
+      triggers="always" // run once on mount (no reverse)
       duration={duration}
       color={color}
       borderWidth={borderWidth}
