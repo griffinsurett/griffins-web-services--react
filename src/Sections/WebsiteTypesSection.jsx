@@ -33,7 +33,7 @@ export default function WebsiteTypesSection() {
               key={item.key}
               variant="scale-in"
               animationDuration={600}
-              animationDelay={idx * 300}
+              animationDelay={idx * 100}
               threshold={0.1}
               rootMargin="0px 0px -10px 0px"
               once={false}
