@@ -6,21 +6,25 @@ import LabelIcon from "../components/LoopComponents/LabelIcon";
 import AnimatedElementWrapper from "../components/AnimatedElementWrapper";
 import SmoothScrollCarousel from "../components/Carousels/SmoothScrollCarousel";
 import { useHoverInteraction } from "../hooks/animations/useInteractions";
+
+// Brand icons via react-icons (Simple Icons)
 import {
-  Code2,
-  Layers,
-  Zap,
-  Globe,
-  Database,
-  PenTool,
-  Frame,
-  Triangle,
-  Github,
-  Sparkles,
-  Blocks,
-  Server,
-  Cloud,
-} from "lucide-react";
+  SiAstro,
+  SiNextdotjs,
+  SiReact,
+  SiGatsby,
+  SiSvelte,
+  SiShopify,
+  SiWordpress,
+  SiElementor,
+  SiPayloadcms,
+  SiWebflow,
+  SiFramer,
+  SiVercel,
+  SiGithub,
+  SiNodedotjs,
+  // FaAmazonaws,
+} from "react-icons/si";
 
 const TechStack = () => {
   // Mobile touch state for LabelIcon interactions
@@ -30,25 +34,24 @@ const TechStack = () => {
   // Hovered tech label to show in overlay
   const [hoveredTech, setHoveredTech] = useState(null);
 
-  const description =
-    "From modern frameworks, CMS platforms, to a wide range of hosting platforms we build with the right tools for your project.";
+  const iconClass = "w-8 h-8"; // adjust globally here
 
   const technologies = [
-    { name: "Astro.js", icon: <Code2 className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Next.js", icon: <Code2 className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "React", icon: <Sparkles className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Gatsby", icon: <Layers className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Svelte", icon: <Blocks className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Shopify", icon: <Zap className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "WordPress", icon: <Globe className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Elementor", icon: <Zap className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Payload CMS", icon: <Database className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Webflow", icon: <PenTool className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Framer", icon: <Frame className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Vercel", icon: <Triangle className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "GitHub", icon: <Github className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "Node.js", icon: <Server className="w-8 h-8 md:w-10 md:h-10" /> },
-    { name: "AWS", icon: <Cloud className="w-8 h-8 md:w-10 md:h-10" /> },
+    { name: "Astro",       icon: <SiAstro className={iconClass} aria-hidden /> },
+    { name: "Next.js",     icon: <SiNextdotjs className={iconClass} aria-hidden /> },
+    { name: "React",       icon: <SiReact className={iconClass} aria-hidden /> },
+    { name: "Gatsby",      icon: <SiGatsby className={iconClass} aria-hidden /> },
+    { name: "Svelte",      icon: <SiSvelte className={iconClass} aria-hidden /> },
+    { name: "Shopify",     icon: <SiShopify className={iconClass} aria-hidden /> },
+    { name: "WordPress",   icon: <SiWordpress className={iconClass} aria-hidden /> },
+    { name: "Elementor",   icon: <SiElementor className={iconClass} aria-hidden /> },
+    { name: "Payload CMS", icon: <SiPayloadcms className={iconClass} aria-hidden /> },
+    { name: "Webflow",     icon: <SiWebflow className={iconClass} aria-hidden /> },
+    { name: "Framer",      icon: <SiFramer className={iconClass} aria-hidden /> },
+    { name: "Vercel",      icon: <SiVercel className={iconClass} aria-hidden /> },
+    { name: "GitHub",      icon: <SiGithub className={iconClass} aria-hidden /> },
+    { name: "Node.js",     icon: <SiNodedotjs className={iconClass} aria-hidden /> },
+    // { name: "AWS",         icon: <SiAmazonaws className={iconClass} aria-hidden /> },
   ];
 
   const DEFAULT_BEFORE = "We've mastered ";
@@ -61,9 +64,7 @@ const TechStack = () => {
       const name = el?.dataset?.techName || null;
       setHoveredTech(name);
     },
-    onHoverEnd: () => {
-      setHoveredTech(null);
-    },
+    onHoverEnd: () => setHoveredTech(null),
   });
 
   // Mobile touch: show label for 2.5s
@@ -93,23 +94,29 @@ const TechStack = () => {
           {/* Left side - Text content */}
           <div className="w-sm">
             <div className="relative inline-block mb-6 leading-tight">
-              {/* Base heading IN FLOW — never changes. Locks layout height. */}
+              {/* Base heading IN FLOW — stays text-heading */}
               <Heading
                 tagName="h2"
                 before={DEFAULT_BEFORE}
                 beforeClass="text-heading block lg:inline"
                 text={DEFAULT_HEADING_TEXT}
-                textClass={`text-heading block lg:inline transition-opacity duration-150 ${hoveredTech ? "opacity-0" : "opacity-100"}`}
+                textClass={`text-heading block lg:inline transition-opacity duration-150 ${
+                  hoveredTech ? "opacity-0" : "opacity-100"
+                }`}
               />
 
-              {/* Overlay heading — absolute; fades in/out; no layout impact */}
-              <div className={`absolute inset-0 transition-opacity duration-150 ${hoveredTech ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+              {/* Overlay heading — ONLY the tech label uses text-accent */}
+              <div
+                className={`absolute inset-0 transition-opacity duration-150 ${
+                  hoveredTech ? "opacity-100" : "opacity-0 pointer-events-none"
+                }`}
+              >
                 <Heading
                   tagName="h2"
                   before={DEFAULT_BEFORE}
-                  beforeClass="text-heading block lg:inline"
-                  text={hoveredTech || ""}
-                  textClass="text-heading block lg:inline"
+                  beforeClass="text-heading block lg:inline" // "We've mastered" stays heading color
+                  text={hoveredTech || ""}                   // tech name
+                  textClass="text-accent block lg:inline"    // accent color for the tech text
                 />
               </div>
             </div>
@@ -136,7 +143,6 @@ const TechStack = () => {
                     index={index}
                     isActive={isMobileActive}
                     onTouch={handleMobileTouch}
-                    // pass element to hook so it can read dataset.techName
                     onHoverStart={(el) => handleMouseEnter(el, index)}
                     onHoverEnd={(el) => handleMouseLeave(el, index)}
                     showName={false}
@@ -155,11 +161,6 @@ const TechStack = () => {
             className="relative w-full h-[84px] md:h-[96px]" // reserves carousel lane height
           />
         </div>
-
-        {/* Mobile subtitle */}
-        <p className="text-center text-text text-base lg:hidden">
-          {description}
-        </p>
       </div>
     </section>
   );

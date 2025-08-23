@@ -30,7 +30,7 @@ export default function LabelIcon({
       <div
         className="
           relative
-          p-3 md:p-4
+          p-2
           transition-all duration-300
           group-hover:scale-110
           cursor-pointer
@@ -43,7 +43,7 @@ export default function LabelIcon({
         onMouseLeave={() => onHoverEnd?.(rootRef.current)}
       >
         {/* Glow */}
-        <div
+        {/* <div
           className={`
             absolute inset-0
             bg-accent/30
@@ -52,7 +52,7 @@ export default function LabelIcon({
             rounded-full
             ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
           `}
-        />
+        /> */}
         {/* Icon */}
         <div
           className={`
