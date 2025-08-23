@@ -11,7 +11,7 @@ import Benefits from "./Sections/Benefits";
 import Stats from "./Sections/Stats";
 import Testimonials from "./Sections/Testimonials";
 import CTASection from "./Sections/CTASection";
-import QuoteForm from "./Sections/QuoteForm";
+import QuoteForm from "./Sections/QuoteFormSection";
 import PortfolioSection from "./Sections/PortfolioSection";
 import HostingMaintenance from "./Sections/HostingMaintenance";
 import AddOnServices from "./Sections/AddOnServices";
