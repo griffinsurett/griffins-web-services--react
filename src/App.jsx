@@ -6,7 +6,7 @@ import Header from "./Sections/Header";
 import Footer from "./Sections/Footer";
 import Hero from "./Sections/Hero";
 import About from "./Sections/About";
-import WebsiteTypes from "./Sections/WebsiteTypes";
+import WebsiteTypes from "./Sections/WebsiteTypesSection";
 import Benefits from "./Sections/Benefits";
 import Stats from "./Sections/Stats";
 import Testimonials from "./Sections/Testimonials";

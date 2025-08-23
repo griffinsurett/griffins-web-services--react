@@ -88,7 +88,7 @@ const QuoteForm = () => {
             // onSubmit={handleSubmit}
             action={"https://formspree.io/f/mjkgojyo"}
             method="POST"
-            className="group bg-bg2 section-box outer-card-transition"
+            className="group section-box card-bg outer-card-transition"
           >
             <div className="inner-card-style"></div>
 

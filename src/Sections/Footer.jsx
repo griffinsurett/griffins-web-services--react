@@ -26,7 +26,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative w-19/20 lg:9/10 gap-6 lg:gap-0 mx-auto flex-col">
+    <footer className="relative w-19/20 lg:9/10 gap-6 lg:gap-3 mx-auto flex flex-col">
       {/* Contact Information */}
       <div
         className={`footer-top ${TW.row} ${TW.betweenResp} ${TW.yStackResp} ${TW.gap3_6} text-center`}
@@ -75,7 +75,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="text-muted order-last md:order-2 m-0">
+        <div className="text-primary order-last md:order-2 m-0">
           © {year} {siteData.legalName}. All rights reserved.
         </div>
 

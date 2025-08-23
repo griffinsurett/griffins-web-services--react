@@ -238,35 +238,6 @@
     transform var(--animation-duration) var(--animation-easing);
 }
 
-/* BorderTitle text fade, then color swap to primary */
-.color-text-fade {
-  /* start hidden, keep current color (e.g., text-heading) */
-  opacity: 0;
-
-  /* animate ONLY opacity; color switches at the end with a 0ms delayed transition */
-  transition-property: opacity, color;
-  transition-duration: var(--animation-duration, 600ms), 0ms;
-  transition-timing-function: var(--animation-easing, ease), linear;
-  transition-delay:
-    var(--animation-delay, 0ms),
-    calc(var(--animation-delay, 0ms) + var(--animation-duration, 600ms));
-}
-
-.color-text-fade[data-visible="true"] {
-  opacity: 1;
-  /* swap to your "text-primary" token; matches the rest of your system */
-  color: var(--color-primary);
-}
-
-/* reduced motion: skip fade but still apply final color */
-@media (prefers-reduced-motion: reduce) {
-  .color-text-fade {
-    transition: none;
-    opacity: 1;
-    color: var(--color-primary);
-  }
-}
-
 /* Hover-only rolling icon that moves left while rotating (ball-roll) */
 .link-roll {
   position: absolute;
@@ -296,5 +267,44 @@
     transition: none;
     transform: translateY(-50%);
     opacity: 1;
+  }
+}
+
+/* Symmetric fade + color swap (both directions) */
+.color-text-fade {
+  /* base + tokens */
+  --ctf-color-hidden: currentColor;           /* inherits from parent (e.g., .text-heading) */
+  --ctf-color-visible: var(--color-primary);  /* your highlight */
+  --ctf-color: var(--ctf-color-hidden);
+  --ctf-color-delay: 0ms;
+
+  opacity: 0;
+  color: var(--ctf-color);
+
+  /* fade opacity normally; change color instantly but only after a delay */
+  transition:
+    opacity var(--animation-duration, 600ms) var(--animation-easing, ease) var(--animation-delay, 0ms),
+    color   0ms                              linear                           var(--ctf-color-delay);
+}
+
+/* ENTER: fade to 1, then switch to primary AFTER the fade-in completes */
+.color-text-fade[data-visible="true"] {
+  opacity: 1;
+  --ctf-color: var(--ctf-color-visible);
+  --ctf-color-delay: calc(var(--animation-delay, 0ms) + var(--animation-duration, 600ms));
+}
+
+/* EXIT (reverse): keep primary while fading out, then switch back to base at the end */
+.color-text-fade[data-visible="false"][data-animation-direction="reverse"] {
+  --ctf-color: var(--ctf-color-hidden);
+  --ctf-color-delay: calc(var(--animation-delay, 0ms) + var(--animation-duration, 600ms));
+}
+
+/* Reduced motion: no animation; just show final color */
+@media (prefers-reduced-motion: reduce) {
+  .color-text-fade {
+    transition: none;
+    opacity: 1;
+    color: var(--ctf-color-visible);
   }
 }
