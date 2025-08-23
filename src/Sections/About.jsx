@@ -7,12 +7,6 @@ import { siteData } from "../siteData";
 const About = () => {
   const Services = [
     {
-      icon: "💭",
-      title: "Dream",
-      description:
-        "We turn your ideas into stunning digital experiences. Our team collaborates with you to understand your vision and create a website that reflects your brand and engages your audience.",
-    },
-    {
       icon: "🎨",
       title: "Design",
       description:
@@ -24,6 +18,12 @@ const About = () => {
       description:
         "Fast, secure, and scalable websites built with modern technology. From simple landing pages to complex e-commerce platforms, we bring your vision to life.",
     },
+    {
+      icon: "📄",
+      title: "Ongoing Support",
+      description:
+        "Dedicated hosting and maintenance to ensure your website remains up-to-date, secure, and optimized for performance.",
+    }
   ];
 
   return (
@@ -31,19 +31,21 @@ const About = () => {
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">
-          <Heading
-            tagName="h2"
-            className="mb-6"
-            before="Who We "
-            text="Are"
-            textClass="emphasized-text"
-          />
-          <p className="large-text mb-8">
-            Websites is what we do, we're here to make you a lightning fast,
-            secure, and scalable website that handles your marketing campaigns,
-            integrates with ai, and stands the test of time.
-          </p>
-        </div>
+      <Heading
+        tagName="h2"
+        className="mb-6 h1"
+        before="Websites aren't just part of what we do. "
+        text="They're everything we do."
+        // textClass="emphasized-text"
+      />
+      
+      <p className="text-xl lg:text-2xl leading-relaxed mb-8">
+      While others juggle dozens of services, we've mastered one: building lightning-fast, 
+        secure, and scalable sites that turn visitors into customers. Every site delivers 
+        peak performance, handles your marketing campaigns, integrates with AI and modern tools, 
+        and stands the test of time.
+      </p>
+    </div>
 
         <div className="max-3-secondary">
           {Services.map((item, idx) => (

@@ -8,7 +8,7 @@ export const siteData = {
   title: "Griffin's Web Services",
   tagline: "Build Your Digital Empire",
   description:
-    "Fast, modern, and conversion-focused web experiences that drive real results for your business.",
+      "We design and develop websites that look stunning on every device and load faster than your competition, bringing you more qualified customers who are ready to buy.",
   legalName: "Griffin's Web Services LLC",
 };
 
