@@ -1,47 +1,42 @@
-// src/hooks/UseMode.js
-import { useEffect, useState } from "react";
+// src/hooks/theme/UseMode.js
+import { useEffect, useMemo } from "react";
+import useLocalStorageState from "../useLocalStorageState";
 
 /**
  * Theme hook — mirrors how accent color is handled:
  * - Sets `data-theme` + `color-scheme` on <html>
- * - Updates a CSS var `--color-bg` (so the <head> script syncs <meta name="theme-color">)
+ * - Updates CSS var `--color-bg` for the <meta name="theme-color"> updater
  * - Persists the user’s choice in localStorage
- *
- * NOTE: index.html already has a MutationObserver that watches `data-theme`/style
- * and updates <meta name="theme-color"> from the computed `--color-bg`.
  */
 export function UseMode() {
-  // Pick the correct initial value synchronously
-  const getInitial = () => {
-    try {
-      const stored = localStorage.getItem("theme");
-      if (stored === "light") return true;
-      if (stored === "dark")  return false;
-      return window.matchMedia("(prefers-color-scheme: light)").matches;
-    } catch {
-      return false; // safe fallback: dark
-    }
-  };
+  // Initial: localStorage > OS preference (light?) > dark fallback
+  const [theme, setTheme] = useLocalStorageState(
+    "theme",
+    () => {
+      try {
+        return window.matchMedia("(prefers-color-scheme: light)").matches
+          ? "light"
+          : "dark";
+      } catch {
+        return "dark";
+      }
+    },
+    { raw: true, validate: (v) => v === "light" || v === "dark" }
+  );
 
-  const [isLight, setIsLight] = useState(getInitial);
+  const isLight = theme === "light";
+  const setIsLight = (val) => setTheme(val ? "light" : "dark");
 
-  // Apply to <html> + persist whenever it changes
+  // Apply to <html> whenever it changes
   useEffect(() => {
-    const theme = isLight ? "light" : "dark";
     const root = document.documentElement;
+    const t = isLight ? "light" : "dark";
 
-    // Attribute + UA hint
-    root.setAttribute("data-theme", theme);
-    root.style.colorScheme = theme;
+    root.setAttribute("data-theme", t);
+    root.style.colorScheme = t;
 
-    // Keep a CSS var in sync so the <head> script updates <meta name="theme-color">
-    // (Do NOT set the meta tag here—mirror the accent approach by only touching CSS vars.)
-    const bg = theme === "light" ? "#fafafa" : "#000000";
-    root.style.setProperty("--color-bg", bg);
-
-    try {
-      localStorage.setItem("theme", theme);
-    } catch {}
+    // Keep CSS var in sync so the head script updates <meta name="theme-color">
+    root.style.setProperty("--color-bg", t === "light" ? "#fafafa" : "#000000");
   }, [isLight]);
 
   // Follow OS changes only if user hasn't explicitly saved a preference
@@ -51,13 +46,13 @@ export function UseMode() {
       try {
         const stored = localStorage.getItem("theme");
         if (stored !== "light" && stored !== "dark") {
-          setIsLight(e.matches);
+          setTheme(e.matches ? "light" : "dark");
         }
       } catch {}
     };
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
-  }, []);
+  }, [setTheme]);
 
   return [isLight, setIsLight];
 }
