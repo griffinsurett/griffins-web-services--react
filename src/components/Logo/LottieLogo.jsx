@@ -6,7 +6,6 @@ import { useVisibility } from "../../hooks/animations/useVisibility";
 // Import your Lottie JSON file
 import LOGO_ANIMATION from "../../../public/Lotties/Animation_logo_small_size.json";
 // Or if you prefer to load it as a path:
-// const LOGO_ANIMATION_PATH = "/lotties/Animation_logo_small_size.json";
 
 /**
  * LottieLogo - Drop-in replacement for VideoLogo using Lottie
@@ -15,7 +14,7 @@ import LOGO_ANIMATION from "../../../public/Lotties/Animation_logo_small_size.js
 export default function LottieLogo({
   alt = "",
   className = "logo-class",
-  mediaClasses = "block w-[35px] p-0 m-0 md:w-[40px] lg:w-[45px] h-auto",
+  mediaClasses = "block wp-0 m-0 w-[40px] lg:w-[45px] h-auto",
   trigger = "auto", // "auto" | "scroll" | "visible"
   respectReducedMotion = true,
 }) {
