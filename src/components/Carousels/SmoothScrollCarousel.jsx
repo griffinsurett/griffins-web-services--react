@@ -1,5 +1,5 @@
 // ============================================================================
-// src/components/SmoothScrollCarousel.jsx - HAS AUTOPLAY → USES useEngagementAutoplay
+// src/components/Carousels/SmoothScrollCarousel.jsx
 // ============================================================================
 
 import React, { useRef, useEffect, useState, useMemo, forwardRef } from "react";
@@ -8,34 +8,28 @@ import useEngagementAutoplay from "../../hooks/autoplay/useEngagementAutoplay";
 
 /**
  * SmoothScrollCarousel - Component WITH autoplay functionality
- * ✅ CORRECT: Uses useEngagementAutoplay because IT has autoplay
+ * - Waits `startDelay` ms before starting scroll when eligible
+ * - Pauses on engagement (hover/click etc.) via useEngagementAutoplay
  */
 const SmoothScrollCarousel = forwardRef(
   (
     {
       items = [],
       renderItem = () => null,
-
-      // Behavior
       speed = 30,
       duplicateCount = 3,
       autoplay = true,
       pauseOnHover = true,
       pauseOnEngage = true,
-
-      // Layout
+      startDelay = 2500,          
       gap = 24,
       itemWidth = 120,
       gradientMask = true,
       gradientWidth = { base: 48, md: 80 },
       threshold = 0.3,
-
-      // Interaction
       onItemInteraction,
       resumeDelay = 3000,
       resumeTriggers = ["scroll", "click-outside", "hover-away"],
-
-      // Styling
       className = "",
       trackClassName = "",
     },
@@ -59,14 +53,14 @@ const SmoothScrollCarousel = forwardRef(
       setOffset: setCurrentOffset,
     }));
 
-    // ✅ VISIBILITY: Check if carousel itself is in view
+    // Visibility of the carousel itself
     const inView = useVisibility(containerRef, { threshold });
 
-    // Duplicate items for infinite scroll
+    // Duplicate items for infinite track
     const duplicatedItems = useMemo(() => {
-      const result = [];
+      const out = [];
       for (let i = 0; i < duplicateCount; i++) {
-        result.push(
+        out.push(
           ...items.map((item, idx) => ({
             ...item,
             _duplicateIndex: i,
@@ -74,56 +68,83 @@ const SmoothScrollCarousel = forwardRef(
           }))
         );
       }
-      return result;
+      return out;
     }, [items, duplicateCount]);
 
     const totalWidth = items.length * itemWidth;
 
-    // ✅ CORRECT: useEngagementAutoplay IN THE COMPONENT THAT HAS AUTOPLAY
+    // Engagement-aware autoplay coordinator (for pausing/resuming)
     const {
       isAutoplayPaused,
       isResumeScheduled,
       userEngaged,
       engageUser,
-      pause,
-      resume,
+      // pause, resume (exposed if needed)
     } = useEngagementAutoplay({
       totalItems: items.length,
       currentIndex:
-        Math.floor(Math.abs(currentOffset) / itemWidth) % items.length,
-      setIndex: () => {}, // Carousel handles its own animation
-      autoplayTime: 50, // Fast for smooth animation
+        Math.floor(Math.abs(currentOffset) / itemWidth) % (items.length || 1),
+      setIndex: () => {}, // continuous scroll handles its own position
+      autoplayTime: 50,   // fast tick; we manage actual motion via RAF
       resumeDelay,
       resumeTriggers,
-
-      // ✅ SELECTORS: Target this specific carousel
       containerSelector: `[data-autoplay-scope="${scopeId}"]`,
       itemSelector: `[data-autoplay-scope="${scopeId}"] [data-smooth-item]`,
-
       inView: autoplay && inView,
       pauseOnEngage,
       engageOnlyOnActiveItem: false,
       activeItemAttr: "data-active",
     });
 
-    // ✅ ANIMATION: Controlled by engagement system
+    // ⏱️ NEW: delayed start gate (mirrors PortfolioItem startDelay behavior)
+    const [canAnimate, setCanAnimate] = useState(false);
+    const startTimerRef = useRef(null);
+
     useEffect(() => {
-      if (!autoplay || !inView || isAutoplayPaused) return;
+      const eligible = autoplay && inView && !isAutoplayPaused;
+
+      // If not eligible, stop and clear timer immediately
+      if (!eligible) {
+        setCanAnimate(false);
+        if (startTimerRef.current) {
+          clearTimeout(startTimerRef.current);
+          startTimerRef.current = null;
+        }
+        return;
+      }
+
+      // Eligible → schedule delayed start
+      if (startTimerRef.current) clearTimeout(startTimerRef.current);
+      startTimerRef.current = setTimeout(() => {
+        setCanAnimate(true);
+      }, Math.max(0, Number(startDelay) || 0));
+
+      // Cleanup on dependency change/unmount
+      return () => {
+        if (startTimerRef.current) {
+          clearTimeout(startTimerRef.current);
+          startTimerRef.current = null;
+        }
+      };
+    }, [autoplay, inView, isAutoplayPaused, startDelay]);
+
+    // RAF animation loop (runs only when canAnimate === true)
+    useEffect(() => {
+      if (!canAnimate) return;
 
       let animationId;
       let lastTime = Date.now();
 
       const animate = () => {
         const now = Date.now();
-        const deltaTime = (now - lastTime) / 1000;
+        const dt = (now - lastTime) / 1000;
         lastTime = now;
 
         setCurrentOffset((prev) => {
-          let newOffset = prev - speed * deltaTime;
-          if (Math.abs(newOffset) >= totalWidth) {
-            newOffset = newOffset + totalWidth;
-          }
-          return newOffset;
+          if (totalWidth <= 0) return prev;
+          let next = prev - speed * dt;
+          if (Math.abs(next) >= totalWidth) next += totalWidth;
+          return next;
         });
 
         animationId = requestAnimationFrame(animate);
@@ -133,21 +154,24 @@ const SmoothScrollCarousel = forwardRef(
       return () => {
         if (animationId) cancelAnimationFrame(animationId);
       };
-    }, [autoplay, inView, isAutoplayPaused, speed, totalWidth]);
+    }, [canAnimate, speed, totalWidth]);
 
-    // Handle item interaction
-    const handleItemInteraction = (item, index, interactionType) => {
-      if (pauseOnEngage) {
-        engageUser();
-      }
-      onItemInteraction?.(item, index, interactionType);
+    // Hover → engage (pauses via engagement system)
+    const handleMouseEnterContainer = () => {
+      if (pauseOnHover) engageUser();
     };
 
     // Responsive gradient width
-    const getGradientWidth = () => {
-      if (typeof window === "undefined") return gradientWidth.base;
-      const vw = window.innerWidth;
-      return vw >= 768 ? gradientWidth.md : gradientWidth.base;
+const getGradientWidth = () => {
+   if (typeof window === "undefined") return gradientWidth.base;
+   return window.innerWidth >= 768 ? gradientWidth.md : gradientWidth.base;
+ };
+ const gw = getGradientWidth();
+
+    // Item interaction
+    const handleItemInteraction = (item, index, type) => {
+      if (pauseOnEngage) engageUser();
+      onItemInteraction?.(item, index, type);
     };
 
     return (
@@ -156,6 +180,8 @@ const SmoothScrollCarousel = forwardRef(
         data-autoplay-scope={scopeId}
         className={`relative w-full overflow-hidden ${className}`}
         data-smooth-carousel
+        onMouseEnter={handleMouseEnterContainer}
+        // onMouseLeave: engagement hook handles resume scheduling
       >
         {/* Gradient masks */}
         {gradientMask && (
@@ -171,18 +197,8 @@ const SmoothScrollCarousel = forwardRef(
           </>
         )}
 
-        {/* Carousel container */}
-        <div
-          className="overflow-hidden"
-          onMouseEnter={() => {
-            if (pauseOnHover) {
-              engageUser();
-            }
-          }}
-          onMouseLeave={() => {
-            // The engagement system handles hover-away
-          }}
-        >
+        {/* Track */}
+        <div className="overflow-hidden" style={{ paddingInline: `${gw}px` }}>
           <div
             ref={trackRef}
             className={`flex items-center ${trackClassName}`}
@@ -209,7 +225,7 @@ const SmoothScrollCarousel = forwardRef(
           </div>
         </div>
 
-        {/* Debug info */}
+        {/* Dev debug */}
         {process.env.NODE_ENV === "development" && (
           <div className="absolute top-2 right-2 text-xs bg-black/50 text-white p-2 rounded pointer-events-none z-50">
             <div>🎠 Autoplay: {autoplay ? "ON" : "OFF"}</div>
@@ -217,6 +233,7 @@ const SmoothScrollCarousel = forwardRef(
             <div>⏸️ Paused: {isAutoplayPaused ? "YES" : "NO"}</div>
             <div>👤 Engaged: {userEngaged ? "YES" : "NO"}</div>
             <div>⏲️ Resume: {isResumeScheduled ? "YES" : "NO"}</div>
+            <div>⏳ Can Animate (post-delay): {canAnimate ? "YES" : "NO"}</div>
           </div>
         )}
       </div>
@@ -225,5 +242,4 @@ const SmoothScrollCarousel = forwardRef(
 );
 
 SmoothScrollCarousel.displayName = "SmoothScrollCarousel";
-
 export default SmoothScrollCarousel;

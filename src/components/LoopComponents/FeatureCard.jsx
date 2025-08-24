@@ -6,12 +6,7 @@ export default function FeatureCard({
   data,
   className = "",
   ringDuration = 800,
-  // animation props intentionally ignored here; animation now happens in the loop wrapper
-  animationDuration,
-  animationDelay,
 }) {
-  const { icon, title, description } = data;
-
   return (
     <div className={className}>
       <AnimatedBorder

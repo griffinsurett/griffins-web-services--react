@@ -34,8 +34,8 @@ const About = () => {
       <Heading
         tagName="h2"
         className="mb-6 h1"
-        before="Websites aren't just part of what we do. "
-        text="They're everything we do."
+        before="Websites aren't just something we do. "
+        text="They're our specialty."
         // textClass="emphasized-text"
       />
       

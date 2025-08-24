@@ -92,7 +92,7 @@ const technologies = [
       <div className="inner-section text-center lg:text-left">
         <BorderTitle>Our Tech Stack</BorderTitle>
 
-        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_2fr] gap-4 lg:gap-12 items-center">
+        <div className="flex flex-col lg:grid lg:grid-cols-[1fr_2fr] gap-4 lg:gap-8 items-center">
           {/* Left side - Text content */}
           <div className="w-sm">
             <div className="relative inline-block mb-6 leading-tight">
@@ -127,6 +127,7 @@ const technologies = [
           {/* Right side - Smooth Scroll Carousel */}
           <SmoothScrollCarousel
             items={technologies}
+            startDelay={5000}
             renderItem={(tech, index) => {
               const itemKey = `${tech.name}-${index}`;
               const isMobileActive = activeMobileItem === itemKey;
@@ -159,7 +160,7 @@ const technologies = [
             pauseOnHover={true}
             pauseOnEngage={true}
             gradientMask={true}
-            gradientWidth={{ base: 48, md: 80 }}
+            gradientWidth={{ base: 48, md: 30 }}
             className="relative w-full h-[84px] md:h-[96px]" // reserves carousel lane height
           />
         </div>

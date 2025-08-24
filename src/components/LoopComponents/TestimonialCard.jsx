@@ -25,7 +25,7 @@ export default function TestimonialCard({
   return (
     <div className={className}>
       <AnimatedBorder
-        variant="progress"
+        variant="progress-b-f"
         triggers="hover"
         duration={ringDuration}
         borderRadius="rounded-3xl"
