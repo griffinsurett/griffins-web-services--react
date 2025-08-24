@@ -275,7 +275,7 @@
 
   /* Icon sizing */
   .icon-large {
-    @apply w-12 h-12 lg:w-15 lg:h-15 text-xl lg:text-2xl flex items-center justify-center mx-auto rounded-full relative;
+    @apply w-15 h-15 text-xl lg:text-2xl flex items-center justify-center mx-auto rounded-full relative;
   }
 
   .icon-medium {
