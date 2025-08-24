@@ -203,7 +203,7 @@ export default function WebsiteTypes({
               key={idx}
               variant="fade-in"
               animationDuration={600}
-              animationDelay={idx * 300}
+              style={{ animationDelay: `${(idx % 3) * 300}ms` }}
               threshold={0}
               rootMargin="0px 0px -50px 0px"
               once={false}
