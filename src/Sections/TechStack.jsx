@@ -24,7 +24,7 @@ import {
   SiGithub,
   SiNodedotjs,
 } from "react-icons/si";
-import { FaAws, FaFigma, FaCloudflare } from "react-icons/fa"; // Font Awesome (brands)
+import { FaAws, FaFigma, FaCloudflare, FaPhp, FaPython } from "react-icons/fa"; // Font Awesome (brands)
 
 const TechStack = () => {
   // Mobile touch state for LabelIcon interactions
@@ -45,6 +45,7 @@ const technologies = [
   { name: "Shopify",     icon: <SiShopify className={iconClass} aria-hidden /> },
   { name: "WordPress",   icon: <SiWordpress className={iconClass} aria-hidden /> },
   { name: "Elementor",   icon: <SiElementor className={iconClass} aria-hidden /> },
+  { name: "PHP",         icon: <FaPhp className={iconClass} aria-hidden /> },
   // { name: "Payload CMS", icon: <SiPayloadcms className={iconClass} aria-hidden /> },
   { name: "Webflow",     icon: <SiWebflow className={iconClass} aria-hidden /> },
   { name: "Figma",       icon: <FaFigma className={iconClass} aria-hidden /> }, // ← FA
@@ -53,6 +54,7 @@ const technologies = [
   { name: "Cloudflare",  icon: <FaCloudflare className={iconClass} aria-hidden /> },
   { name: "GitHub",      icon: <SiGithub className={iconClass} aria-hidden /> },
   { name: "Node.js",     icon: <SiNodedotjs className={iconClass} aria-hidden /> },
+  { name: "Python",      icon: <FaPython className={iconClass} aria-hidden /> },
   { name: "AWS",         icon: <FaAws className={iconClass} aria-hidden /> },   // ← FA
 ];
 

@@ -11,6 +11,7 @@ const ACCENT_COLORS = [
   "var(--color-red-500)",
   "var(--color-pink-500)",
   "var(--color-orange-500)",
+  "#722F37", // Wine (for night time)
 ];
 
 export function useAccentColor() {
