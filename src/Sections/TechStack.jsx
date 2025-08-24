@@ -17,7 +17,7 @@ import {
   SiShopify,
   SiWordpress,
   SiElementor,
-  SiPayloadcms,
+  // SiPayloadcms,
   SiWebflow,
   SiFramer,
   SiVercel,
@@ -45,7 +45,7 @@ const technologies = [
   { name: "Shopify",     icon: <SiShopify className={iconClass} aria-hidden /> },
   { name: "WordPress",   icon: <SiWordpress className={iconClass} aria-hidden /> },
   { name: "Elementor",   icon: <SiElementor className={iconClass} aria-hidden /> },
-  { name: "Payload CMS", icon: <SiPayloadcms className={iconClass} aria-hidden /> },
+  // { name: "Payload CMS", icon: <SiPayloadcms className={iconClass} aria-hidden /> },
   { name: "Webflow",     icon: <SiWebflow className={iconClass} aria-hidden /> },
   { name: "Figma",       icon: <FaFigma className={iconClass} aria-hidden /> }, // ← FA
   { name: "Framer",      icon: <SiFramer className={iconClass} aria-hidden /> },
