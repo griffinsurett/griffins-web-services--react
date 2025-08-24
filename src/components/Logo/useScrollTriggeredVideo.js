@@ -59,116 +59,50 @@ export function useScrollTriggeredVideo(
 
   const [activated, setActivated] = useState(false);
   const pauseTimeout = useRef(null);
-  const isPlaying = useRef(false);
-  const lastScrollTime = useRef(0);
-  const reverseAnimationFrame = useRef(null);
 
-  // ✅ FIXED: Improved scroll handling with proper BACKWARD PLAYBACK
+  // ✅ REFACTORED: Use centralized scroll interaction instead of hardcoded listeners
   const handleMovement = useMemo(
     () => (deltaY) => {
       const vid = videoRef.current;
-      const now = Date.now();
-      lastScrollTime.current = now;
 
-      // Clear any existing pause timeout since we're actively scrolling
-      clearTimeout(pauseTimeout.current);
-      // Cancel any ongoing reverse animation
-      if (reverseAnimationFrame.current) {
-        cancelAnimationFrame(reverseAnimationFrame.current);
-        reverseAnimationFrame.current = null;
-      }
-
-      // First scroll down ever → activate
+      // first scroll down ever → activate
       if (!activated && deltaY > 0) {
         setActivated(true);
         return;
       }
       if (!vid) return;
 
-      console.log('Scroll deltaY:', deltaY, 'Current time:', vid.currentTime);
+      clearTimeout(pauseTimeout.current);
 
-      const scrollSpeed = Math.abs(deltaY);
-      
       if (deltaY > 0) {
-        // Scrolling down - play forward
-        console.log('Scrolling DOWN - playing forward');
-        
-        // Stop any reverse playback
-        if (vid.playbackRate < 0) {
-          vid.pause();
-        }
-        
-        if (vid.paused || !isPlaying.current) {
-          vid.play().catch(() => {});
-          isPlaying.current = true;
-        }
-        
-        // Set positive playback rate for forward play
-        const forwardRate = Math.min(Math.max(scrollSpeed / 20, 0.5), 2.0);
-        vid.playbackRate = forwardRate;
-        console.log('Forward playback rate:', forwardRate);
-        
+        vid.playbackRate = 0.5;
+        vid.play().catch(() => {});
       } else if (deltaY < 0) {
-        // Scrolling up - play backward
-        console.log('Scrolling UP - playing BACKWARD');
-        
-        // Try using negative playbackRate for smooth reverse
-        try {
-          if (vid.paused || !isPlaying.current) {
-            vid.play().catch(() => {});
-            isPlaying.current = true;
-          }
-          
-          // Set negative playback rate for backward play
-          const backwardRate = -Math.min(Math.max(scrollSpeed / 20, 0.5), 2.0);
-          vid.playbackRate = backwardRate;
-          console.log('Backward playback rate:', backwardRate);
-          
-        } catch (error) {
-          // Fallback: manual reverse animation if negative playbackRate isn't supported
-          console.log('Negative playbackRate not supported, using manual reverse');
-          vid.pause();
-          isPlaying.current = false;
-          
-          const animateReverse = () => {
-            if (vid.currentTime > 0) {
-              const rewindSpeed = Math.min(Math.max(scrollSpeed / 30, 0.03), 0.1);
-              vid.currentTime = Math.max(vid.currentTime - rewindSpeed, 0);
-              reverseAnimationFrame.current = requestAnimationFrame(animateReverse);
-            }
-          };
-          animateReverse();
-        }
-        
-        // If we're at the very top of the page, ensure we're at the beginning
-        if (window.pageYOffset <= 10) {
-          console.log('At top of page - ensuring video at start');
+        vid.pause();
+        const reverseStep = 0.02;
+        vid.currentTime =
+          vid.currentTime > reverseStep
+            ? vid.currentTime - reverseStep
+            : vid.duration;
+
+        if (window.pageYOffset <= 0) {
           vid.currentTime = 0;
+          vid.play().catch(() => {});
         }
       }
 
-      // ✅ Pause after scroll ends
       pauseTimeout.current = setTimeout(() => {
-        if (now === lastScrollTime.current && vid) {
-          vid.pause();
-          isPlaying.current = false;
-          // Cancel any ongoing reverse animation
-          if (reverseAnimationFrame.current) {
-            cancelAnimationFrame(reverseAnimationFrame.current);
-            reverseAnimationFrame.current = null;
-          }
-          console.log('Auto-paused after scroll ended');
-        }
-      }, 300);
+        vid.pause();
+      }, 100);
     },
     [activated, videoRef]
   );
 
-  // ✅ FIXED: More responsive scroll detection
+  // ✅ REFACTORED: Use useScrollInteraction instead of manual event listeners
   useScrollInteraction({
     elementRef: null, // Use window (default)
     scrollThreshold: 1, // Very sensitive to any scroll
-    debounceDelay: 8, // Reduced for more responsive feel (~120fps)
+    debounceDelay: 16, // ~60fps for smooth video control
     trustedOnly: true,
     wheelSensitivity: 1,
 
@@ -188,38 +122,11 @@ export function useScrollTriggeredVideo(
       : undefined,
   });
 
-  // Autoplay as soon as "activated" and handle video events
+  // Autoplay as soon as "activated"
   useEffect(() => {
     if (!activated || !videoRef.current) return;
-    const vid = videoRef.current;
-    
-    // Start playing forward
-    vid.playbackRate = 0.5;
-    vid.play().catch(() => {});
-    isPlaying.current = true;
-
-    // Handle video reaching boundaries during playback
-    const handleTimeUpdate = () => {
-      // If playing backward and reached the beginning, pause
-      if (vid.playbackRate < 0 && vid.currentTime <= 0) {
-        vid.pause();
-        vid.currentTime = 0;
-        isPlaying.current = false;
-        console.log('Reached beginning during reverse play');
-      }
-      // If playing forward and reached the end, loop or pause
-      else if (vid.playbackRate > 0 && vid.currentTime >= vid.duration - 0.1) {
-        // For looping behavior during scroll-controlled playback
-        if (isPlaying.current) {
-          vid.currentTime = 0;
-        }
-      }
-    };
-
-    vid.addEventListener('timeupdate', handleTimeUpdate);
-    return () => {
-      vid.removeEventListener('timeupdate', handleTimeUpdate);
-    };
+    videoRef.current.playbackRate = 0.5;
+    videoRef.current.play().catch(() => {});
   }, [activated, videoRef]);
 
   // Menu checkbox → reset video to 0 on open
@@ -231,8 +138,6 @@ export function useScrollTriggeredVideo(
     const resetOnOpen = () => {
       if (box.checked && videoRef.current) {
         videoRef.current.currentTime = 0;
-        videoRef.current.pause();
-        isPlaying.current = false;
       }
     };
 
@@ -249,9 +154,6 @@ export function useScrollTriggeredVideo(
   useEffect(
     () => () => {
       clearTimeout(pauseTimeout.current);
-      if (reverseAnimationFrame.current) {
-        cancelAnimationFrame(reverseAnimationFrame.current);
-      }
     },
     []
   );
