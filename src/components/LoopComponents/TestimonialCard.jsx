@@ -31,7 +31,7 @@ export default function TestimonialCard({
         borderRadius="rounded-3xl"
         borderWidth={2}
         className="group text-left outer-card-transition !duration-[900ms] ease-out"
-        innerClassName="px-8 py-8 lg:px-10 lg:py-10 relative card-bg"
+        innerClassName="h-85 mx-auto px-10 flex flex-col justify-center items-start relative card-bg"
       >
         <div className="inner-card-style inner-card-transition inner-card-color" />
 
@@ -45,13 +45,13 @@ export default function TestimonialCard({
           showTitle={false}
         />
 
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 relative z-10">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 relative z-10 w-full">
           <IconListItem
             data={{ icon: avatar, title: author, description: role }}
             layout="horizontal"
             alignment="left"
             className="gap-4"
-            iconClassName="icon-small card-icon-color"
+            iconClassName="icon-small card-icon-color hidden"
             titleClassName="h4"
             titleTag="h4"
             descriptionClassName="text-text text-sm"
