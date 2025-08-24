@@ -26,7 +26,7 @@ const Hero = () => {
   return (
     <section className="min-h-screen flex items-center justify-center text-center px-5 pt-32 pb-20 bg-bg relative">
       <div className="absolute inset-0 hero-gradient-bg"></div>
-      <div className="inner-section relative z-10">
+      <div className="inner-section relative z-10 text-left lg:text-center">
         <Heading
           tagName="h1"
           className="mb-2"
