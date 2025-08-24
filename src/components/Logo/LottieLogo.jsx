@@ -4,7 +4,7 @@ import lottie from "lottie-web";
 import { useVisibility } from "../../hooks/animations/useVisibility";
 
 // Import your Lottie JSON file
-import LOGO_ANIMATION from "../../assets/lotties/Animation_logo_small_size.json";
+import LOGO_ANIMATION from "../../../public/Lotties/Animation_logo_small_size.json";
 // Or if you prefer to load it as a path:
 // const LOGO_ANIMATION_PATH = "/lotties/Animation_logo_small_size.json";
 
