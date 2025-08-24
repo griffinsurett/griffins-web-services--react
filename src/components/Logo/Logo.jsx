@@ -1,18 +1,22 @@
+// ──────────────────────────────────────────────────────────────
+// Updated Logo.jsx to use LottieLogo
+// ──────────────────────────────────────────────────────────────
+
+// src/components/Logo/Logo.jsx
 import React, { useEffect, useRef, useState } from "react";
 import TextLogo from "./TextLogo";
-import VideoLogo from "./VideoLogo";
+import LottieLogo from "./LottieLogo"; // Changed from VideoLogo
 import { useVisibility } from "../../hooks/animations/useVisibility";
 
 /**
- * Logo combines the video logo and the animated text logo.
- * `animateOutText`: when true (default), text hides on forward scroll and shows on backward scroll.
- * When false, text stays visible (no “out” animation).
+ * Logo combines the Lottie logo and the animated text logo.
+ * Now using Lottie instead of video for smoother reverse playback!
  */
 const Logo = ({
   loading = "lazy",
   trigger = "auto",
   textFadeMs = 1200,
-  animateOutText = false, // ← requested prop name
+  animateOutText = false,
 }) => {
   const textRef = useRef(null);
   const [textHidden, setTextHidden] = useState(false);
@@ -34,7 +38,7 @@ const Logo = ({
 
   return (
     <a href="/" className="flex justify-center items-center gap-1.5">
-      <VideoLogo
+      <LottieLogo
         alt="Griffin's Web Services Animated Logo"
         loading={loading}
         trigger={trigger}
