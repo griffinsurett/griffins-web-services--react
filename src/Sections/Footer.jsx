@@ -8,7 +8,7 @@ import Logo from "../components/Logo/Logo";
 import Heading from "../components/Heading";
 
 // Enhanced Tailwind patterns for better design
-const footerContainer = "max-w-7xl mx-auto px-6 lg:px-8";
+const footerContainer = "w-95/100 mx-auto px-6 lg:px-8";
 const containerJustify = "lg:justify-between";
 const flexRowToCol = "flex flex-col lg:flex-row";
 const mainTopFootContainer = "flex flex-col items-start";
