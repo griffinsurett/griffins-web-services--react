@@ -2,31 +2,34 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import lottie from "lottie-web";
 import { useVisibility } from "../../hooks/animations/useVisibility";
+import { useScrollInteraction } from "../../hooks/animations/useInteractions";
 
-// Import your Lottie JSON file
+// Static poster image
+import POSTER_SRC from "../../assets/GWS-animated.png";
+// Import Lottie JSON directly
 import LOGO_ANIMATION from "../../Lotties/Animation_logo_small_size.json";
-// Or if you prefer to load it as a path:
 
 /**
- * LottieLogo - Drop-in replacement for VideoLogo using Lottie
- * Maintains the same props and behavior as VideoLogo
+ * LottieLogo - Simple version that mirrors VideoLogo behavior
  */
 export default function LottieLogo({
   alt = "",
-  className = "logo-class",
-  mediaClasses = "block wp-0 m-0 w-[40px] lg:w-[45px] h-auto",
-  trigger = "auto", // "auto" | "scroll" | "visible"
+  className = "logo-class", 
+  mediaClasses = "block w-[35px] p-0 m-0 md:w-[40px] lg:w-[45px] h-auto",
+  loading = "lazy",
+  trigger = "auto",
   respectReducedMotion = true,
 }) {
   const containerRef = useRef(null);
+  const lottieContainerRef = useRef(null);
   const animationRef = useRef(null);
   const pauseTimeout = useRef(null);
-  const lastDirection = useRef(null);
+  const lastScrollTime = useRef(0);
   
   const [activated, setActivated] = useState(false);
   const [pageScrollable, setPageScrollable] = useState(false);
 
-  // Detect if the page can scroll (run on client after mount)
+  // Detect if page can scroll
   useEffect(() => {
     const el = document.documentElement;
     setPageScrollable((el?.scrollHeight || 0) > (window.innerHeight || 0) + 1);
@@ -46,188 +49,171 @@ export default function LottieLogo({
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Visibility detection
-  const visible = useVisibility(containerRef, {
-    threshold: 0,
+  const seenOnce = useVisibility(containerRef, {
+    threshold: 0.1,
     rootMargin: "0px",
     once: true,
   });
 
-  // Initialize Lottie animation
+  const visible = useVisibility(containerRef, {
+    threshold: 0,
+    rootMargin: "0px", 
+    once: false,
+  });
+
+  // Final activation decision
+  const shouldActivate = prefersReduced
+    ? false
+    : effectiveTrigger === "scroll"
+    ? seenOnce
+    : visible;
+
+  // Initialize Lottie when activated
   useEffect(() => {
-    if (!containerRef.current) return;
-    if (prefersReduced) return; // Don't load animation if reduced motion
+    if (!shouldActivate || !lottieContainerRef.current || animationRef.current) return;
 
-    animationRef.current = lottie.loadAnimation({
-      container: containerRef.current,
-      renderer: "svg", // Can change to "canvas" for better performance
-      loop: true,
-      autoplay: false,
-      animationData: LOGO_ANIMATION, // Use the imported JSON directly
-      // OR if loading from path:
-      // path: LOGO_ANIMATION_PATH,
-    });
-
-    // Set initial speed
-    animationRef.current.setSpeed(0.5);
+    console.log('Loading Lottie animation...');
     
-    // Start from first frame
-    animationRef.current.goToAndStop(0, true);
+    try {
+      animationRef.current = lottie.loadAnimation({
+        container: lottieContainerRef.current,
+        renderer: "svg",
+        loop: true,
+        autoplay: false,
+        animationData: LOGO_ANIMATION,
+      });
+
+      animationRef.current.setSpeed(0.5);
+      animationRef.current.goToAndStop(0, true);
+      
+      console.log('Lottie animation loaded successfully');
+    } catch (error) {
+      console.error('Failed to load Lottie:', error);
+    }
 
     return () => {
-      animationRef.current?.destroy();
+      if (animationRef.current) {
+        animationRef.current.destroy();
+        animationRef.current = null;
+      }
     };
-  }, [prefersReduced]);
+  }, [shouldActivate]);
 
-  // Handle scroll-triggered animation
-  useEffect(() => {
-    if (effectiveTrigger !== "scroll") return;
-    if (!visible) return; // Wait until visible at least once
-    if (prefersReduced) return;
-
-    const handleScroll = () => {
+  // Simple scroll handling
+  const handleMovement = useMemo(
+    () => (deltaY) => {
       const anim = animationRef.current;
+      const now = Date.now();
+      lastScrollTime.current = now;
+
+      console.log('Scroll detected:', deltaY, 'Animation exists:', !!anim);
+
       if (!anim) return;
 
-      const currentScrollY = window.pageYOffset || window.scrollY;
-      const lastScrollY = handleScroll.lastScrollY || 0;
-      const deltaY = currentScrollY - lastScrollY;
-      handleScroll.lastScrollY = currentScrollY;
+      // Clear any existing pause timeout
+      clearTimeout(pauseTimeout.current);
 
-      if (Math.abs(deltaY) < 1) return; // Ignore tiny movements
-
-      // First scroll down - activate
+      // First scroll down ever → activate
       if (!activated && deltaY > 0) {
         setActivated(true);
+        console.log('Lottie activated by scroll');
       }
 
       if (!activated) return;
-
-      clearTimeout(pauseTimeout.current);
 
       if (deltaY > 0) {
         // Scrolling down - play forward
-        if (lastDirection.current !== 'forward') {
-          anim.setDirection(1); // Forward direction
+        console.log('Playing FORWARD');
+        anim.setDirection(1);
+        if (anim.isPaused) {
           anim.play();
-          lastDirection.current = 'forward';
         }
       } else if (deltaY < 0) {
-        // Scrolling up - play reverse (THIS JUST WORKS WITH LOTTIE!)
-        if (lastDirection.current !== 'reverse') {
-          anim.setDirection(-1); // Reverse direction
+        // Scrolling up - play reverse  
+        console.log('Playing REVERSE');
+        anim.setDirection(-1);
+        if (anim.isPaused) {
           anim.play();
-          lastDirection.current = 'reverse';
         }
       }
 
-      // Pause after inactivity
+      // Pause after scroll stops
       pauseTimeout.current = setTimeout(() => {
-        anim.pause();
-        lastDirection.current = null;
-      }, 100);
-    };
-
-    // Handle wheel events for smoother response
-    const handleWheel = (e) => {
-      const anim = animationRef.current;
-      if (!anim) return;
-
-      const deltaY = e.deltaY;
-
-      // First scroll down - activate
-      if (!activated && deltaY > 0) {
-        setActivated(true);
-      }
-
-      if (!activated) return;
-
-      clearTimeout(pauseTimeout.current);
-
-      if (deltaY > 0) {
-        // Wheel down - play forward
-        if (lastDirection.current !== 'forward') {
-          anim.setDirection(1);
-          anim.play();
-          lastDirection.current = 'forward';
+        if (now === lastScrollTime.current && anim) {
+          anim.pause();
+          console.log('Paused after scroll ended');
         }
-      } else if (deltaY < 0) {
-        // Wheel up - play reverse
-        if (lastDirection.current !== 'reverse') {
-          anim.setDirection(-1);
-          anim.play();
-          lastDirection.current = 'reverse';
+      }, 200);
+    },
+    [activated]
+  );
+
+  // Scroll detection for scroll mode
+  useScrollInteraction({
+    elementRef: null,
+    scrollThreshold: 1,
+    debounceDelay: 8,
+    trustedOnly: true,
+    wheelSensitivity: 1,
+
+    onScrollActivity: (effectiveTrigger === "scroll" && seenOnce)
+      ? ({ dir, delta }) => {
+          const deltaY = dir === "down" ? delta : -delta;
+          handleMovement(deltaY);
         }
-      }
+      : undefined,
 
-      // Pause after inactivity
-      pauseTimeout.current = setTimeout(() => {
-        anim.pause();
-        lastDirection.current = null;
-      }, 100);
-    };
+    onWheelActivity: (effectiveTrigger === "scroll" && seenOnce)
+      ? ({ deltaY }) => {
+          handleMovement(deltaY);
+        }
+      : undefined,
+  });
 
-    // Initialize scroll position
-    handleScroll.lastScrollY = window.pageYOffset || window.scrollY;
-
-    // Add listeners
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("wheel", handleWheel, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("wheel", handleWheel);
-      clearTimeout(pauseTimeout.current);
-    };
-  }, [effectiveTrigger, visible, activated, prefersReduced]);
-
-  // Handle visibility-triggered animation
+  // Handle visibility mode
   useEffect(() => {
     if (effectiveTrigger !== "visible") return;
-    if (prefersReduced) return;
-    
-    const anim = animationRef.current;
-    if (!anim) return;
+    if (!animationRef.current) return;
 
     if (visible) {
-      // Start playing forward when visible
-      anim.setDirection(1);
-      anim.play();
+      console.log('Visibility triggered - playing forward');
+      animationRef.current.setDirection(1);
+      animationRef.current.play();
     }
-  }, [effectiveTrigger, visible, prefersReduced]);
+  }, [effectiveTrigger, visible]);
 
-  // Handle activation for scroll mode
+  // Handle initial activation for scroll mode
   useEffect(() => {
     if (activated && animationRef.current && effectiveTrigger === "scroll") {
+      console.log('Initial activation - playing forward');
       animationRef.current.setDirection(1);
       animationRef.current.play();
     }
   }, [activated, effectiveTrigger]);
 
-  // Show static state for reduced motion
-  if (prefersReduced) {
-    return (
-      <div 
-        className={`${className} ${mediaClasses}`}
-        aria-label={alt}
-        style={{ 
-          width: '35px', 
-          height: '35px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        {/* You could put a static SVG or image here for reduced motion */}
-        <span style={{ fontSize: '24px' }}>🎯</span>
-      </div>
-    );
-  }
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      clearTimeout(pauseTimeout.current);
+    };
+  }, []);
 
   return (
-    <div 
-      ref={containerRef}
-      className={`${className} ${mediaClasses}`}
-      aria-label={alt}
-    />
+    <div ref={containerRef}>
+      {!shouldActivate ? (
+        <img
+          src={POSTER_SRC}
+          alt={alt}
+          loading={loading}
+          className={`${className} ${mediaClasses}`}
+        />
+      ) : (
+        <div 
+          ref={lottieContainerRef}
+          className={`${className} ${mediaClasses}`}
+          aria-label={alt}
+        />
+      )}
+    </div>
   );
 }
