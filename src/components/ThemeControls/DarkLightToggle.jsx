@@ -3,17 +3,15 @@ import { CircleCheckbox } from "./checkboxes/CircleCheckbox";
 import { UseMode } from "../../hooks/theme/UseMode.js";
 
 export default function ThemeToggle() {
-  const moonSize = 14;
-  const sunSize = 18;
   const [isLight, setIsLight] = UseMode();
   const maskId = useId();
 
   // Match sun's center disc
-  const R = 18; // outer radius (same as sun disc)
+  const R = 18;       // outer radius (same as sun disc)
   const ratio = 0.69; // inner/outer radius ratio = slim crescent
   const rIn = R * ratio; // inner cutout radius
-  const dx = -R * 0.4; // flip horizontally so the crescent faces the other way
-  const dy = R * -0.2; // y-offset of cutout
+  const dx = -R * 0.4;   // flip horizontally so the crescent faces the other way
+  const dy = R * -0.2;   // y-offset of cutout
 
   return (
     <div className="flex items-center gap-2">
@@ -26,11 +24,9 @@ export default function ThemeToggle() {
         {/* Dark icon (moon) */}
         <div className="light:hidden dark:block">
           <svg
-            width={moonSize}
-            height={moonSize}
             viewBox="32 32 36 36" // tightly wraps a circle at (50,50) r=18
             xmlns="http://www.w3.org/2000/svg"
-            className="block"
+            className="block w-4 h-4 sm:w-[14px] sm:h-[14px]" // 16px on mobile, 14px at sm+
           >
             <defs>
               <mask id={maskId}>
@@ -49,15 +45,13 @@ export default function ThemeToggle() {
           </svg>
         </div>
 
-        {/* Light icon (sun) — unchanged */}
+        {/* Light icon (sun) */}
         <div className="light:block dark:hidden">
           <svg
-            width={sunSize}
-            height={sunSize}
             viewBox="13 13 74 74" // crops to the ray tips (includes stroke caps)
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="block" // kills baseline gap
+            className="block w-5 h-5 sm:w-[18px] sm:h-[18px]" // 20px on mobile, 18px at sm+
           >
             <circle cx="50" cy="50" r="18" fill="var(--color-primary)" />
             <g
