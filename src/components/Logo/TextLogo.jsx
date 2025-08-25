@@ -8,7 +8,7 @@ const TextLogo = forwardRef(function TextLogo(
   {
     title = "",
     className = "",
-    firstClass = "text-xl md:text-2xl lg:text-3xl -ml-[0.1rem] leading-wide font-bold",
+    firstClass = "text-2xl lg:text-3xl -ml-[0.1rem] leading-wide font-bold",
     restClass  = "font-light text-accent uppercase text-xs lg:text-sm p-0 m-0 tracking-wider",
     fadeDuration = 1200,
     hidden = false,
