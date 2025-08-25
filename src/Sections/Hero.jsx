@@ -9,7 +9,7 @@ const heroTaglines = [
   { before: "Build Your ", emphasized: "Digital Empire", after: " with Griffin's Web Services" },
   { before: "Leave Your Competition ", emphasized: "In the Dust", after: " with a Blazing Fast Website" },
   { before: "Your Business Deserves a ", emphasized: "Professional Website", after: " That Delivers." },
-  { before: "Boost Your Business with a ", emphasized: "Lightning-Fast Website" },
+  { before: "Boost Your Business with a ", emphasized: "Lightning-Fast", after: " Website" },
   { before: "Get a High-Performing Website That ", emphasized: "Loads in Seconds", after: " — Not Minutes" }
 ];
 
@@ -24,10 +24,11 @@ const Hero = () => {
   return (
     <section className="min-h-screen flex items-center justify-center text-center px-5 pt-32 pb-20 bg-bg relative">
       <div className="absolute inset-0 hero-gradient-bg"></div>
-      <div className="inner-section relative z-10 text-left lg:text-center">
+      <div className="inner-section mx-5 relative z-10 text-left lg:text-center">
+        
         <Heading
           tagName="h1"
-          className="mb-2"
+          className="mb-2 mr-10 lg:mr-0"
           before={tagline.before}
           text={tagline.emphasized}
           textClass="emphasized-text"
@@ -36,6 +37,7 @@ const Hero = () => {
         <p className="hero-text text-text mb-8 max-w-4xl mx-auto">
           {siteData.description}
         </p>
+        
         <div className="flex flex-col">
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
             <Button variant="primary" href="#contact">
