@@ -38,11 +38,11 @@ const Logo = ({
 
   return (
     <a href="/" className="flex justify-center items-center gap-1.5">
-      {/* <LottieLogo
+      <LottieLogo
         alt="Griffin's Web Services Animated Logo"
         loading={loading}
         trigger={trigger}
-      /> */}
+      />
       <div>
         <TextLogo
           ref={textRef}
