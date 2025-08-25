@@ -15,7 +15,7 @@ import LOGO_ANIMATION from "../../Lotties/Animation_logo_small_size.json";
 export default function LottieLogo({
   alt = "",
   className = "logo-class", 
-  mediaClasses = "block w-[35px] p-0 m-0 md:w-[40px] lg:w-[45px] h-auto",
+  mediaClasses = "block w-[40px] lg:w-[45px] h-auto",
   loading = "lazy",
   trigger = "auto",
   respectReducedMotion = true,
