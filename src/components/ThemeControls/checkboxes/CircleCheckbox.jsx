@@ -15,7 +15,7 @@ export function CircleCheckbox({ checked, className = "circle-box", onChange, la
       
       {/* 2. The visible circle with theme-aware border and children support */}
       <span
-        className={`${className} w-9 h-9 rounded-full transition-all flex items-center justify-center relative`}
+        className={`${className} w-7 h-7 lg:w-9 lg:h-9 rounded-full transition-all flex items-center justify-center relative`}
       >
         {children}
       </span>
