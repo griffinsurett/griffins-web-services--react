@@ -11,17 +11,15 @@
     <!-- Let the UA know we support both schemes -->
     <meta name="color-scheme" content="dark light" />
 
+    <!-- iOS Status Bar Style -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
     <!-- Pre-paint theme/accent bootstrap (prevents flash of wrong theme) -->
     <script>
       (() => {
         try {
           const root = document.documentElement;
-
-          // Semi-transparent equivalent colors for mobile status bar
-          const themeColors = {
-            light: "#f5f5f5", // Equivalent to bg-bg/50 in light mode
-            dark: "#0a0a0a",  // Equivalent to bg-bg/50 in dark mode
-          };
 
           // Resolve theme: localStorage -> OS preference -> dark
           const ls = localStorage.getItem("theme");
@@ -38,8 +36,19 @@
           root.setAttribute("data-theme", theme);
           root.style.colorScheme = theme;
 
-          // Use semi-transparent equivalent color for mobile status bar
-          root.style.setProperty("--color-bg", themeColors[theme]);
+          // Calculate semi-transparent background equivalent
+          // For bg-bg/50 effect, we blend bg with opposite color at 50% opacity
+          const lightBg = "#fafafa";  // Your light theme bg
+          const darkBg = "#000000";   // Your dark theme bg
+          
+          // Semi-transparent effect: blend bg with opposite at 50%
+          const semiTransparentBg = theme === "light" 
+            ? "#f5f5f5"  // Slightly darker than pure light bg
+            : "#0a0a0a";  // Slightly lighter than pure dark bg
+
+          // Provide the background vars
+          root.style.setProperty("--color-bg", theme === "light" ? lightBg : darkBg);
+          root.style.setProperty("--color-bg-semi", semiTransparentBg);
 
           // If user picked an accent previously, set it pre-paint
           const accent = localStorage.getItem("accent");
@@ -70,7 +79,7 @@
     <link rel="manifest" href="/favicons/site.webmanifest" />
 
     <!-- Windows tiles -->
-    <meta name="msapplication-TileColor" content="#0a0a0a" />
+    <meta name="msapplication-TileColor" content="#000000" />
 
     <!-- SEO -->
     <meta
@@ -78,20 +87,21 @@
       content="Griffin's Web Services offers fast performing, mobile responsive, and high-quality websites."
     />
 
-    <!-- Initial status bar color with semi-transparent equivalent -->
+    <!-- Initial status bar color with semi-transparent effect -->
     <meta name="theme-color" content="#0a0a0a" />
 
-    <!-- Keep <meta name="theme-color"> synced with current CSS --color-bg -->
+    <!-- Keep <meta name="theme-color"> synced with current CSS --color-bg-semi -->
     <script>
       (() => {
         const meta = document.querySelector('meta[name="theme-color"]');
         if (!meta) return;
 
         const update = () => {
-          const bg = getComputedStyle(document.documentElement)
-            .getPropertyValue("--color-bg")
+          // Use the semi-transparent background variable
+          const bgSemi = getComputedStyle(document.documentElement)
+            .getPropertyValue("--color-bg-semi")
             .trim();
-          if (bg) meta.setAttribute("content", bg);
+          if (bgSemi) meta.setAttribute("content", bgSemi);
         };
 
         if (document.readyState === "loading") {

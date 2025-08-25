@@ -6,8 +6,7 @@ import useLocalStorageState from "../useLocalStorageState";
  * Theme hook — mirrors how accent color is handled:
  * - Sets `data-theme` + `color-scheme` on <html>
  * - Updates CSS var `--color-bg` for the <meta name="theme-color"> updater
- * - Persists the user's choice in localStorage
- * - Uses semi-transparent equivalent colors for mobile status bar
+ * - Persists the user’s choice in localStorage
  */
 export function UseMode() {
   // Initial: localStorage > OS preference (light?) > dark fallback
@@ -28,24 +27,17 @@ export function UseMode() {
   const isLight = theme === "light";
   const setIsLight = (val) => setTheme(val ? "light" : "dark");
 
-  // Calculate semi-transparent equivalent colors for theme-color meta tag
-  // Since theme-color doesn't support alpha, we simulate bg-bg/50 with solid colors
-  const themeColors = useMemo(() => ({
-    light: "#f5f5f5", // Equivalent to 50% opacity #fafafa over white
-    dark: "#0a0a0a",  // Equivalent to 50% opacity #000000 over typical dark UI
-  }), []);
-
   // Apply to <html> whenever it changes
   useEffect(() => {
     const root = document.documentElement;
     const t = isLight ? "light" : "dark";
-    
+
     root.setAttribute("data-theme", t);
     root.style.colorScheme = t;
-    
-    // Set the theme color for mobile status bar (simulating bg-bg/50)
-    root.style.setProperty("--color-bg", themeColors[t]);
-  }, [isLight, themeColors]);
+
+    // Keep CSS var in sync so the head script updates <meta name="theme-color">
+    root.style.setProperty("--color-bg", t === "light" ? "#fafafa" : "#000000");
+  }, [isLight]);
 
   // Follow OS changes only if user hasn't explicitly saved a preference
   useEffect(() => {
@@ -58,7 +50,6 @@ export function UseMode() {
         }
       } catch {}
     };
-
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, [setTheme]);
