@@ -17,6 +17,12 @@
         try {
           const root = document.documentElement;
 
+          // Semi-transparent equivalent colors for mobile status bar
+          const themeColors = {
+            light: "#f5f5f5", // Equivalent to bg-bg/50 in light mode
+            dark: "#0a0a0a",  // Equivalent to bg-bg/50 in dark mode
+          };
+
           // Resolve theme: localStorage -> OS preference -> dark
           const ls = localStorage.getItem("theme");
           const prefersLight =
@@ -32,11 +38,8 @@
           root.setAttribute("data-theme", theme);
           root.style.colorScheme = theme;
 
-          // Provide the background var used by CSS/hooks so first paint matches
-          root.style.setProperty(
-            "--color-bg",
-            theme === "light" ? "#fafafa" : "#000000"
-          );
+          // Use semi-transparent equivalent color for mobile status bar
+          root.style.setProperty("--color-bg", themeColors[theme]);
 
           // If user picked an accent previously, set it pre-paint
           const accent = localStorage.getItem("accent");
@@ -67,7 +70,7 @@
     <link rel="manifest" href="/favicons/site.webmanifest" />
 
     <!-- Windows tiles -->
-    <meta name="msapplication-TileColor" content="#000000" />
+    <meta name="msapplication-TileColor" content="#0a0a0a" />
 
     <!-- SEO -->
     <meta
@@ -75,8 +78,8 @@
       content="Griffin's Web Services offers fast performing, mobile responsive, and high-quality websites."
     />
 
-    <!-- Initial status bar color; kept in sync with --color-bg below -->
-    <meta name="theme-color" content="#000000" />
+    <!-- Initial status bar color with semi-transparent equivalent -->
+    <meta name="theme-color" content="#0a0a0a" />
 
     <!-- Keep <meta name="theme-color"> synced with current CSS --color-bg -->
     <script>
