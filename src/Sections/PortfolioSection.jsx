@@ -8,7 +8,7 @@ import FariasDesktop from "../assets/FariasDemolition/Farias-Desktop.jpg";
 import JSVDesktop from "../assets/JSV-Quick-Solar/JSV-Desktop.jpg";
 import PablosDesktop from "../assets/PablosPeakRoofing/Pablos-Desktop.jpg";
 import RoonysDesktop from "../assets/RoonysMarketing/Roonys-Desktop.jpg";
-import KoiDesktop from "../assets/KoiRoofingandSolar/koiroofingandsolar.com-desktop.jpg"
+// import KoiDesktop from "../assets/KoiRoofingandSolar/koiroofingandsolar.com-desktop.jpg"
 import CleanomaticFl from "../assets/Cleanomatic/cleanomaticfl.com-desktop.jpg"
 
 export default function PortfolioSection() {
@@ -16,7 +16,7 @@ export default function PortfolioSection() {
 
   const items = [
     { id: 1, title: "Pronto Junk Removal", image: ProntoDesktop },
-    { id: 2, title: "Koi Roofing and Solar", image: KoiDesktop },
+    // { id: 2, title: "Koi Roofing and Solar", image: KoiDesktop },
     { id: 3, title: "Roonys Marketing", image: RoonysDesktop },
     { id: 4, title: "Faria's Demolition", image: FariasDesktop },
     { id: 5, title: "Cleanomatic Fl LLC", image: CleanomaticFl },

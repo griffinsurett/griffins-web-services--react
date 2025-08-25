@@ -21,7 +21,7 @@ export default function BorderTitle({
     duration, // fade length
     delay: 0,
     threshold: 0, // flip as soon as it's on screen
-    rootMargin: "0px 0px -15% 0px",
+    rootMargin: "0px 0px -15px 0px",
   });
 
   return (

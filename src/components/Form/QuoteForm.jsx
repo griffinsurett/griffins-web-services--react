@@ -37,7 +37,7 @@ const DEFAULT_TIMELINES = [
 export default function QuoteForm({
   action = "https://formspree.io/f/mjkgojyo",
   method = "POST",
-  className = "group section-box card-bg outer-card-transition md:mx-5 lg:mx-10 flex flex-col",
+  className = "group section-box card-bg outer-card-transition md:mx-5 lg:mx-10 xl:mx-15 flex flex-col",
   websiteTypeOptions = WEBSITE_TYPE_OPTIONS,
   budgetOptions = DEFAULT_BUDGETS,
   timelineOptions = DEFAULT_TIMELINES,
