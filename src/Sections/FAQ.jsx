@@ -19,49 +19,61 @@ const FAQ = () => {
         "Our ongoing support includes 24/7 monitoring, security updates, content updates, technical support, regular backups, performance optimization, and monthly analytics reports. We're basically your dedicated web team, ensuring your site stays fast, secure, and up-to-date.",
     },
     {
-      question: "Can you redesign my current site or do you only build from scratch?",
-      answer: "Both. We’ll audit what you have and recommend the fastest path to better results—refresh, rebuild, or migrate."
+      question:
+        "Can you redesign my current site or do you only build from scratch?",
+      answer:
+        "Both. We’ll audit what you have and recommend the fastest path to better results—refresh, rebuild, or migrate.",
     },
     {
       question: "Will my website be mobile-friendly?",
-      answer: "Absolutely. We design mobile-first so your site looks great and converts on phones, tablets, and desktops."
+      answer:
+        "Absolutely. We design mobile-first so your site looks great and converts on phones, tablets, and desktops.",
     },
     {
       question: "Do you handle hosting and maintenance?",
-      answer: "Yes. We offer managed hosting and ongoing care—security updates, backups, monitoring, and speed tuning—so you don’t have to worry about it."
+      answer:
+        "Yes. We offer managed hosting and ongoing care—security updates, backups, monitoring, and speed tuning—so you don’t have to worry about it.",
     },
     {
       question: "Can you help with the words and images?",
-      answer: "Yes. We offer copywriting and content services, plus guidance on images and brand assets. We can also source stock if needed."
+      answer:
+        "Yes. We offer copywriting and content services, plus guidance on images and brand assets. We can also source stock if needed.",
     },
     {
       question: "Do you set up Google Business and social accounts?",
-      answer: "Yes. We can set up and optimize Google Business, Facebook/Instagram, TikTok Shop, and more so customers can find you."
+      answer:
+        "Yes. We can set up and optimize Google Business, Facebook/Instagram, TikTok Shop, and more so customers can find you.",
     },
     {
       question: "Do you build online stores?",
-      answer: "Yes. We create secure shops with products, payments, shipping/tax rules, and inventory. We also connect your CRM, email, and analytics.",
+      answer:
+        "Yes. We create secure shops with products, payments, shipping/tax rules, and inventory. We also connect your CRM, email, and analytics.",
     },
     {
       question: "Can you connect forms, bookings, or a CRM?",
-      answer: "Definitely. We build lead forms, bookings, and integrations with CRMs and calendars so data lands where you need it."
+      answer:
+        "Definitely. We build lead forms, bookings, and integrations with CRMs and calendars so data lands where you need it.",
     },
     {
       question: "Will my site be secure?",
-      answer: "Yes. We use SSL, hardened hosting, regular updates, malware scans, and daily backups. We also recommend best practices for logins and roles."
+      answer:
+        "Yes. We use SSL, hardened hosting, regular updates, malware scans, and daily backups. We also recommend best practices for logins and roles.",
     },
     {
       question: "Do you do SEO?",
-      answer: "We build SEO-ready sites (clean structure, fast load, on-page best practices) and can provide ongoing SEO and content plans if you want to grow."
+      answer:
+        "We build SEO-ready sites (clean structure, fast load, on-page best practices) and can provide ongoing SEO and content plans if you want to grow.",
     },
     {
       question: "What about “AI SEO” and ChatGPT visibility?",
-      answer: "We structure content and metadata so your brand is easier for AI systems to understand and surface, then refine based on real queries."
+      answer:
+        "We structure content and metadata so your brand is easier for AI systems to understand and surface, then refine based on real queries.",
     },
     {
       question: "How do we get started?",
-      answer: "Send a quick message through the contact form. We’ll schedule a short call, outline your options, and deliver a clear plan and quote."
-    }
+      answer:
+        "Send a quick message through the contact form. We’ll schedule a short call, outline your options, and deliver a clear plan and quote.",
+    },
   ];
 
   return (
@@ -82,22 +94,22 @@ const FAQ = () => {
 
         <div className="space-y-4">
           {faqs.map((faq, idx) => (
-        <AnimatedElementWrapper
-            key={`faq-${idx}`}
-            variant="fade-in"
-            animationDuration={600}
-            animationDelay={idx *300} // ⬅️ same stagger you had
-            threshold={0.2}
-            rootMargin="0px 0px -50px 0px" // early trigger
-            once={false}
-          >
-            <AccordionItem
-              key={idx}
-              data={faq}
-              name="faq" // shared group -> one open at a time
-              value={String(idx)} // radio value
-              defaultOpen={idx === 0} // open the first by default (optional)
-            />
+            <AnimatedElementWrapper
+              key={`faq-${idx}`}
+              variant="fade-in"
+              animationDuration={600}
+              animationDelay={idx * 300} // ⬅️ same stagger you had
+              threshold={0.2}
+              rootMargin="0px 0px -50px 0px" // early trigger
+              once={false}
+            >
+              <AccordionItem
+                key={idx}
+                data={faq}
+                name="faq" // shared group -> one open at a time
+                value={String(idx)} // radio value
+                defaultOpen={idx === 0} // open the first by default (optional)
+              />
             </AnimatedElementWrapper>
           ))}
         </div>

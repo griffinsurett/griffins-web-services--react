@@ -8,9 +8,7 @@ import Logo from "../components/Logo/Logo";
 import Heading from "../components/Heading";
 
 // Enhanced Tailwind patterns for better design
-const footerContainer = "w-95/100 mx-auto px-6 lg:px-8";
-const containerJustify = "lg:justify-between";
-const flexRowToCol = "flex flex-col lg:flex-row";
+const topfooterContainer = "w-95/100 mx-auto px-6 lg:px-8";
 const mainTopFootContainer = "flex flex-col items-start";
 const menuLabel = "text-text font-semibold text-xl mb-2";
 
@@ -30,10 +28,10 @@ export default function Footer() {
       <div className="section-color-border"></div>
 
       {/* Main Footer Content */}
-      <div className={footerContainer}>
+      <div>
         {/* Top Section - Logo, Description, Contact */}
         <div
-          className={`flex flex-wrap lg:justify-between sm:justify-center justify-start w-full gap-12 lg:gap-6 py-16 lg:py-20`}
+          className={`flex flex-wrap lg:justify-between sm:justify-center justify-start ${topfooterContainer} gap-12 lg:gap-6 py-16 lg:py-20`}
         >
           {/* Logo & Description */}
           <div className={`${mainTopFootContainer} space-y-3 max-w-md`}>
@@ -111,10 +109,9 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-gradient-to-r from-transparent via-accent/20 to-transparent"></div>
-
         {/* Bottom Section - Navigation, Copyright, Social */}
-        <div className="py-5">
+        <div className="py-5 bg-bg2 border-t mx-auto w-90/100 border-accent/20">
+          {/* Optional: Subtle bottom glow effect */}
           <div
             className={`flex justify-center items-center text-center space-y-8 lg:space-y-0`}
           >
@@ -125,9 +122,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Optional: Subtle bottom glow effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent"></div>
     </footer>
   );
 }

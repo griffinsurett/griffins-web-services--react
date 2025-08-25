@@ -11,10 +11,6 @@
     <!-- Let the UA know we support both schemes -->
     <meta name="color-scheme" content="dark light" />
 
-    <!-- iOS Status Bar Style -->
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-
     <!-- Pre-paint theme/accent bootstrap (prevents flash of wrong theme) -->
     <script>
       (() => {
@@ -36,19 +32,11 @@
           root.setAttribute("data-theme", theme);
           root.style.colorScheme = theme;
 
-          // Calculate semi-transparent background equivalent
-          // For bg-bg/50 effect, we blend bg with opposite color at 50% opacity
-          const lightBg = "#fafafa";  // Your light theme bg
-          const darkBg = "#000000";   // Your dark theme bg
-          
-          // Semi-transparent effect: blend bg with opposite at 50%
-          const semiTransparentBg = theme === "light" 
-            ? "#f5f5f5"  // Slightly darker than pure light bg
-            : "#0a0a0a";  // Slightly lighter than pure dark bg
-
-          // Provide the background vars
-          root.style.setProperty("--color-bg", theme === "light" ? lightBg : darkBg);
-          root.style.setProperty("--color-bg-semi", semiTransparentBg);
+          // Provide the background var used by CSS/hooks so first paint matches
+          root.style.setProperty(
+            "--color-bg",
+            theme === "light" ? "#fafafa" : "#000000"
+          );
 
           // If user picked an accent previously, set it pre-paint
           const accent = localStorage.getItem("accent");
@@ -87,21 +75,20 @@
       content="Griffin's Web Services offers fast performing, mobile responsive, and high-quality websites."
     />
 
-    <!-- Initial status bar color with semi-transparent effect -->
-    <meta name="theme-color" content="#0a0a0a" />
+    <!-- Initial status bar color; kept in sync with --color-bg below -->
+    <meta name="theme-color" content="#000000" />
 
-    <!-- Keep <meta name="theme-color"> synced with current CSS --color-bg-semi -->
+    <!-- Keep <meta name="theme-color"> synced with current CSS --color-bg -->
     <script>
       (() => {
         const meta = document.querySelector('meta[name="theme-color"]');
         if (!meta) return;
 
         const update = () => {
-          // Use the semi-transparent background variable
-          const bgSemi = getComputedStyle(document.documentElement)
-            .getPropertyValue("--color-bg-semi")
+          const bg = getComputedStyle(document.documentElement)
+            .getPropertyValue("--color-bg")
             .trim();
-          if (bgSemi) meta.setAttribute("content", bgSemi);
+          if (bg) meta.setAttribute("content", bg);
         };
 
         if (document.readyState === "loading") {

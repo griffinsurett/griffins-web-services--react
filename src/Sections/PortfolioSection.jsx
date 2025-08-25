@@ -9,7 +9,7 @@ import JSVDesktop from "../assets/JSV-Quick-Solar/JSV-Desktop.jpg";
 import PablosDesktop from "../assets/PablosPeakRoofing/Pablos-Desktop.jpg";
 import RoonysDesktop from "../assets/RoonysMarketing/Roonys-Desktop.jpg";
 // import KoiDesktop from "../assets/KoiRoofingandSolar/koiroofingandsolar.com-desktop.jpg"
-import CleanomaticFl from "../assets/Cleanomatic/cleanomaticfl.com-desktop.jpg"
+import CleanomaticFl from "../assets/Cleanomatic/cleanomaticfl.com-desktop.jpg";
 
 export default function PortfolioSection() {
   const sectionRef = useRef(null);

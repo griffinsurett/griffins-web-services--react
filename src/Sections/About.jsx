@@ -23,7 +23,7 @@ const About = () => {
       title: "Ongoing Support",
       description:
         "Dedicated hosting and maintenance to ensure your website remains up-to-date, secure, and optimized for performance.",
-    }
+    },
   ];
 
   return (
@@ -31,21 +31,22 @@ const About = () => {
       <div className="section-dim-border"></div>
       <div className="inner-section">
         <div className="text-section">
-      <Heading
-        tagName="h2"
-        className="mb-6 h1"
-        before="Websites aren't just something we do. "
-        text="They're our specialty."
-        // textClass="emphasized-text"
-      />
-      
-      <p className="text-xl lg:text-2xl leading-relaxed mb-8">
-      While others juggle dozens of services, we've mastered one: building lightning-fast, 
-        secure, and scalable sites that turn visitors into customers. Every site delivers 
-        peak performance, handles your marketing campaigns, integrates with AI and modern tools, 
-        and stands the test of time.
-      </p>
-    </div>
+          <Heading
+            tagName="h2"
+            className="mb-6 h1"
+            before="Websites aren't just something we do. "
+            text="They're our specialty."
+            // textClass="emphasized-text"
+          />
+
+          <p className="text-xl lg:text-2xl leading-relaxed mb-8">
+            While others juggle dozens of services, we've mastered one: building
+            lightning-fast, secure, and scalable sites that turn visitors into
+            customers. Every site delivers peak performance, handles your
+            marketing campaigns, integrates with AI and modern tools, and stands
+            the test of time.
+          </p>
+        </div>
 
         <div className="max-3-secondary">
           {Services.map((item, idx) => (
