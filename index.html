@@ -1,11 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0" />
-    <title>Griffin's Web Services | Fast Performing | Mobile Responsive | Best Websites</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Griffin's Web Services | Fast Performing | Mobile Responsive | Best
+      Websites
+    </title>
 
     <!-- Let the UA know we support both schemes -->
     <meta name="color-scheme" content="dark light" />
@@ -18,14 +19,24 @@
 
           // Resolve theme: localStorage -> OS preference -> dark
           const ls = localStorage.getItem("theme");
-          const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
-          const theme = (ls === "light" || ls === "dark") ? ls : (prefersLight ? "light" : "dark");
+          const prefersLight =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: light)").matches;
+          const theme =
+            ls === "light" || ls === "dark"
+              ? ls
+              : prefersLight
+              ? "light"
+              : "dark";
 
           root.setAttribute("data-theme", theme);
           root.style.colorScheme = theme;
 
           // Provide the background var used by CSS/hooks so first paint matches
-          root.style.setProperty("--color-bg", theme === "light" ? "#fafafa" : "#000000");
+          root.style.setProperty(
+            "--color-bg",
+            theme === "light" ? "#fafafa" : "#000000"
+          );
 
           // If user picked an accent previously, set it pre-paint
           const accent = localStorage.getItem("accent");
@@ -36,9 +47,23 @@
 
     <!-- Favicons -->
     <link rel="shortcut icon" href="/favicons/favicon.ico" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/favicons/favicon-16x16.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/favicons/favicon-32x32.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/favicons/apple-touch-icon.png"
+    />
     <link rel="manifest" href="/favicons/site.webmanifest" />
 
     <!-- Windows tiles -->
@@ -47,7 +72,8 @@
     <!-- SEO -->
     <meta
       name="description"
-      content="Griffin's Web Services offers fast performing, mobile responsive, and high-quality websites." />
+      content="Griffin's Web Services offers fast performing, mobile responsive, and high-quality websites."
+    />
 
     <!-- Initial status bar color; kept in sync with --color-bg below -->
     <meta name="theme-color" content="#000000" />

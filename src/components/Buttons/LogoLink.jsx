@@ -1,9 +1,9 @@
-// src/components/buttons/UnderlineLink.jsx
+// src/components/buttons/Link.jsx
 import React from "react";
 import Logo from "../../assets/GWS-animated.png";
 import siteData from "../../siteData";
 
-const UnderlineLink = ({
+const Link = ({
   Base = "a",
   className = "",
   underlineColor = "currentColor",
@@ -34,7 +34,7 @@ const UnderlineLink = ({
     ? "after:w-0 group-hover:after:w-full focus-visible:after:w-full"
     : "after:w-full";
 
-     const hasIcon = rollIcon !== false && rollIcon != null;
+  const hasIcon = rollIcon !== false && rollIcon != null;
 
   const defaultIcon = (
     <img
@@ -83,4 +83,4 @@ const UnderlineLink = ({
   );
 };
 
-export default UnderlineLink;
+export default Link;

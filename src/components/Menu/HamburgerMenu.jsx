@@ -1,7 +1,7 @@
 // src/components/Menu/HamburgerMenu.jsx
 import React from "react";
 import Modal from "../Modal";
-import UnderlineLink from "../LoopComponents/Link";
+import LogoLink from "../Buttons/LogoLink";
 
 const navItems = [
   { label: "Home", href: "/#home" },
@@ -61,14 +61,14 @@ export default function HamburgerMenu({ checkboxId = "nav-toggle" }) {
           <ul className="flex flex-col items-center space-y-6 text-center">
             {navItems.map((item) => (
               <li key={item.label}>
-                <UnderlineLink
+                <LogoLink
                   href={item.href}
                   className="text-3xl md:text-4xl font-bold hover:text-accent transition-colors duration-300"
                   rollIcon={true}
                   onClick={handleNavClick}
                 >
                   {item.label}
-                </UnderlineLink>
+                </LogoLink>
               </li>
             ))}
           </ul>

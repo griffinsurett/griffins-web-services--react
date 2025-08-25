@@ -1,10 +1,10 @@
 // src/components/LoopComponents/ContactItem.jsx
-import UnderlineLink from "./UnderlineLink";
+import LogoLink from "./LogoLink";
 
 export default function ContactItem({ data }) {
   const { href, label, icon: Icon } = data;
   return (
-    <UnderlineLink
+    <LogoLink
       href={href}
       className="
        text-text text-xl lg:text-2xl
@@ -14,6 +14,6 @@ export default function ContactItem({ data }) {
     >
       <Icon />
       {label}
-    </UnderlineLink>
+    </LogoLink>
   );
 }

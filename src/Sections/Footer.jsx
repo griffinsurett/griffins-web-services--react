@@ -2,7 +2,7 @@
 import React from "react";
 import IconListItem from "../components/LoopComponents/IconListItem";
 import SocialLink from "../components/LoopComponents/SocialLink";
-import UnderlineLink from "../components/LoopComponents/Link";
+import LogoLink from "../components/Buttons/LogoLink";
 import { siteData, contactItems, socialMediaLinks } from "../siteData";
 import Logo from "../components/Logo/Logo";
 import Heading from "../components/Heading";
@@ -50,13 +50,13 @@ export default function Footer() {
             </Heading>
             <nav className="gap-4 flex flex-col">
               {footerNav.map((item) => (
-                <UnderlineLink
+                <LogoLink
                   key={item.label}
                   href={item.href}
                   className="text-text/80 hover:text-accent transition-all duration-300 font-medium"
                 >
                   {item.label}
-                </UnderlineLink>
+                </LogoLink>
               ))}
             </nav>
           </div>
@@ -70,7 +70,7 @@ export default function Footer() {
             </Heading>
             <nav className="flex flex-col gap-2">
               {contactItems.map((item, index) => (
-                <UnderlineLink
+                <LogoLink
                   key={item.href}
                   href={item.href}
                   className="group flex items-center justify-start lg:justify-end"
@@ -90,16 +90,16 @@ export default function Footer() {
                     showDescription={false}
                     containerClassName="flex items-center"
                   />
-                </UnderlineLink>
+                </LogoLink>
               ))}
             </nav>
-                {/* Social Links */}
+            {/* Social Links */}
             <div className="flex items-center gap-4">
               {/* <span className="text-text/60 text-sm font-medium mr-2 hidden sm:block">
                 Follow Us:
               </span> */}
               {socialMediaLinks.map((item) => (
-                <div 
+                <div
                   key={item.name}
                   className="transform hover:scale-110 transition-transform duration-200"
                 >
