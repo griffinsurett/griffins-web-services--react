@@ -5,13 +5,12 @@ import Heading from "../components/Heading";
 import { siteData } from "../siteData";
 
 const heroTaglines = [
-  { before: "Turn Visitors Into ", emphasized: "Paying Customers", after: " with Griffin's Web Services" },
   { before: "Get a Website That ", emphasized: "Actually Sells", after: " for Your Business" },
   { before: "Build Your ", emphasized: "Digital Empire", after: " with Griffin's Web Services" },
-  { before: "Transform Your Business with a ", emphasized: "High-Performance Website", after: " That Converts" },
+  // { before: "Transform Your Business with a ", emphasized: "High-Performance Website", after: " That Converts" },
   { before: "Leave Your Competition ", emphasized: "In the Dust", after: " with a Blazing Fast Website" },
-  { before: "Your Business Deserves a ", emphasized: "Professional Website", after: " That Delivers Results" },
-  { before: "Boost Your Business with a ", emphasized: "Lightning-Fast Website", after: " Built Right!" },
+  { before: "Your Business Deserves a ", emphasized: "Professional Website", after: " That Delivers." },
+  { before: "Boost Your Business with a ", emphasized: "Lightning-Fast Website" },
   { before: "Get a High-Performing Website That ", emphasized: "Loads in Seconds", after: " — Not Minutes" }
 ];
 
